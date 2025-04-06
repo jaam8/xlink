@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+option go_package = "pkg/api/shortener";
+
+package api;
+
+service ShortenerService {
+  rpc Redirect(Url) returns (Url);
+  rpc CreateNewLink(CreateLinkRequest) returns (Link);
+  rpc UpdateLink(UpdateLinkRequest) returns (Link);
+  rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse);
+}
+
+message CreateLinkRequest {
+  string user_id = 1;
+  optional string group_id = 2;
+  bool generated = 3;
+  string short_link = 4;
+  string url = 5;
+  optional string expire_at = 6;
+}
+
+message UpdateLinkRequest {
+  string id = 1;
+  string user_id = 2;
+  optional string group_id = 3;
+  bool generated = 4;
+  string short_link = 5;
+  string url = 6;
+  optional string expire_at = 7;
+}
+
+message DeleteLinkRequest {
+  string id = 1;
+}
+
+message Link {
+  string id = 1;
+  string user_id = 2;
+  optional string group_id = 3;
+  bool generated = 4;
+  string short_link = 5;
+  string url = 6;
+  string created_at = 7;
+  string expire_at = 8;
+}
+
+message Url {
+  string url = 1;
+}
+
+message DeleteLinkResponse {
+  bool status = 1;
+}
