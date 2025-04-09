@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option go_package = "pkg/api/tokenservice";
+
+package api;
+
+service TokenService {
+  rpc TokenCheck(TokenCheckRequest) returns (TokenDeleteResponse);
+
+  rpc TokenCreate(TokenRequest) returns (TokenCreateResponse);
+
+  rpc TokenDelete(TokenRequest) returns (TokenDeleteResponse);
+}
+
+message TokenRequest {
+  string user_id = 1;
+}
+
+message TokenCheckRequest {
+  string user_id = 1;
+  string token = 2;
+}
+
+message TokenCheckResponse {
+  bool status = 1;
+}
+
+message TokenCreateResponse {
+  string token = 1;
+}
+
+message TokenDeleteResponse {
+  bool status = 1;
+}
