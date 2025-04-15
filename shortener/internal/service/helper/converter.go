@@ -2,16 +2,18 @@ package helper
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"shortener/internal/models"
 	"shortener/pkg/api/shortener"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func LinkResponseFromLinkModel(link models.Link) *shortener.Link {
-	var GroupId *string = nil
+	var GroupId *string
 	if link.GroupId != nil {
-		*GroupId = link.GroupId.String()
+		str := link.GroupId.String()
+		GroupId = &str
 	}
 
 	return &shortener.Link{

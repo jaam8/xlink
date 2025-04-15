@@ -10,6 +10,5 @@ type LinkBodyRequest interface {
 }
 
 type LinkBodyRequestWithId interface {
-	*LinkBodyRequest
 	GetId() string
 }
