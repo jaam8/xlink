@@ -2,10 +2,11 @@ package helper
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func GetValidatedId(request LinkBodyRequestOnlyId) (uuid.UUID, error) {
