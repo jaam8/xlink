@@ -9,6 +9,11 @@ type LinkBodyRequest interface {
 	GetExpireAt() string
 }
 
-type LinkBodyRequestWithId interface {
+type LinkBodyRequestOnlyId interface {
 	GetId() string
+}
+
+type LinkBodyRequestWithId interface {
+	LinkBodyRequest
+	LinkBodyRequestOnlyId
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetValidatedId(request LinkBodyRequestWithId) (uuid.UUID, error) {
+func GetValidatedId(request LinkBodyRequestOnlyId) (uuid.UUID, error) {
 	var id uuid.UUID
 	var err error
 
