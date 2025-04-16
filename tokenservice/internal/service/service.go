@@ -61,6 +61,22 @@ func (s *Service) CreateToken(ctx context.Context, req *tokenservice.TokenReques
 	return &tokenservice.TokenCreateResponse{Token: newToken}, nil
 }
 
+func (s *Service) GetUserIDByToken(ctx context.Context, req *tokenservice.TokenGetUserIDRequest) (*tokenservice.TokenGetUserIDResponse, error) {
+	if len(req.Token) == 0 {
+		return nil, fmt.Errorf("user id is empty")
+	}
+	userId, err := s.tokensRepo.GetUserIdByToken(req.Token)
+	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't get userId by token",
+			zap.String(tokenKey, req.Token),
+			zap.Error(err),
+		)
+		return nil, fmt.Errorf("couldn't get userId by token '%s': %v", req.Token, err)
+	}
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "got userId by token", zap.String(tokenKey, req.Token))
+	return &tokenservice.TokenGetUserIDResponse{UserId: userId}, nil
+}
+
 func (s *Service) DeleteToken(ctx context.Context, req *tokenservice.TokenRequest) (*tokenservice.TokenDeleteResponse, error) {
 	if len(req.UserId) == 0 {
 		return nil, fmt.Errorf("user id is empty")

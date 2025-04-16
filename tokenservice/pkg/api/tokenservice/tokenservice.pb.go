@@ -65,6 +65,94 @@ func (x *TokenRequest) GetUserId() string {
 	return ""
 }
 
+type TokenGetUserIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TokenGetUserIDRequest) Reset() {
+	*x = TokenGetUserIDRequest{}
+	mi := &file_api_tokenservice_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TokenGetUserIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TokenGetUserIDRequest) ProtoMessage() {}
+
+func (x *TokenGetUserIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_tokenservice_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TokenGetUserIDRequest.ProtoReflect.Descriptor instead.
+func (*TokenGetUserIDRequest) Descriptor() ([]byte, []int) {
+	return file_api_tokenservice_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TokenGetUserIDRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type TokenGetUserIDResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TokenGetUserIDResponse) Reset() {
+	*x = TokenGetUserIDResponse{}
+	mi := &file_api_tokenservice_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TokenGetUserIDResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TokenGetUserIDResponse) ProtoMessage() {}
+
+func (x *TokenGetUserIDResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_tokenservice_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TokenGetUserIDResponse.ProtoReflect.Descriptor instead.
+func (*TokenGetUserIDResponse) Descriptor() ([]byte, []int) {
+	return file_api_tokenservice_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *TokenGetUserIDResponse) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
 type TokenCheckRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -75,7 +163,7 @@ type TokenCheckRequest struct {
 
 func (x *TokenCheckRequest) Reset() {
 	*x = TokenCheckRequest{}
-	mi := &file_api_tokenservice_proto_msgTypes[1]
+	mi := &file_api_tokenservice_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -87,7 +175,7 @@ func (x *TokenCheckRequest) String() string {
 func (*TokenCheckRequest) ProtoMessage() {}
 
 func (x *TokenCheckRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_tokenservice_proto_msgTypes[1]
+	mi := &file_api_tokenservice_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -100,7 +188,7 @@ func (x *TokenCheckRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenCheckRequest.ProtoReflect.Descriptor instead.
 func (*TokenCheckRequest) Descriptor() ([]byte, []int) {
-	return file_api_tokenservice_proto_rawDescGZIP(), []int{1}
+	return file_api_tokenservice_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *TokenCheckRequest) GetUserId() string {
@@ -126,7 +214,7 @@ type TokenCheckResponse struct {
 
 func (x *TokenCheckResponse) Reset() {
 	*x = TokenCheckResponse{}
-	mi := &file_api_tokenservice_proto_msgTypes[2]
+	mi := &file_api_tokenservice_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -138,7 +226,7 @@ func (x *TokenCheckResponse) String() string {
 func (*TokenCheckResponse) ProtoMessage() {}
 
 func (x *TokenCheckResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_tokenservice_proto_msgTypes[2]
+	mi := &file_api_tokenservice_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -151,7 +239,7 @@ func (x *TokenCheckResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenCheckResponse.ProtoReflect.Descriptor instead.
 func (*TokenCheckResponse) Descriptor() ([]byte, []int) {
-	return file_api_tokenservice_proto_rawDescGZIP(), []int{2}
+	return file_api_tokenservice_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *TokenCheckResponse) GetStatus() bool {
@@ -170,7 +258,7 @@ type TokenCreateResponse struct {
 
 func (x *TokenCreateResponse) Reset() {
 	*x = TokenCreateResponse{}
-	mi := &file_api_tokenservice_proto_msgTypes[3]
+	mi := &file_api_tokenservice_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -182,7 +270,7 @@ func (x *TokenCreateResponse) String() string {
 func (*TokenCreateResponse) ProtoMessage() {}
 
 func (x *TokenCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_tokenservice_proto_msgTypes[3]
+	mi := &file_api_tokenservice_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -195,7 +283,7 @@ func (x *TokenCreateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenCreateResponse.ProtoReflect.Descriptor instead.
 func (*TokenCreateResponse) Descriptor() ([]byte, []int) {
-	return file_api_tokenservice_proto_rawDescGZIP(), []int{3}
+	return file_api_tokenservice_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *TokenCreateResponse) GetToken() string {
@@ -214,7 +302,7 @@ type TokenDeleteResponse struct {
 
 func (x *TokenDeleteResponse) Reset() {
 	*x = TokenDeleteResponse{}
-	mi := &file_api_tokenservice_proto_msgTypes[4]
+	mi := &file_api_tokenservice_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -226,7 +314,7 @@ func (x *TokenDeleteResponse) String() string {
 func (*TokenDeleteResponse) ProtoMessage() {}
 
 func (x *TokenDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_tokenservice_proto_msgTypes[4]
+	mi := &file_api_tokenservice_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -239,7 +327,7 @@ func (x *TokenDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenDeleteResponse.ProtoReflect.Descriptor instead.
 func (*TokenDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_api_tokenservice_proto_rawDescGZIP(), []int{4}
+	return file_api_tokenservice_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *TokenDeleteResponse) GetStatus() bool {
@@ -255,6 +343,10 @@ const file_api_tokenservice_proto_rawDesc = "" +
 	"\n" +
 	"\x16api/tokenservice.proto\x12\x03api\"'\n" +
 	"\fTokenRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"-\n" +
+	"\x15TokenGetUserIDRequest\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"1\n" +
+	"\x16TokenGetUserIDResponse\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"B\n" +
 	"\x11TokenCheckRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
@@ -264,12 +356,13 @@ const file_api_tokenservice_proto_rawDesc = "" +
 	"\x13TokenCreateResponse\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"-\n" +
 	"\x13TokenDeleteResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\bR\x06status2\xc6\x01\n" +
+	"\x06status\x18\x01 \x01(\bR\x06status2\x91\x02\n" +
 	"\fTokenService\x12>\n" +
 	"\n" +
 	"TokenCheck\x12\x16.api.TokenCheckRequest\x1a\x18.api.TokenDeleteResponse\x12:\n" +
 	"\vTokenCreate\x12\x11.api.TokenRequest\x1a\x18.api.TokenCreateResponse\x12:\n" +
-	"\vTokenDelete\x12\x11.api.TokenRequest\x1a\x18.api.TokenDeleteResponseB\x16Z\x14pkg/api/tokenserviceb\x06proto3"
+	"\vTokenDelete\x12\x11.api.TokenRequest\x1a\x18.api.TokenDeleteResponse\x12I\n" +
+	"\x0eTokenGetUserID\x12\x1a.api.TokenGetUserIDRequest\x1a\x1b.api.TokenGetUserIDResponseB\x16Z\x14pkg/api/tokenserviceb\x06proto3"
 
 var (
 	file_api_tokenservice_proto_rawDescOnce sync.Once
@@ -283,23 +376,27 @@ func file_api_tokenservice_proto_rawDescGZIP() []byte {
 	return file_api_tokenservice_proto_rawDescData
 }
 
-var file_api_tokenservice_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_api_tokenservice_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_api_tokenservice_proto_goTypes = []any{
-	(*TokenRequest)(nil),        // 0: api.TokenRequest
-	(*TokenCheckRequest)(nil),   // 1: api.TokenCheckRequest
-	(*TokenCheckResponse)(nil),  // 2: api.TokenCheckResponse
-	(*TokenCreateResponse)(nil), // 3: api.TokenCreateResponse
-	(*TokenDeleteResponse)(nil), // 4: api.TokenDeleteResponse
+	(*TokenRequest)(nil),           // 0: api.TokenRequest
+	(*TokenGetUserIDRequest)(nil),  // 1: api.TokenGetUserIDRequest
+	(*TokenGetUserIDResponse)(nil), // 2: api.TokenGetUserIDResponse
+	(*TokenCheckRequest)(nil),      // 3: api.TokenCheckRequest
+	(*TokenCheckResponse)(nil),     // 4: api.TokenCheckResponse
+	(*TokenCreateResponse)(nil),    // 5: api.TokenCreateResponse
+	(*TokenDeleteResponse)(nil),    // 6: api.TokenDeleteResponse
 }
 var file_api_tokenservice_proto_depIdxs = []int32{
-	1, // 0: api.TokenService.TokenCheck:input_type -> api.TokenCheckRequest
+	3, // 0: api.TokenService.TokenCheck:input_type -> api.TokenCheckRequest
 	0, // 1: api.TokenService.TokenCreate:input_type -> api.TokenRequest
 	0, // 2: api.TokenService.TokenDelete:input_type -> api.TokenRequest
-	4, // 3: api.TokenService.TokenCheck:output_type -> api.TokenDeleteResponse
-	3, // 4: api.TokenService.TokenCreate:output_type -> api.TokenCreateResponse
-	4, // 5: api.TokenService.TokenDelete:output_type -> api.TokenDeleteResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
+	1, // 3: api.TokenService.TokenGetUserID:input_type -> api.TokenGetUserIDRequest
+	6, // 4: api.TokenService.TokenCheck:output_type -> api.TokenDeleteResponse
+	5, // 5: api.TokenService.TokenCreate:output_type -> api.TokenCreateResponse
+	6, // 6: api.TokenService.TokenDelete:output_type -> api.TokenDeleteResponse
+	2, // 7: api.TokenService.TokenGetUserID:output_type -> api.TokenGetUserIDResponse
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -316,7 +413,7 @@ func file_api_tokenservice_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_tokenservice_proto_rawDesc), len(file_api_tokenservice_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

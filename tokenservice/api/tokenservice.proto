@@ -6,13 +6,20 @@ package api;
 
 service TokenService {
   rpc TokenCheck(TokenCheckRequest) returns (TokenDeleteResponse);
-
   rpc TokenCreate(TokenRequest) returns (TokenCreateResponse);
-
   rpc TokenDelete(TokenRequest) returns (TokenDeleteResponse);
+  rpc TokenGetUserID(TokenGetUserIDRequest) returns (TokenGetUserIDResponse);
 }
 
 message TokenRequest {
+  string user_id = 1;
+}
+
+message TokenGetUserIDRequest {
+  string token = 1;
+}
+
+message TokenGetUserIDResponse {
   string user_id = 1;
 }
 

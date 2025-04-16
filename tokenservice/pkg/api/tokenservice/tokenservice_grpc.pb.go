@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TokenService_TokenCheck_FullMethodName  = "/api.TokenService/TokenCheck"
-	TokenService_TokenCreate_FullMethodName = "/api.TokenService/TokenCreate"
-	TokenService_TokenDelete_FullMethodName = "/api.TokenService/TokenDelete"
+	TokenService_TokenCheck_FullMethodName     = "/api.TokenService/TokenCheck"
+	TokenService_TokenCreate_FullMethodName    = "/api.TokenService/TokenCreate"
+	TokenService_TokenDelete_FullMethodName    = "/api.TokenService/TokenDelete"
+	TokenService_TokenGetUserID_FullMethodName = "/api.TokenService/TokenGetUserID"
 )
 
 // TokenServiceClient is the client API for TokenService service.
@@ -31,6 +32,7 @@ type TokenServiceClient interface {
 	TokenCheck(ctx context.Context, in *TokenCheckRequest, opts ...grpc.CallOption) (*TokenDeleteResponse, error)
 	TokenCreate(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenCreateResponse, error)
 	TokenDelete(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenDeleteResponse, error)
+	TokenGetUserID(ctx context.Context, in *TokenGetUserIDRequest, opts ...grpc.CallOption) (*TokenGetUserIDResponse, error)
 }
 
 type tokenServiceClient struct {
@@ -71,6 +73,16 @@ func (c *tokenServiceClient) TokenDelete(ctx context.Context, in *TokenRequest, 
 	return out, nil
 }
 
+func (c *tokenServiceClient) TokenGetUserID(ctx context.Context, in *TokenGetUserIDRequest, opts ...grpc.CallOption) (*TokenGetUserIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TokenGetUserIDResponse)
+	err := c.cc.Invoke(ctx, TokenService_TokenGetUserID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TokenServiceServer is the server API for TokenService service.
 // All implementations must embed UnimplementedTokenServiceServer
 // for forward compatibility.
@@ -78,6 +90,7 @@ type TokenServiceServer interface {
 	TokenCheck(context.Context, *TokenCheckRequest) (*TokenDeleteResponse, error)
 	TokenCreate(context.Context, *TokenRequest) (*TokenCreateResponse, error)
 	TokenDelete(context.Context, *TokenRequest) (*TokenDeleteResponse, error)
+	TokenGetUserID(context.Context, *TokenGetUserIDRequest) (*TokenGetUserIDResponse, error)
 	mustEmbedUnimplementedTokenServiceServer()
 }
 
@@ -96,6 +109,9 @@ func (UnimplementedTokenServiceServer) TokenCreate(context.Context, *TokenReques
 }
 func (UnimplementedTokenServiceServer) TokenDelete(context.Context, *TokenRequest) (*TokenDeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TokenDelete not implemented")
+}
+func (UnimplementedTokenServiceServer) TokenGetUserID(context.Context, *TokenGetUserIDRequest) (*TokenGetUserIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TokenGetUserID not implemented")
 }
 func (UnimplementedTokenServiceServer) mustEmbedUnimplementedTokenServiceServer() {}
 func (UnimplementedTokenServiceServer) testEmbeddedByValue()                      {}
@@ -172,6 +188,24 @@ func _TokenService_TokenDelete_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TokenService_TokenGetUserID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TokenGetUserIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TokenServiceServer).TokenGetUserID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TokenService_TokenGetUserID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TokenServiceServer).TokenGetUserID(ctx, req.(*TokenGetUserIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TokenService_ServiceDesc is the grpc.ServiceDesc for TokenService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -190,6 +224,10 @@ var TokenService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TokenDelete",
 			Handler:    _TokenService_TokenDelete_Handler,
+		},
+		{
+			MethodName: "TokenGetUserID",
+			Handler:    _TokenService_TokenGetUserID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
