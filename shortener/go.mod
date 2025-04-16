@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/chempik1234/common-chempik-pkg-golang v1.0.0
+	github.com/chempik1234/common-chempik-pkg-golang v1.0.1
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
