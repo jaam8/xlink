@@ -26,7 +26,13 @@ func New(tokensRepo ports.TokensRepository) *Service {
 	}
 }
 
-func (s *Service) CheckToken(ctx context.Context, req *tokenservice.TokenCheckRequest) (*tokenservice.TokenCheckResponse, error) {
+func (s *Service) CheckToken(ctx context.Context, req *tokenservice.TokenCheckRequest) (*tokenservice.TokenStatusResponse, error) {
+	if len(req.UserId) == 0 {
+		return nil, fmt.Errorf("user_id is empty")
+	}
+	if len(req.Token) == 0 {
+		return nil, fmt.Errorf("token is empty")
+	}
 	tokenCorrect, err := s.tokensRepo.Check(req.UserId, req.Token)
 	if err != nil {
 		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't create new token for userId",
@@ -41,14 +47,13 @@ func (s *Service) CheckToken(ctx context.Context, req *tokenservice.TokenCheckRe
 		zap.String(tokenKey, req.Token),
 		zap.Bool(statusKey, tokenCorrect),
 	)
-	return &tokenservice.TokenCheckResponse{Status: tokenCorrect}, nil
+	return &tokenservice.TokenStatusResponse{Status: tokenCorrect}, nil
 }
 
 func (s *Service) CreateToken(ctx context.Context, req *tokenservice.TokenRequest) (*tokenservice.TokenCreateResponse, error) {
 	if len(req.UserId) == 0 {
 		return nil, fmt.Errorf("user id is empty")
 	}
-
 	newToken, err := s.tokensRepo.Create(req.UserId)
 	if err != nil {
 		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't create new token for userId",
@@ -61,11 +66,14 @@ func (s *Service) CreateToken(ctx context.Context, req *tokenservice.TokenReques
 	return &tokenservice.TokenCreateResponse{Token: newToken}, nil
 }
 
-func (s *Service) GetUserIDByToken(ctx context.Context, req *tokenservice.TokenGetUserIDRequest) (*tokenservice.TokenGetUserIDResponse, error) {
-	if len(req.Token) == 0 {
-		return nil, fmt.Errorf("user id is empty")
+func (s *Service) RefreshToken(ctx context.Context, req *tokenservice.TokenCheckRequest) (*tokenservice.TokenCreateResponse, error) {
+	if len(req.UserId) == 0 {
+		return nil, fmt.Errorf("user_id is empty")
 	}
-	userId, err := s.tokensRepo.GetUserIdByToken(req.Token)
+	if len(req.Token) == 0 {
+		return nil, fmt.Errorf("token is empty")
+	}
+	token, err := s.tokensRepo.Refresh(req.UserId, req.Token)
 	if err != nil {
 		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't get userId by token",
 			zap.String(tokenKey, req.Token),
@@ -74,15 +82,15 @@ func (s *Service) GetUserIDByToken(ctx context.Context, req *tokenservice.TokenG
 		return nil, fmt.Errorf("couldn't get userId by token '%s': %v", req.Token, err)
 	}
 	logger.GetLoggerFromCtx(ctx).Info(ctx, "got userId by token", zap.String(tokenKey, req.Token))
-	return &tokenservice.TokenGetUserIDResponse{UserId: userId}, nil
+	return &tokenservice.TokenCreateResponse{Token: token}, nil
 }
 
-func (s *Service) DeleteToken(ctx context.Context, req *tokenservice.TokenRequest) (*tokenservice.TokenDeleteResponse, error) {
+func (s *Service) DeleteToken(ctx context.Context, req *tokenservice.TokenRequest) (*tokenservice.TokenStatusResponse, error) {
 	if len(req.UserId) == 0 {
-		return nil, fmt.Errorf("user id is empty")
+		return nil, fmt.Errorf("user_id is empty")
 	}
-
-	if err := s.tokensRepo.Delete(req.UserId); err != nil {
+	status, err := s.tokensRepo.Delete(req.UserId)
+	if err != nil {
 		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't delete token for userId",
 			zap.String(userIdKey, req.UserId),
 			zap.Error(err),
@@ -91,5 +99,5 @@ func (s *Service) DeleteToken(ctx context.Context, req *tokenservice.TokenReques
 	}
 	logger.GetLoggerFromCtx(ctx).Info(ctx, "deleted token", zap.String(userIdKey, req.UserId))
 
-	return &tokenservice.TokenDeleteResponse{}, nil
+	return &tokenservice.TokenStatusResponse{Status: status}, nil
 }

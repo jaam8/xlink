@@ -5,21 +5,13 @@ option go_package = "pkg/api/tokenservice";
 package api;
 
 service TokenService {
-  rpc TokenCheck(TokenCheckRequest) returns (TokenCheckResponse);
+  rpc TokenCheck(TokenCheckRequest) returns (TokenStatusResponse);
   rpc TokenCreate(TokenRequest) returns (TokenCreateResponse);
-  rpc TokenDelete(TokenRequest) returns (TokenDeleteResponse);
-  rpc TokenGetUserID(TokenGetUserIDRequest) returns (TokenGetUserIDResponse);
+  rpc TokenRefresh(TokenCheckRequest) returns (TokenCreateResponse);
+  rpc TokenDelete(TokenRequest) returns (TokenStatusResponse);
 }
 
 message TokenRequest {
-  string user_id = 1;
-}
-
-message TokenGetUserIDRequest {
-  string token = 1;
-}
-
-message TokenGetUserIDResponse {
   string user_id = 1;
 }
 
@@ -28,14 +20,10 @@ message TokenCheckRequest {
   string token = 2;
 }
 
-message TokenCheckResponse {
-  bool status = 1;
-}
-
 message TokenCreateResponse {
   string token = 1;
 }
 
-message TokenDeleteResponse {
+message TokenStatusResponse {
   bool status = 1;
 }

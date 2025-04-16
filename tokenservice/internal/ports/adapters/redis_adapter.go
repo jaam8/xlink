@@ -39,10 +39,27 @@ func (t TokensRepositoryRedis) Create(userId string) (string, error) {
 	return token, nil
 }
 
-func (t TokensRepositoryRedis) Delete(userId string) error {
+func (t TokensRepositoryRedis) Refresh(userId string, token string) (string, error) {
+	// todo added domain errors
+	status, err := t.Check(userId, token)
+	if err != nil {
+		if !status {
+			return "", err
+		}
+		return "", err
+	}
+
+	token, err = t.Create(userId)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func (t TokensRepositoryRedis) Delete(userId string) (bool, error) {
 	result := t.RedisClient.Del(userId)
 	if result.Err() != nil {
-		return result.Err()
+		return false, result.Err()
 	}
-	return nil
+	return true, nil
 }
