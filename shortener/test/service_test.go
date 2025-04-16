@@ -82,7 +82,7 @@ func TestCreateNewLink(t *testing.T) {
 	testCreateLinkRequest := shortener.CreateLinkRequest{
 		UserId:    userIDStr,
 		GroupId:   &groupIDStr,
-		Generated: false,
+		Generated: true,
 		ShortLink: "http://qwerty",
 		Url:       "http://qwertysdijvnisdnc",
 		ExpireAt:  &expireAtStr,

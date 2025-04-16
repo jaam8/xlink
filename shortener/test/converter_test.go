@@ -41,7 +41,7 @@ func TestLinkModelFromLinkRequest(t *testing.T) {
 	expectedModel := &models.Link{
 		UserId:    userUUID,
 		GroupId:   &groupUUID,
-		Generated: false,
+		Generated: true,
 		ShortLink: "http://qwerty",
 		Url:       "http://qwertysdijvnisdnc",
 		CreatedAt: createdAtTime,
@@ -92,7 +92,7 @@ func TestLinkModelFromLinkRequestWithId(t *testing.T) {
 		Id:        idUUID,
 		UserId:    userUUID,
 		GroupId:   &groupUUID,
-		Generated: false,
+		Generated: true,
 		ShortLink: "http://qwerty",
 		Url:       "http://qwertysdijvnisdnc",
 		CreatedAt: createdAtTime,
