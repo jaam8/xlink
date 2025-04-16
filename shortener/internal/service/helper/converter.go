@@ -86,7 +86,7 @@ func LinkModelFromLinkRequestWithId(request LinkBodyRequestWithId, expireAtDefau
 	if err != nil {
 		return nil, fmt.Errorf("error while validating link with id: %v", err)
 	}
-	id, err = GetValidatedUserId(request)
+	id, err = GetValidatedId(request)
 	if err != nil {
 		return nil, fmt.Errorf("error while validating link with id: %v", err)
 	}
