@@ -64,6 +64,8 @@ func LinkModelFromLinkRequest(request LinkBodyRequest, expireAtDefault time.Time
 	}
 	url = request.GetUrl()
 
+	generated = request.GetGenerated()
+
 	inputData := &models.Link{
 		UserId:    userId,
 		GroupId:   groupId,
