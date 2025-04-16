@@ -356,10 +356,10 @@ const file_api_tokenservice_proto_rawDesc = "" +
 	"\x13TokenCreateResponse\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"-\n" +
 	"\x13TokenDeleteResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\bR\x06status2\x91\x02\n" +
-	"\fTokenService\x12>\n" +
+	"\x06status\x18\x01 \x01(\bR\x06status2\x90\x02\n" +
+	"\fTokenService\x12=\n" +
 	"\n" +
-	"TokenCheck\x12\x16.api.TokenCheckRequest\x1a\x18.api.TokenDeleteResponse\x12:\n" +
+	"TokenCheck\x12\x16.api.TokenCheckRequest\x1a\x17.api.TokenCheckResponse\x12:\n" +
 	"\vTokenCreate\x12\x11.api.TokenRequest\x1a\x18.api.TokenCreateResponse\x12:\n" +
 	"\vTokenDelete\x12\x11.api.TokenRequest\x1a\x18.api.TokenDeleteResponse\x12I\n" +
 	"\x0eTokenGetUserID\x12\x1a.api.TokenGetUserIDRequest\x1a\x1b.api.TokenGetUserIDResponseB\x16Z\x14pkg/api/tokenserviceb\x06proto3"
@@ -391,7 +391,7 @@ var file_api_tokenservice_proto_depIdxs = []int32{
 	0, // 1: api.TokenService.TokenCreate:input_type -> api.TokenRequest
 	0, // 2: api.TokenService.TokenDelete:input_type -> api.TokenRequest
 	1, // 3: api.TokenService.TokenGetUserID:input_type -> api.TokenGetUserIDRequest
-	6, // 4: api.TokenService.TokenCheck:output_type -> api.TokenDeleteResponse
+	4, // 4: api.TokenService.TokenCheck:output_type -> api.TokenCheckResponse
 	5, // 5: api.TokenService.TokenCreate:output_type -> api.TokenCreateResponse
 	6, // 6: api.TokenService.TokenDelete:output_type -> api.TokenDeleteResponse
 	2, // 7: api.TokenService.TokenGetUserID:output_type -> api.TokenGetUserIDResponse

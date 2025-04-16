@@ -5,7 +5,7 @@ option go_package = "pkg/api/tokenservice";
 package api;
 
 service TokenService {
-  rpc TokenCheck(TokenCheckRequest) returns (TokenDeleteResponse);
+  rpc TokenCheck(TokenCheckRequest) returns (TokenCheckResponse);
   rpc TokenCreate(TokenRequest) returns (TokenCreateResponse);
   rpc TokenDelete(TokenRequest) returns (TokenDeleteResponse);
   rpc TokenGetUserID(TokenGetUserIDRequest) returns (TokenGetUserIDResponse);

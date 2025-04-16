@@ -29,7 +29,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TokenServiceClient interface {
-	TokenCheck(ctx context.Context, in *TokenCheckRequest, opts ...grpc.CallOption) (*TokenDeleteResponse, error)
+	TokenCheck(ctx context.Context, in *TokenCheckRequest, opts ...grpc.CallOption) (*TokenCheckResponse, error)
 	TokenCreate(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenCreateResponse, error)
 	TokenDelete(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenDeleteResponse, error)
 	TokenGetUserID(ctx context.Context, in *TokenGetUserIDRequest, opts ...grpc.CallOption) (*TokenGetUserIDResponse, error)
@@ -43,9 +43,9 @@ func NewTokenServiceClient(cc grpc.ClientConnInterface) TokenServiceClient {
 	return &tokenServiceClient{cc}
 }
 
-func (c *tokenServiceClient) TokenCheck(ctx context.Context, in *TokenCheckRequest, opts ...grpc.CallOption) (*TokenDeleteResponse, error) {
+func (c *tokenServiceClient) TokenCheck(ctx context.Context, in *TokenCheckRequest, opts ...grpc.CallOption) (*TokenCheckResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TokenDeleteResponse)
+	out := new(TokenCheckResponse)
 	err := c.cc.Invoke(ctx, TokenService_TokenCheck_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (c *tokenServiceClient) TokenGetUserID(ctx context.Context, in *TokenGetUse
 // All implementations must embed UnimplementedTokenServiceServer
 // for forward compatibility.
 type TokenServiceServer interface {
-	TokenCheck(context.Context, *TokenCheckRequest) (*TokenDeleteResponse, error)
+	TokenCheck(context.Context, *TokenCheckRequest) (*TokenCheckResponse, error)
 	TokenCreate(context.Context, *TokenRequest) (*TokenCreateResponse, error)
 	TokenDelete(context.Context, *TokenRequest) (*TokenDeleteResponse, error)
 	TokenGetUserID(context.Context, *TokenGetUserIDRequest) (*TokenGetUserIDResponse, error)
@@ -101,7 +101,7 @@ type TokenServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTokenServiceServer struct{}
 
-func (UnimplementedTokenServiceServer) TokenCheck(context.Context, *TokenCheckRequest) (*TokenDeleteResponse, error) {
+func (UnimplementedTokenServiceServer) TokenCheck(context.Context, *TokenCheckRequest) (*TokenCheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TokenCheck not implemented")
 }
 func (UnimplementedTokenServiceServer) TokenCreate(context.Context, *TokenRequest) (*TokenCreateResponse, error) {
