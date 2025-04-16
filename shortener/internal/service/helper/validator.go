@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func GetValidatedId(request LinkBodyRequestWithId) (uuid.UUID, error) {
+func GetValidatedId(request LinkBodyRequestOnlyId) (uuid.UUID, error) {
 	var id uuid.UUID
 	var err error
 
@@ -33,17 +33,18 @@ func GetValidatedUserId(request LinkBodyRequest) (uuid.UUID, error) {
 }
 
 func GetValidatedGroupId(request LinkBodyRequest, defaultValue *uuid.UUID) (*uuid.UUID, error) {
-	var groupId = defaultValue
 	var err error
 
 	if request.GetGroupId() != "" {
-		*groupId, err = uuid.Parse(request.GetGroupId())
+		var parsed uuid.UUID
+		parsed, err = uuid.Parse(request.GetGroupId())
 		if err != nil {
 			return nil, fmt.Errorf("invalid group id (can't parse uuid): %w", err)
 		}
+		return &parsed, nil
 	}
 
-	return groupId, nil
+	return defaultValue, nil
 }
 
 func GetValidatedExpireAt(request LinkBodyRequest, defaultValue time.Time) (time.Time, error) {

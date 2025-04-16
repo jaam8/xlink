@@ -46,7 +46,7 @@ func (s *Service) CreateNewLink(ctx context.Context, request *shortener.CreateLi
 }
 
 func (s *Service) UpdateLink(ctx context.Context, request *shortener.UpdateLinkRequest) (*shortener.Link, error) {
-	inputData, err := helper.LinkModelFromLinkRequest(request, time.Now().Add(s.defaultLinkExpireTime))
+	inputData, err := helper.LinkModelFromLinkRequestWithId(request, time.Now().Add(s.defaultLinkExpireTime))
 	if err != nil {
 		return &shortener.Link{}, fmt.Errorf("error while validating link: %v", err)
 	}

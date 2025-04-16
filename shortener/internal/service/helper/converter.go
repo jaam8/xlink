@@ -11,7 +11,8 @@ import (
 func LinkResponseFromLinkModel(link models.Link) *shortener.Link {
 	var GroupId *string = nil
 	if link.GroupId != nil {
-		*GroupId = link.GroupId.String()
+		str := link.GroupId.String()
+		GroupId = &str
 	}
 
 	return &shortener.Link{
@@ -73,4 +74,29 @@ func LinkModelFromLinkRequest(request LinkBodyRequest, expireAtDefault time.Time
 	}
 
 	return inputData, nil
+}
+
+func LinkModelFromLinkRequestWithId(request LinkBodyRequestWithId, expireAtDefault time.Time) (*models.Link, error) {
+	var err error
+	var inputData *models.Link
+	var id uuid.UUID
+	inputData, err = LinkModelFromLinkRequest(request, expireAtDefault)
+	if err != nil {
+		return nil, fmt.Errorf("error while validating link with id: %v", err)
+	}
+	id, err = GetValidatedUserId(request)
+	if err != nil {
+		return nil, fmt.Errorf("error while validating link with id: %v", err)
+	}
+
+	return &models.Link{
+		Id:        id,
+		UserId:    inputData.UserId,
+		GroupId:   inputData.GroupId,
+		Generated: inputData.Generated,
+		ShortLink: inputData.ShortLink,
+		Url:       inputData.Url,
+		CreatedAt: inputData.CreatedAt,
+		ExpireAt:  inputData.ExpireAt,
+	}, nil
 }
