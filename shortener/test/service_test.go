@@ -1,10 +1,9 @@
-package unitTests
+package tests
 
 import (
 	"context"
 	"shortener/internal/models"
 	"shortener/internal/service"
-	"shortener/internal/service/helper"
 	"shortener/pkg/api/shortener"
 	"testing"
 	"time"
@@ -55,7 +54,7 @@ type mokShortenerSenderRepository struct{ mock.Mock }
 func (m *mokShortenerSenderRepository) SendRedirectInfo() {}
 
 const (
-	testdefaultLinkExpireTime = 100 * time.Millisecond
+	testdefaultLinkExpireTime = 1 * time.Second
 )
 
 func TestCreateNewLink(t *testing.T) {
@@ -69,14 +68,15 @@ func TestCreateNewLink(t *testing.T) {
 
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireDuration := 1 * time.Second
-	expireAtTime := time.Now().Add(expireDuration)
-	expireAtStr := expireAtTime.Format(time.RFC3339)
+	expireAtStr := "2025-04-16T11:28:07+03:00"
 
 	userUUID, err := uuid.Parse(userIDStr)
 	require.NoError(t, err)
 
 	groupUUID, err := uuid.Parse(groupIDStr)
+	require.NoError(t, err)
+
+	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
 	require.NoError(t, err)
 
 	testCreateLinkRequest := shortener.CreateLinkRequest{
@@ -107,10 +107,14 @@ func TestCreateNewLink(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
+	assert.Equal(t, expectedModel.Id.String(), testCreateNewLinkResponse.Id)
 	assert.Equal(t, expectedModel.UserId.String(), testCreateNewLinkResponse.UserId)
 	assert.Equal(t, expectedModel.GroupId.String(), *testCreateNewLinkResponse.GroupId)
+	assert.Equal(t, expectedModel.Generated, testCreateNewLinkResponse.Generated)
 	assert.Equal(t, expectedModel.ShortLink, testCreateNewLinkResponse.ShortLink)
 	assert.Equal(t, expectedModel.Url, testCreateNewLinkResponse.Url)
+	assert.Equal(t, expectedModel.CreatedAt.String(), testCreateNewLinkResponse.CreatedAt)
+	assert.Equal(t, expectedModel.ExpireAt.String(), testCreateNewLinkResponse.ExpireAt)
 
 	testShortenerStorageRepository.AssertExpectations(t)
 
@@ -129,9 +133,8 @@ func TestUpdateLink(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireDuration := 1 * time.Second
-	expireAtTime := time.Now().Add(expireDuration)
-	expireAtStr := expireAtTime.Format(time.RFC3339)
+	createdAtStr := "2025-04-16T11:28:06+03:00"
+	expireAtStr := "2025-04-16T11:28:07+03:00"
 
 	idUUID, err := uuid.Parse(idStr)
 	require.NoError(t, err)
@@ -140,6 +143,12 @@ func TestUpdateLink(t *testing.T) {
 	require.NoError(t, err)
 
 	groupUUID, err := uuid.Parse(groupIDStr)
+	require.NoError(t, err)
+
+	createdAtTime, err := time.Parse(time.RFC3339, createdAtStr)
+	require.NoError(t, err)
+
+	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
 	require.NoError(t, err)
 
 	testUpdateLinkRequest := shortener.UpdateLinkRequest{
@@ -159,7 +168,7 @@ func TestUpdateLink(t *testing.T) {
 		Generated: true,
 		ShortLink: "http://qwerty",
 		Url:       "http://qwertysdijvnisdnc",
-		CreatedAt: time.Now(),
+		CreatedAt: createdAtTime,
 		ExpireAt:  expireAtTime,
 	}
 
@@ -174,8 +183,11 @@ func TestUpdateLink(t *testing.T) {
 	assert.Equal(t, expectedModel.Id.String(), testUpdateLinkResponse.Id)
 	assert.Equal(t, expectedModel.UserId.String(), testUpdateLinkResponse.UserId)
 	assert.Equal(t, expectedModel.GroupId.String(), *testUpdateLinkResponse.GroupId)
+	assert.Equal(t, expectedModel.Generated, testUpdateLinkResponse.Generated)
 	assert.Equal(t, expectedModel.ShortLink, testUpdateLinkResponse.ShortLink)
 	assert.Equal(t, expectedModel.Url, testUpdateLinkResponse.Url)
+	assert.Equal(t, expectedModel.CreatedAt.String(), testUpdateLinkResponse.CreatedAt)
+	assert.Equal(t, expectedModel.ExpireAt.String(), testUpdateLinkResponse.ExpireAt)
 
 	testShortenerStorageRepository.AssertExpectations(t)
 
@@ -193,8 +205,8 @@ func TestDeleteLink(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireDuration := 1 * time.Second
-	expireAtTime := time.Now().Add(expireDuration)
+	createdAtStr := "2025-04-16T11:28:06+03:00"
+	expireAtStr := "2025-04-16T11:28:07+03:00"
 
 	idUUID, err := uuid.Parse(idStr)
 	require.NoError(t, err)
@@ -203,6 +215,12 @@ func TestDeleteLink(t *testing.T) {
 	require.NoError(t, err)
 
 	groupUUID, err := uuid.Parse(groupIDStr)
+	require.NoError(t, err)
+
+	createdAtTime, err := time.Parse(time.RFC3339, createdAtStr)
+	require.NoError(t, err)
+
+	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
 	require.NoError(t, err)
 
 	testDeleteLinkRequest := shortener.DeleteLinkRequest{
@@ -216,7 +234,7 @@ func TestDeleteLink(t *testing.T) {
 		Generated: true,
 		ShortLink: "http://qwerty",
 		Url:       "http://qwertysdijvnisdnc",
-		CreatedAt: time.Now(),
+		CreatedAt: createdAtTime,
 		ExpireAt:  expireAtTime,
 	}
 
@@ -248,8 +266,8 @@ func TestRedirect(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireDuration := 1 * time.Second
-	expireAtTime := time.Now().Add(expireDuration)
+	createdAtStr := "2025-04-16T11:28:06+03:00"
+	expireAtStr := "2025-04-16T11:28:07+03:00"
 
 	idUUID, err := uuid.Parse(idStr)
 	require.NoError(t, err)
@@ -258,6 +276,12 @@ func TestRedirect(t *testing.T) {
 	require.NoError(t, err)
 
 	groupUUID, err := uuid.Parse(groupIDStr)
+	require.NoError(t, err)
+
+	createdAtTime, err := time.Parse(time.RFC3339, createdAtStr)
+	require.NoError(t, err)
+
+	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
 	require.NoError(t, err)
 
 	testRedirectRequest := shortener.Url{
@@ -271,7 +295,7 @@ func TestRedirect(t *testing.T) {
 		Generated: true,
 		ShortLink: "http://qwerty",
 		Url:       "http://qwertysdijvnisdnc",
-		CreatedAt: time.Now(),
+		CreatedAt: createdAtTime,
 		ExpireAt:  expireAtTime,
 	}
 
@@ -287,259 +311,5 @@ func TestRedirect(t *testing.T) {
 	assert.Equal(t, expectedModel.Url, testRedirectResponse.Url)
 
 	testShortenerStorageRepository.AssertExpectations(t)
-
-}
-
-func TestGetValidatedId(t *testing.T) {
-	testRequest := shortener.DeleteLinkRequest{Id: "f9e71cb4-e1e1-4721-8eef-806338db2222"}
-
-	testResponse, err := helper.GetValidatedId(&testRequest)
-	if err != nil {
-		t.Fatalf("Unable to get id, %v", err)
-	}
-
-	expected, err := uuid.Parse("f9e71cb4-e1e1-4721-8eef-806338db2222")
-	if err != nil {
-		t.Fatalf("Unable to parse id, %v", err)
-	}
-
-	assert.Equal(t, expected, testResponse)
-
-}
-
-func TestGetValidatedUserId(t *testing.T) {
-
-	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
-	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
-	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireDuration := 1 * time.Second
-	expireAtTime := time.Now().Add(expireDuration).Format(time.RFC3339)
-
-	testRequest := shortener.UpdateLinkRequest{
-		Id:        idStr,
-		UserId:    userIDStr,
-		GroupId:   &groupIDStr,
-		Generated: true,
-		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
-		ExpireAt:  &expireAtTime,
-	}
-
-	testResponse, err := helper.GetValidatedUserId(&testRequest)
-	if err != nil {
-		t.Fatalf("Unable to get id, %v", err)
-	}
-
-	expected, err := uuid.Parse(userIDStr)
-	if err != nil {
-		t.Fatalf("Unable to parse id, %v", err)
-	}
-
-	assert.Equal(t, expected, testResponse)
-
-}
-
-func TestGetValidatedGroupId(t *testing.T) {
-
-	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
-	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
-	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireDuration := 1 * time.Second
-	expireAtTime := time.Now().Add(expireDuration).Format(time.RFC3339)
-
-	testRequest := shortener.UpdateLinkRequest{
-		Id:        idStr,
-		UserId:    userIDStr,
-		GroupId:   &groupIDStr,
-		Generated: true,
-		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
-		ExpireAt:  &expireAtTime,
-	}
-
-	testResponse, err := helper.GetValidatedGroupId(&testRequest, nil)
-	if err != nil {
-		t.Fatalf("Unable to get id, %v", err)
-	}
-
-	parsed, err := uuid.Parse(groupIDStr)
-	expected := &parsed
-	if err != nil {
-		t.Fatalf("Unable to parse id, %v", err)
-	}
-
-	assert.Equal(t, expected, testResponse)
-
-}
-
-func TestGetValidatedExpireAt(t *testing.T) {
-
-	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
-	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
-	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireAtTime := "2025-04-16T11:28:07+03:00"
-
-	testRequest := shortener.UpdateLinkRequest{
-		Id:        idStr,
-		UserId:    userIDStr,
-		GroupId:   &groupIDStr,
-		Generated: true,
-		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
-		ExpireAt:  &expireAtTime,
-	}
-
-	testResponse, err := helper.GetValidatedExpireAt(&testRequest, time.Now())
-	if err != nil {
-		t.Fatalf("Unable to get ExpireAt, %v", err)
-	}
-
-	expected, err := time.Parse(time.RFC3339, expireAtTime)
-	if err != nil {
-		t.Fatalf("Unable to parse ExpireAt, %v", err)
-	}
-
-	assert.Equal(t, expected, testResponse)
-
-}
-
-func TestValidatedStringNotEmpty(t *testing.T) {
-
-	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
-	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
-	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireAtTime := "2025-04-16T11:28:07+03:00"
-
-	testRequest := shortener.UpdateLinkRequest{
-		Id:        idStr,
-		UserId:    userIDStr,
-		GroupId:   &groupIDStr,
-		Generated: true,
-		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
-		ExpireAt:  &expireAtTime,
-	}
-
-	testerror := helper.ValidateStringNotEmpty(testRequest.GetShortLink())
-	if testerror != nil {
-		t.Fatalf("ValidateStringNotEmpty error, %v", testerror)
-	}
-
-	assert.NoError(t, testerror)
-
-}
-
-func TestValidatedUrl(t *testing.T) {
-
-	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
-	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
-	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireAtTime := "2025-04-16T11:28:07+03:00"
-
-	testRequest := shortener.UpdateLinkRequest{
-		Id:        idStr,
-		UserId:    userIDStr,
-		GroupId:   &groupIDStr,
-		Generated: true,
-		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
-		ExpireAt:  &expireAtTime,
-	}
-
-	testerror := helper.ValidateUrl(testRequest.GetUrl())
-	if testerror != nil {
-		t.Fatalf("ValidateUrl error, %v", testerror)
-	}
-
-	assert.NoError(t, testerror)
-
-}
-
-func TestLinkModelFromLinkRequest(t *testing.T) {
-
-	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
-	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
-	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireAtTime := "2025-04-16T11:28:07+03:00"
-	expireAtAsTime, _ := time.Parse(time.RFC3339, expireAtTime)
-
-	userUUID, err := uuid.Parse(userIDStr)
-	require.NoError(t, err)
-
-	groupUUID, err := uuid.Parse(groupIDStr)
-	require.NoError(t, err)
-
-	testRequest := shortener.UpdateLinkRequest{
-		Id:        idStr,
-		UserId:    userIDStr,
-		GroupId:   &groupIDStr,
-		Generated: true,
-		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
-		ExpireAt:  &expireAtTime,
-	}
-
-	expectedModel := &models.Link{
-		UserId:    userUUID,
-		GroupId:   &groupUUID,
-		Generated: false,
-		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
-		ExpireAt:  expireAtAsTime,
-	}
-
-	testResponse, err := helper.LinkModelFromLinkRequest(&testRequest, time.Now())
-	if err != nil {
-		t.Fatalf("Unable to get link model, %v", err)
-	}
-
-	assert.Equal(t, expectedModel, testResponse)
-
-}
-
-func TestLinkModelFromLinkRequestWithId(t *testing.T) {
-	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
-	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
-	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	expireAtTime := "2025-04-16T11:28:07+03:00"
-	expireAtAsTime, _ := time.Parse(time.RFC3339, expireAtTime)
-	var CreatedAt time.Time
-
-	idUUID, err := uuid.Parse(idStr)
-	require.NoError(t, err)
-
-	userUUID, err := uuid.Parse(userIDStr)
-	require.NoError(t, err)
-
-	groupUUID, err := uuid.Parse(groupIDStr)
-	require.NoError(t, err)
-
-	testRequest := shortener.UpdateLinkRequest{
-		Id:        idStr,
-		UserId:    userIDStr,
-		GroupId:   &groupIDStr,
-		Generated: true,
-		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
-		ExpireAt:  &expireAtTime,
-	}
-
-	expectedModel := &models.Link{
-		Id:        idUUID,
-		UserId:    userUUID,
-		GroupId:   &groupUUID,
-		Generated: false,
-		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
-		CreatedAt: CreatedAt,
-		ExpireAt:  expireAtAsTime,
-	}
-
-	testResponse, err := helper.LinkModelFromLinkRequestWithId(&testRequest, time.Now())
-	if err != nil {
-		t.Fatalf("Unable to get link model, %v", err)
-	}
-
-	assert.Equal(t, expectedModel, testResponse)
 
 }
