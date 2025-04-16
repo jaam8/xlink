@@ -6,8 +6,6 @@ github.com/Masterminds/squirrel v1.5.4 h1:uUcX/aBc8O7Fg9kaISIUsHXdKuqehiXAMQTYX8
 github.com/Masterminds/squirrel v1.5.4/go.mod h1:NNaOrjSoIDfDA40n7sr2tPNZRfjzjA400rg+riTZj10=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
-github.com/chempik1234/common-chempik-pkg-golang v1.0.0 h1:CwvorkAN7HKRA0UYjhe6aOxSPY3rKLobJltJF/er0Os=
-github.com/chempik1234/common-chempik-pkg-golang v1.0.0/go.mod h1:o8XWur87RoGCGvJuzjMklugC6Zrzankfr9AKCgJOFJQ=
 github.com/chempik1234/common-chempik-pkg-golang v1.0.1 h1:rDa8yW+7WgBqybC67j4l22x+Cc+fEe57lLpW8LmYlzk=
 github.com/chempik1234/common-chempik-pkg-golang v1.0.1/go.mod h1:o8XWur87RoGCGvJuzjMklugC6Zrzankfr9AKCgJOFJQ=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
