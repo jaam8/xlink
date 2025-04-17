@@ -2,11 +2,11 @@ package tests
 
 import (
 	"context"
-	"shortener/internal/models"
-	"shortener/internal/service"
-	"shortener/pkg/api/shortener"
 	"testing"
 	"time"
+	"xlink/shortener/internal/models"
+	"xlink/shortener/internal/service"
+	"xlink/shortener/pkg/api/shortener"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

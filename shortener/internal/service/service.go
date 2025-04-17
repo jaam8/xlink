@@ -3,14 +3,14 @@ package service
 import (
 	"context"
 	"fmt"
-	"shortener/internal/models"
-	"shortener/internal/ports"
-	"shortener/internal/service/helper"
-	"shortener/pkg/api/shortener"
 	"time"
+	"xlink/shortener/internal/models"
+	"xlink/shortener/internal/ports"
+	"xlink/shortener/internal/service/helper"
+	"xlink/shortener/pkg/api/shortener"
 
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/logger"
 	"go.uber.org/zap"
+	"xlink/common/logger"
 )
 
 type Service struct {
