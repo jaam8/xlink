@@ -11,13 +11,14 @@ import (
 )
 
 type Config struct {
-	Host     string `yaml:"POSTGRES_HOST" env:"POSTGRES_HOST" env-default:"localhost"`
-	Port     uint16 `yaml:"POSTGRES_PORT" env:"POSTGRES_PORT" env-default:"5432"`
-	Username string `yaml:"POSTGRES_USER" env:"POSTGRES_USER" env-default:"postgres"`
-	Password string `yaml:"POSTGRES_PASSWORD" env:"POSTGRES_PASSWORD" env-default:"1234"`
-	Database string `yaml:"POSTGRES_DB" env:"POSTGRES_DB" env-default:"postgres"`
-	MaxConns int32  `yaml:"POSTGRES_MAX_CONNS" env:"POSTGRES_MAX_CONNS" env-default:"10"`
-	MinConns int32  `yaml:"POSTGRES_MIN_CONNS" env:"POSTGRES_MIN_CONNS" env-default:"5"`
+	Host           string `yaml:"POSTGRES_HOST" env:"POSTGRES_HOST" env-default:"localhost"`
+	Port           uint16 `yaml:"POSTGRES_PORT" env:"POSTGRES_PORT" env-default:"5432"`
+	Username       string `yaml:"POSTGRES_USER" env:"POSTGRES_USER" env-default:"postgres"`
+	Password       string `yaml:"POSTGRES_PASSWORD" env:"POSTGRES_PASSWORD" env-default:"1234"`
+	Database       string `yaml:"POSTGRES_DB" env:"POSTGRES_DB" env-default:"postgres"`
+	MaxConns       int32  `yaml:"POSTGRES_MAX_CONNS" env:"POSTGRES_MAX_CONNS" env-default:"10"`
+	MinConns       int32  `yaml:"POSTGRES_MIN_CONNS" env:"POSTGRES_MIN_CONNS" env-default:"5"`
+	MigrationsPath string `yaml:"POSTGRES_ROOT_MIGRATIONS_PATH" env:"POSTGRES_ROOT_MIGRATIONS_PATH" env-default:"file:///app/migrations"`
 }
 
 func New(ctx context.Context, config Config) (*pgxpool.Pool, error) {
