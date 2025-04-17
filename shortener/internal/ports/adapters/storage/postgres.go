@@ -6,7 +6,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"shortener/internal/models"
+	"xlink/shortener/internal/models"
 )
 
 type ShortenerStorageRepositoryPostgres struct {

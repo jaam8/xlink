@@ -3,15 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/logger"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/storage/redis"
 	"go.uber.org/zap"
 	"log"
 	"os"
 	"os/signal"
-	"tokenservice/internal/config"
-	"tokenservice/internal/ports/adapters"
-	"tokenservice/internal/runner"
+	"xlink/common/logger"
+	"xlink/common/redis"
+	"xlink/token_service/internal/config"
+	"xlink/token_service/internal/ports/adapters"
+	"xlink/token_service/internal/runner"
 )
 
 func main() {

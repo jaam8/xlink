@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "pkg/api/tokenservice";
+option go_package = "pkg/api/token_service";
 
 package api;
 

@@ -3,15 +3,15 @@ package runner
 import (
 	"context"
 	"fmt"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/logger"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/transport/grpc/interceptors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"net"
-	"shortener/internal/ports"
-	"shortener/internal/service"
-	"shortener/pkg/api/shortener"
 	"time"
+	"xlink/common/grpc/interceptors"
+	"xlink/common/logger"
+	"xlink/shortener/internal/ports"
+	"xlink/shortener/internal/service"
+	"xlink/shortener/pkg/api/shortener"
 )
 
 func CreateGRPC(

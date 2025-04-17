@@ -3,19 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/logger"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/storage/postgres"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/storage/redis"
 	"go.uber.org/zap"
 	"log"
 	"os"
 	"os/signal"
-	"shortener/internal/config"
-	"shortener/internal/ports/adapters/cache"
-	"shortener/internal/ports/adapters/sender"
-	"shortener/internal/ports/adapters/storage"
-	"shortener/internal/runner"
 	"time"
+	"xlink/common/logger"
+	"xlink/common/postgres"
+	"xlink/common/redis"
+	"xlink/shortener/internal/config"
+	"xlink/shortener/internal/ports/adapters/cache"
+	"xlink/shortener/internal/ports/adapters/sender"
+	"xlink/shortener/internal/ports/adapters/storage"
+	"xlink/shortener/internal/runner"
 )
 
 func main() {

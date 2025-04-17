@@ -2,7 +2,7 @@ package ports
 
 import (
 	"github.com/google/uuid"
-	"shortener/internal/models"
+	"xlink/shortener/internal/models"
 )
 
 type ShortenerCacheRepository interface {

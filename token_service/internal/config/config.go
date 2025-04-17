@@ -2,8 +2,8 @@ package config
 
 import (
 	"fmt"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/storage/redis"
 	"github.com/ilyakaznacheev/cleanenv"
+	"xlink/common/redis"
 )
 
 type Config struct {
@@ -15,8 +15,7 @@ type Config struct {
 func New() (Config, error) {
 	var cfg Config
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
-		return Config{},
-			fmt.Errorf("failed to read env variables after accessing .env: %w", err)
+		return Config{}, fmt.Errorf("failed to read env vars: %v", err)
 	}
 	return cfg, nil
 }

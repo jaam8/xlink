@@ -2,9 +2,9 @@ package helper
 
 import (
 	"fmt"
-	"shortener/internal/models"
-	"shortener/pkg/api/shortener"
 	"time"
+	"xlink/shortener/internal/models"
+	"xlink/shortener/pkg/api/shortener"
 
 	"github.com/google/uuid"
 )
