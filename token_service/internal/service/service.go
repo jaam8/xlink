@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/logger"
 	"go.uber.org/zap"
-	"tokenservice/internal/ports"
-	"tokenservice/pkg/api/tokenservice"
+	"xlink/common/logger"
+	"xlink/token_service/internal/ports"
+	"xlink/token_service/pkg/api/token_service"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 )
 
 type Service struct {
-	tokenservice.TokenServiceServer
+	token_service.TokenServiceServer
 	tokensRepo ports.TokensRepository
 }
 
@@ -26,7 +26,7 @@ func New(tokensRepo ports.TokensRepository) *Service {
 	}
 }
 
-func (s *Service) CheckToken(ctx context.Context, req *tokenservice.TokenCheckRequest) (*tokenservice.TokenStatusResponse, error) {
+func (s *Service) CheckToken(ctx context.Context, req *token_service.TokenCheckRequest) (*token_service.TokenStatusResponse, error) {
 	if len(req.UserId) == 0 {
 		return nil, fmt.Errorf("user_id is empty")
 	}
@@ -47,10 +47,10 @@ func (s *Service) CheckToken(ctx context.Context, req *tokenservice.TokenCheckRe
 		zap.String(tokenKey, req.Token),
 		zap.Bool(statusKey, tokenCorrect),
 	)
-	return &tokenservice.TokenStatusResponse{Status: tokenCorrect}, nil
+	return &token_service.TokenStatusResponse{Status: tokenCorrect}, nil
 }
 
-func (s *Service) CreateToken(ctx context.Context, req *tokenservice.TokenRequest) (*tokenservice.TokenCreateResponse, error) {
+func (s *Service) CreateToken(ctx context.Context, req *token_service.TokenRequest) (*token_service.TokenCreateResponse, error) {
 	if len(req.UserId) == 0 {
 		return nil, fmt.Errorf("user id is empty")
 	}
@@ -63,10 +63,10 @@ func (s *Service) CreateToken(ctx context.Context, req *tokenservice.TokenReques
 		return nil, fmt.Errorf("couldn't create new token for userId %s: %v", req.UserId, err)
 	}
 	logger.GetLoggerFromCtx(ctx).Info(ctx, "created new token", zap.String(userIdKey, req.UserId))
-	return &tokenservice.TokenCreateResponse{Token: newToken}, nil
+	return &token_service.TokenCreateResponse{Token: newToken}, nil
 }
 
-func (s *Service) RefreshToken(ctx context.Context, req *tokenservice.TokenCheckRequest) (*tokenservice.TokenCreateResponse, error) {
+func (s *Service) RefreshToken(ctx context.Context, req *token_service.TokenCheckRequest) (*token_service.TokenCreateResponse, error) {
 	if len(req.UserId) == 0 {
 		return nil, fmt.Errorf("user_id is empty")
 	}
@@ -82,10 +82,10 @@ func (s *Service) RefreshToken(ctx context.Context, req *tokenservice.TokenCheck
 		return nil, fmt.Errorf("couldn't get userId by token '%s': %v", req.Token, err)
 	}
 	logger.GetLoggerFromCtx(ctx).Info(ctx, "got userId by token", zap.String(tokenKey, req.Token))
-	return &tokenservice.TokenCreateResponse{Token: token}, nil
+	return &token_service.TokenCreateResponse{Token: token}, nil
 }
 
-func (s *Service) DeleteToken(ctx context.Context, req *tokenservice.TokenRequest) (*tokenservice.TokenStatusResponse, error) {
+func (s *Service) DeleteToken(ctx context.Context, req *token_service.TokenRequest) (*token_service.TokenStatusResponse, error) {
 	if len(req.UserId) == 0 {
 		return nil, fmt.Errorf("user_id is empty")
 	}
@@ -99,5 +99,5 @@ func (s *Service) DeleteToken(ctx context.Context, req *tokenservice.TokenReques
 	}
 	logger.GetLoggerFromCtx(ctx).Info(ctx, "deleted token", zap.String(userIdKey, req.UserId))
 
-	return &tokenservice.TokenStatusResponse{Status: status}, nil
+	return &token_service.TokenStatusResponse{Status: status}, nil
 }

@@ -3,7 +3,7 @@ package adapters
 import (
 	"errors"
 	"github.com/go-redis/redis/v7"
-	"tokenservice/internal/utils"
+	"xlink/token_service/internal/utils"
 )
 
 type TokensRepositoryRedis struct {
