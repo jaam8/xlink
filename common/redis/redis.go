@@ -3,17 +3,17 @@ package redis
 import (
 	"context"
 	"fmt"
-	"github.com/chempik1234/common-chempik-pkg-golang/pkg/logger"
 	"github.com/go-redis/redis/v7"
 	"go.uber.org/zap"
 	"time"
+	"xlink/common/logger"
 )
 
 type Config struct {
 	Host     string `yaml:"host" env:"HOST" env-default:"redis"`
 	Port     uint16 `yaml:"port" env:"PORT" env-default:"6379"`
-	Username string `yaml:"user" env:"USER" env-default:"user"`
-	Password string `yaml:"user_password" env:"USER_PASSWORD" env-default:"1234"`
+	Username string `yaml:"user" env:"USER"`
+	Password string `yaml:"user_password" env:"USER_PASSWORD"`
 	Database int    `yaml:"db" env:"DB" env-default:"0"`
 
 	MaxRetries int `yaml:"max_retries" env:"MAX_RETRIES" env-default:"3"`
