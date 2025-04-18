@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1.4
+FROM golang:1.24-alpine AS builder
+LABEL authors="jaam8"
+
+WORKDIR /build
+
+COPY go.mod ./
+COPY tg_bot/go.* ./tg_bot/
+COPY common/go.* ./common/
+COPY shortener/go.* ./shortener/
+COPY token_service/go.* ./token_service/
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go work init ./shortener ./token_service ./common ./tg_bot && \
+    go mod download
+
+COPY . .
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go build -o tg-bot-service tg_bot/cmd/main.go
+
+FROM gcr.io/distroless/base-debian12 AS runner
+
+WORKDIR /app
+
+COPY --from=builder /build/tg-bot-service .
+CMD ["./tg-bot-service"]
