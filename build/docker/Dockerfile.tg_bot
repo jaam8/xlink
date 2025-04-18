@@ -15,8 +15,6 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go work init ./shortener ./token_service ./common ./tg_bot && \
     go mod download
 
-#COPY tg_bot/ ./tg_bot/
-#COPY common/ ./common/
 COPY . .
 
 RUN --mount=type=cache,target=/go/pkg/mod \

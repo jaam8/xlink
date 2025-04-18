@@ -5,9 +5,10 @@ services:
       context: ../../
       dockerfile: build/docker/Dockerfile.token_service
     env_file:
+      - ../../configs/ports.env
       - ../../configs/token_service.env
     ports:
-      - "50051:50051"
+      - ${TOKENS_PORT_GRPC}:50051
     depends_on:
       - postgres
       - redis
@@ -20,9 +21,10 @@ services:
       context: ../../
       dockerfile: build/docker/Dockerfile.shortener
     env_file:
+      - ../../configs/ports.env
       - ../../configs/shortener.env
     ports:
-      - "50052:50052"
+      - ${SHORTENER_PORT_GRPC}:50052
     depends_on:
       - postgres
       - token_service
@@ -49,8 +51,9 @@ services:
   postgres:
     image: postgres:latest
     ports:
-      - "5432:5432"
+      - ${POSTGRES_PORT}:5432
     env_file:
+      - ../../configs/ports.env
       - ../../configs/postgres.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -65,11 +68,10 @@ services:
   redis:
     image: redis:latest
     env_file:
+      - ../../configs/ports.env
       - ../../configs/redis.env
-    environment:
-      REDIS_PORT: ${REDIS_PORT:-6379}
     ports:
-      - "6379:6379"
+      - ${REDIS_PORT}:6379
 
     volumes:
       - redis_data:/data
