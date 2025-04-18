@@ -9,9 +9,9 @@ import (
 	"os/signal"
 	"xlink/common/logger"
 	"xlink/common/redis"
-	"xlink/token_service/internal/config"
-	"xlink/token_service/internal/ports/adapters"
-	"xlink/token_service/internal/runner"
+	"xlink/user_service/internal/config"
+	"xlink/user_service/internal/ports/adapters"
+	"xlink/user_service/internal/runner"
 )
 
 func main() {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"xlink/common/logger"
-	"xlink/token_service/internal/ports"
-	"xlink/token_service/pkg/api/token_service"
+	"xlink/user_service/internal/ports"
+	"xlink/user_service/pkg/api/user_service"
 )
 
 const (
