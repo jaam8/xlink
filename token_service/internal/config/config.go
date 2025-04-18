@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Redis       redis.Config `yaml:"redis" env:"REDIS" env-prefix:""`
+	Redis       redis.Config `yaml:"redis" env-prefix:"REDIS_"`
 	GRPCPort    int          `yaml:"grpc_port" env:"GRPC_PORT" env-default:"50050"`
 	TokenLength int          `yaml:"token_len" env:"TOKEN_LEN" env-default:"32"`
 }
