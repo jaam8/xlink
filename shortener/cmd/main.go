@@ -42,6 +42,12 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to connect to Postgres database: %w", err))
 	}
 
+	// postgres migration
+	err = postgres.Migrate(ctx, postgresCfg, postgresCfg.MigrationsPath)
+	if err != nil {
+		log.Fatal(fmt.Errorf("failed to migrate postgres database: %w", err))
+	}
+
 	repositoryRedis := cache.NewShortenerCacheRepositoryRedis(
 		redisClient, time.Duration(cfg.ExpirationSeconds)*time.Second,
 	)
