@@ -1,8 +1,8 @@
-generate_token_service:
-	protoc -I ./token_service \
-		--go_out=./token_service \
-		--go-grpc_out=./token_service \
-		./token_service/api/token_service.proto
+generate_user_service:
+	protoc -I ./user_service \
+		--go_out=./user_service \
+		--go-grpc_out=./user_service \
+		./user_service/api/user_service.proto
 
 generate_shortener:
 	protoc -I ./shortener \
