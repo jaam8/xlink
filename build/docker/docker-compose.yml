@@ -1,0 +1,89 @@
+
+services:
+  token_service:
+    build:
+      context: ../../
+      dockerfile: build/docker/Dockerfile.token_service
+    env_file:
+      - ../../configs/token_service.env
+    ports:
+      - "50051:50051"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+
+  shortener:
+    build:
+      context: ../../
+      dockerfile: build/docker/Dockerfile.shortener
+    env_file:
+      - ../../configs/shortener.env
+    ports:
+      - "50052:50052"
+    depends_on:
+      - postgres
+      - token_service
+    volumes:
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+
+  tg_bot:
+    build:
+      context: ../../
+      dockerfile: build/docker/Dockerfile.tg_bot
+    ports:
+      - "50053:50053"
+    env_file:
+      - ../../configs/tg_bot.env
+    depends_on:
+      - postgres
+      - shortener
+      - token_service
+    volumes:
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    env_file:
+      - ../../configs/postgres.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  redis:
+    image: redis:latest
+    env_file:
+      - ../../configs/redis.env
+    environment:
+      REDIS_PORT: ${REDIS_PORT:-6379}
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 1s
+      retries: 3
+    restart: unless-stopped
+
+
+volumes:
+  go-mod-cache:
+  go-build-cache:
+  postgres_data:
+  redis_data:
+

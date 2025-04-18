@@ -1,0 +1,6 @@
+.git/
+.idea/
+.vscode/
+.gitignore
+README.md
+Makefile
