@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	github.com/go-redis/redis/v7 v7.4.1
+	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.1
@@ -17,7 +18,6 @@ require (
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/chempik1234/common-chempik-pkg-golang v1.0.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
