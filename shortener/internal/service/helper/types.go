@@ -1,16 +1,28 @@
 package helper
 
 type LinkBodyRequest interface {
-	GetUserId() string
-	GetGroupId() string
+	LinkBodyRequestOnlyUserId
+	LinkBodyRequestOnlyGroupId
 	GetGenerated() bool
 	GetShortLink() string
 	GetUrl() string
-	GetExpireAt() string
+	LinkBodyRequestOnlyExpireAt
 }
 
 type LinkBodyRequestOnlyId interface {
 	GetId() string
+}
+
+type LinkBodyRequestOnlyUserId interface {
+	GetUserId() string
+}
+
+type LinkBodyRequestOnlyGroupId interface {
+	GetGroupId() string
+}
+
+type LinkBodyRequestOnlyExpireAt interface {
+	GetExpireAt() string
 }
 
 type LinkBodyRequestWithId interface {

@@ -114,3 +114,20 @@ func (s *Service) Redirect(ctx context.Context, request *shortener.Url) (*shorte
 
 	return &shortener.Url{Url: originalUrl}, nil
 }
+
+func (s *Service) GetLinksCountByUserId(ctx context.Context, request *shortener.GetLinksCountByUserIdRequest) (*shortener.GetLinksCountByUserIdResponse, error) {
+	userId, err := helper.GetValidatedUserId(request)
+	if err != nil {
+		return &shortener.GetLinksCountByUserIdResponse{Count: 0},
+			fmt.Errorf("error while getting user id: %v", err)
+	}
+
+	var count int32
+	count, err = s.storageRepo.GetLinksCountByUserId(userId)
+	if err != nil {
+		return &shortener.GetLinksCountByUserIdResponse{Count: 0},
+			fmt.Errorf("error while getting links count by id: %v", err)
+	}
+
+	return &shortener.GetLinksCountByUserIdResponse{Count: count}, nil
+}
