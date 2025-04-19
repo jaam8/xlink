@@ -10,7 +10,9 @@ service UserService {
   rpc GetUserIDByToken(GetUserIDByTokenRequest) returns (GetUserIDByTokenResponse);
   rpc GetUserIDByTgID(GetUserIDByTgIDRequest) returns (GetUserIDByTgIDResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc CheckToken(TokenCheckRequest) returns (TokenCheckResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc DeleteToken(DeleteTokenRequest) returns (DeleteTokenResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserRequest);
 }
 
@@ -55,12 +57,29 @@ message GetUserIDByTgIDResponse {
   bool status = 2;
 }
 
+message TokenCheckRequest {
+  string user_id = 1;
+  string token = 2;
+}
+
+message TokenCheckResponse {
+  bool status = 1;
+}
+
 message RefreshTokenRequest {
   string user_id = 1;
   string token = 2;
 }
 message RefreshTokenResponse {
   string token = 1;
+}
+
+message DeleteTokenRequest {
+  string user_id = 1;
+}
+
+message DeleteTokenResponse {
+  bool status = 1;
 }
 
 message DeleteUserRequest {
