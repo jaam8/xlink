@@ -3,13 +3,30 @@ package config
 import (
 	"fmt"
 	"github.com/ilyakaznacheev/cleanenv"
+	"xlink/common/postgres"
 	"xlink/common/redis"
 )
 
+type UpstreamNamesConfig struct {
+	Shortener string `yaml:"shortener" env:"SHORTENER"`
+}
+
+type UpstreamPortsConfig struct {
+	Shortener string `yaml:"shortener" env:"SHORTENER"`
+}
+
+type TimeoutsConfig struct {
+	Shortener int `yaml:"shortener" env:"SHORTENER"`
+}
+
 type Config struct {
-	Redis       redis.Config `yaml:"redis" env-prefix:"REDIS_"`
-	GRPCPort    int          `yaml:"grpc_port" env:"GRPC_PORT" env-default:"50050"`
-	TokenLength int          `yaml:"token_len" env:"TOKEN_LEN" env-default:"32"`
+	Redis         redis.Config        `yaml:"redis" env-prefix:"REDIS_"`
+	Postgres      postgres.Config     `yaml:"postgres" env-prefix:"POSTGRES_"`
+	UpstreamNames UpstreamNamesConfig `yaml:"upstream_names" env-prefix:"UPSTREAM_NAME_"`
+	UpstreamPorts UpstreamPortsConfig `yaml:"upstream_ports" env-prefix:"UPSTREAM_PORT_"`
+	Timeouts      TimeoutsConfig      `yaml:"timeouts" env-prefix:"TIMEOUT_"`
+	GRPCPort      int                 `yaml:"grpc_port" env:"GRPC_PORT" env-default:"50050"`
+	TokenLength   int                 `yaml:"token_len" env:"TOKEN_LEN" env-default:"32"`
 }
 
 func New() (Config, error) {

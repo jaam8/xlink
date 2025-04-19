@@ -1,8 +1,22 @@
 package ports
 
-type TokensRepository interface {
-	Check(userId string, token string) (bool, error)
-	Create(userId string) (string, error)
-	Refresh(userId string, token string) (string, error)
-	Delete(userId string) (bool, error)
+type UsersCacheRepository interface {
+	CheckToken(userId string, token string) (bool, error)
+	SetToken(userId string, token string) error
+}
+
+type UserStorageRepository interface {
+	CheckToken(userId string, token string) (bool, error)
+	RefreshToken(userId string, token string) (string, error)
+
+	CreateUser(telegramId *int64, isStaff *bool, isAdmin *bool) (string, string, error)      // userId, token, err
+	GetUser(userId string) (string, string, *int64, error)                                   // userId, role, tgId, err
+	GetUserIDByToken(token string) (string, bool, error)                                     // userId, status, err
+	GetUserIDByTgId(tgId int64) (string, bool, error)                                        // userId, status, err
+	UpdateUser(userId string, telegramId *int64, isStaff *bool, isAdmin *bool) (bool, error) // status, err
+	DeleteUser(userId string) (bool, error)
+}
+
+type ShortenerRepository interface {
+	GetLinksCountByUserId(userId string) (int32, error)
 }
