@@ -429,6 +429,94 @@ func (x *DeleteLinkResponse) GetStatus() bool {
 	return false
 }
 
+type GetLinksCountByUserIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLinksCountByUserIdRequest) Reset() {
+	*x = GetLinksCountByUserIdRequest{}
+	mi := &file_api_shortener_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLinksCountByUserIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLinksCountByUserIdRequest) ProtoMessage() {}
+
+func (x *GetLinksCountByUserIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_shortener_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLinksCountByUserIdRequest.ProtoReflect.Descriptor instead.
+func (*GetLinksCountByUserIdRequest) Descriptor() ([]byte, []int) {
+	return file_api_shortener_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetLinksCountByUserIdRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetLinksCountByUserIdResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Count         int32                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLinksCountByUserIdResponse) Reset() {
+	*x = GetLinksCountByUserIdResponse{}
+	mi := &file_api_shortener_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLinksCountByUserIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLinksCountByUserIdResponse) ProtoMessage() {}
+
+func (x *GetLinksCountByUserIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_shortener_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLinksCountByUserIdResponse.ProtoReflect.Descriptor instead.
+func (*GetLinksCountByUserIdResponse) Descriptor() ([]byte, []int) {
+	return file_api_shortener_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetLinksCountByUserIdResponse) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
 var File_api_shortener_proto protoreflect.FileDescriptor
 
 const file_api_shortener_proto_rawDesc = "" +
@@ -474,14 +562,19 @@ const file_api_shortener_proto_rawDesc = "" +
 	"\x03Url\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\",\n" +
 	"\x12DeleteLinkResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\bR\x06status2\xd6\x01\n" +
+	"\x06status\x18\x01 \x01(\bR\x06status\"7\n" +
+	"\x1cGetLinksCountByUserIdRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"5\n" +
+	"\x1dGetLinksCountByUserIdResponse\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x05R\x05count2\xb6\x02\n" +
 	"\x10ShortenerService\x12\x1e\n" +
 	"\bRedirect\x12\b.api.Url\x1a\b.api.Url\x122\n" +
 	"\rCreateNewLink\x12\x16.api.CreateLinkRequest\x1a\t.api.Link\x12/\n" +
 	"\n" +
 	"UpdateLink\x12\x16.api.UpdateLinkRequest\x1a\t.api.Link\x12=\n" +
 	"\n" +
-	"DeleteLink\x12\x16.api.DeleteLinkRequest\x1a\x17.api.DeleteLinkResponseB\x13Z\x11pkg/api/shortenerb\x06proto3"
+	"DeleteLink\x12\x16.api.DeleteLinkRequest\x1a\x17.api.DeleteLinkResponse\x12^\n" +
+	"\x15GetLinksCountByUserId\x12!.api.GetLinksCountByUserIdRequest\x1a\".api.GetLinksCountByUserIdResponseB\x13Z\x11pkg/api/shortenerb\x06proto3"
 
 var (
 	file_api_shortener_proto_rawDescOnce sync.Once
@@ -495,26 +588,30 @@ func file_api_shortener_proto_rawDescGZIP() []byte {
 	return file_api_shortener_proto_rawDescData
 }
 
-var file_api_shortener_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_api_shortener_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_api_shortener_proto_goTypes = []any{
-	(*CreateLinkRequest)(nil),  // 0: api.CreateLinkRequest
-	(*UpdateLinkRequest)(nil),  // 1: api.UpdateLinkRequest
-	(*DeleteLinkRequest)(nil),  // 2: api.DeleteLinkRequest
-	(*Link)(nil),               // 3: api.Link
-	(*Url)(nil),                // 4: api.Url
-	(*DeleteLinkResponse)(nil), // 5: api.DeleteLinkResponse
+	(*CreateLinkRequest)(nil),             // 0: api.CreateLinkRequest
+	(*UpdateLinkRequest)(nil),             // 1: api.UpdateLinkRequest
+	(*DeleteLinkRequest)(nil),             // 2: api.DeleteLinkRequest
+	(*Link)(nil),                          // 3: api.Link
+	(*Url)(nil),                           // 4: api.Url
+	(*DeleteLinkResponse)(nil),            // 5: api.DeleteLinkResponse
+	(*GetLinksCountByUserIdRequest)(nil),  // 6: api.GetLinksCountByUserIdRequest
+	(*GetLinksCountByUserIdResponse)(nil), // 7: api.GetLinksCountByUserIdResponse
 }
 var file_api_shortener_proto_depIdxs = []int32{
 	4, // 0: api.ShortenerService.Redirect:input_type -> api.Url
 	0, // 1: api.ShortenerService.CreateNewLink:input_type -> api.CreateLinkRequest
 	1, // 2: api.ShortenerService.UpdateLink:input_type -> api.UpdateLinkRequest
 	2, // 3: api.ShortenerService.DeleteLink:input_type -> api.DeleteLinkRequest
-	4, // 4: api.ShortenerService.Redirect:output_type -> api.Url
-	3, // 5: api.ShortenerService.CreateNewLink:output_type -> api.Link
-	3, // 6: api.ShortenerService.UpdateLink:output_type -> api.Link
-	5, // 7: api.ShortenerService.DeleteLink:output_type -> api.DeleteLinkResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+	6, // 4: api.ShortenerService.GetLinksCountByUserId:input_type -> api.GetLinksCountByUserIdRequest
+	4, // 5: api.ShortenerService.Redirect:output_type -> api.Url
+	3, // 6: api.ShortenerService.CreateNewLink:output_type -> api.Link
+	3, // 7: api.ShortenerService.UpdateLink:output_type -> api.Link
+	5, // 8: api.ShortenerService.DeleteLink:output_type -> api.DeleteLinkResponse
+	7, // 9: api.ShortenerService.GetLinksCountByUserId:output_type -> api.GetLinksCountByUserIdResponse
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -534,7 +631,7 @@ func file_api_shortener_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_shortener_proto_rawDesc), len(file_api_shortener_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
