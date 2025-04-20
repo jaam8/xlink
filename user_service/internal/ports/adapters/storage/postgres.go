@@ -75,7 +75,7 @@ func (u *UserStorageRepositoryPostgres) GetUser(userId string) (string, string, 
 
 	err := u.pool.QueryRow(context.Background(), query, userId).Scan(&telegramId, &isStaff, &isAdmin)
 	if err != nil {
-		return "", "", nil, fmt.Errorf("(postgres) couldn't get user by id=%s, err=%v", userId, postgresErr)
+		return "", "", nil, fmt.Errorf("(postgres) couldn't get user by id=%s, err=%v", userId, err)
 	}
 
 	role = utils.GetRoleByIsStaffIsAdmin(isStaff, isAdmin)
@@ -177,4 +177,20 @@ func (u *UserStorageRepositoryPostgres) DeleteUser(userId string) (bool, error) 
 	}
 
 	return true, nil
+}
+
+func (u *UserStorageRepositoryPostgres) GetRole(userId string) (string, bool, bool, error) {
+	query := `SELECT is_staff, is_admin FROM schema_name.users WHERE id = $1`
+
+	var isStaff, isAdmin bool
+	var role string
+
+	err := u.pool.QueryRow(context.Background(), query, userId).Scan(&isStaff, &isAdmin)
+	if err != nil {
+		return "", false, false, fmt.Errorf("(postgres) couldn't get user role by id=%s, err=%v", userId, err)
+	}
+
+	role = utils.GetRoleByIsStaffIsAdmin(isStaff, isAdmin)
+
+	return role, isStaff, isAdmin, nil
 }
