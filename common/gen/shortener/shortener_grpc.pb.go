@@ -30,7 +30,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ShortenerServiceClient interface {
-	Redirect(ctx context.Context, in *Url, opts ...grpc.CallOption) (*Url, error)
+	Redirect(ctx context.Context, in *RedirectRequest, opts ...grpc.CallOption) (*RedirectResponse, error)
 	CreateNewLink(ctx context.Context, in *CreateLinkRequest, opts ...grpc.CallOption) (*Link, error)
 	UpdateLink(ctx context.Context, in *UpdateLinkRequest, opts ...grpc.CallOption) (*Link, error)
 	DeleteLink(ctx context.Context, in *DeleteLinkRequest, opts ...grpc.CallOption) (*DeleteLinkResponse, error)
@@ -45,9 +45,9 @@ func NewShortenerServiceClient(cc grpc.ClientConnInterface) ShortenerServiceClie
 	return &shortenerServiceClient{cc}
 }
 
-func (c *shortenerServiceClient) Redirect(ctx context.Context, in *Url, opts ...grpc.CallOption) (*Url, error) {
+func (c *shortenerServiceClient) Redirect(ctx context.Context, in *RedirectRequest, opts ...grpc.CallOption) (*RedirectResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Url)
+	out := new(RedirectResponse)
 	err := c.cc.Invoke(ctx, ShortenerService_Redirect_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (c *shortenerServiceClient) GetLinksCountByUserId(ctx context.Context, in *
 // All implementations must embed UnimplementedShortenerServiceServer
 // for forward compatibility.
 type ShortenerServiceServer interface {
-	Redirect(context.Context, *Url) (*Url, error)
+	Redirect(context.Context, *RedirectRequest) (*RedirectResponse, error)
 	CreateNewLink(context.Context, *CreateLinkRequest) (*Link, error)
 	UpdateLink(context.Context, *UpdateLinkRequest) (*Link, error)
 	DeleteLink(context.Context, *DeleteLinkRequest) (*DeleteLinkResponse, error)
@@ -114,7 +114,7 @@ type ShortenerServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedShortenerServiceServer struct{}
 
-func (UnimplementedShortenerServiceServer) Redirect(context.Context, *Url) (*Url, error) {
+func (UnimplementedShortenerServiceServer) Redirect(context.Context, *RedirectRequest) (*RedirectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Redirect not implemented")
 }
 func (UnimplementedShortenerServiceServer) CreateNewLink(context.Context, *CreateLinkRequest) (*Link, error) {
@@ -151,7 +151,7 @@ func RegisterShortenerServiceServer(s grpc.ServiceRegistrar, srv ShortenerServic
 }
 
 func _ShortenerService_Redirect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Url)
+	in := new(RedirectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func _ShortenerService_Redirect_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: ShortenerService_Redirect_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ShortenerServiceServer).Redirect(ctx, req.(*Url))
+		return srv.(ShortenerServiceServer).Redirect(ctx, req.(*RedirectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
