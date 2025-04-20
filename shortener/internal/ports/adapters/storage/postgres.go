@@ -45,7 +45,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkById(linkId uuid.UUID) (mode
 		Scan(&link.Id, &link.UserId, &link.Generated,
 			&link.ShortLink, &link.Url, &link.CreatedAt, &link.ExpireAt)
 
-	if *link.Id == uuid.Nil {
+	if link.Id == uuid.Nil {
 		return models.Link{}, fmt.Errorf("link not found with id '%s'", linkId)
 	}
 
@@ -65,7 +65,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkByShortUrl(shortUrl string) 
 		Scan(&link.Id, &link.UserId, &link.Generated,
 			&link.ShortLink, &link.Url, &link.CreatedAt, &link.ExpireAt)
 
-	if *link.Id == uuid.Nil {
+	if link.Id == uuid.Nil {
 		return models.Link{}, fmt.Errorf("link not found with shortUrl '%s'", shortUrl)
 	}
 
@@ -92,17 +92,15 @@ func (s *ShortenerStorageRepositoryPostgres) CreateLink(newLink *models.Link) (m
 }
 
 func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *models.Link) (models.Link, error) {
-	_, err := s.GetLinkById(*newLinkWithExistingId.Id)
+	_, err := s.GetLinkById(newLinkWithExistingId.Id)
 	if err != nil {
 		return models.Link{}, fmt.Errorf("couldn't update an existing link: %w", err)
 	}
 
 	updateBuilder := squirrel.Update("schema_name.urls").
-		Where(squirrel.Eq{"id": newLinkWithExistingId.Id})
-
-	if newLinkWithExistingId.UserId != nil {
-		updateBuilder = updateBuilder.Set("user_id", newLinkWithExistingId.UserId)
-	}
+		Where(squirrel.Eq{"id": newLinkWithExistingId.Id}).
+		Set("user_id", newLinkWithExistingId.UserId).
+		Set("url", newLinkWithExistingId.Url)
 
 	if newLinkWithExistingId.Generated != nil {
 		updateBuilder = updateBuilder.Set("generated", newLinkWithExistingId.Generated)
@@ -110,10 +108,6 @@ func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *m
 
 	if newLinkWithExistingId.ShortLink != nil {
 		updateBuilder = updateBuilder.Set("short_link", newLinkWithExistingId.ShortLink)
-	}
-
-	if newLinkWithExistingId.Url != nil {
-		updateBuilder = updateBuilder.Set("url", newLinkWithExistingId.Url)
 	}
 
 	if newLinkWithExistingId.ExpireAt != nil {
