@@ -1,20 +1,20 @@
 generate_user_service:
 	protoc -I ./user_service \
-		--go_out=./user_service \
-		--go-grpc_out=./user_service \
+		--go_out=. \
+		--go-grpc_out=. \
 		./user_service/api/user_service.proto
 
 generate_shortener:
 	protoc -I ./shortener \
-		--go_out=./shortener \
-		--go-grpc_out=./shortener \
+		--go_out=. \
+		--go-grpc_out=. \
 		./shortener/api/shortener.proto
 
-generate_tg_bot:
-	protoc -I ./tg_bot \
-	--go_out=./tg_bot \
-	--go-grpc_out=./tg_bot \
-	./tg_bot/api/tg_bot.proto
+generate_analytics:
+	protoc -I ./analytics \
+	--go_out=. \
+	--go-grpc_out=. \
+	./analytics/api/analytics.proto
 
 copy_env:
 	cp ports.env.example ports.env
