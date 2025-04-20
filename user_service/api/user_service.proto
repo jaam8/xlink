@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "pkg/api/user_service";
+option go_package = "common/gen/user_service";
 
 package api;
 
@@ -15,6 +15,7 @@ service UserService {
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserRequest);
 }
 
+// ======================== Create User ========================
 message CreateUserRequest {
   optional int64 tg_id = 1;
   optional bool is_staff = 2;
@@ -26,6 +27,7 @@ message CreateUserResponse {
   string token = 2;
 }
 
+// ======================== Get User ========================
 message GetUserRequest {
   string user_id = 1;
 }
@@ -38,6 +40,7 @@ message GetUserResponse {
   int32 link_count = 4;
 }
 
+// ======================== Get UserID By Token ========================
 message GetUserIDByTokenRequest {
   string token = 1;
 }
@@ -47,6 +50,7 @@ message GetUserIDByTokenResponse {
   bool status = 2;
 }
 
+// ======================== Get UserID By Tg ID ========================
 message GetUserIDByTgIDRequest {
   int64 tg_id = 1;
 }
@@ -56,6 +60,7 @@ message GetUserIDByTgIDResponse {
   bool status = 2;
 }
 
+// ======================== Check Token ========================
 message TokenCheckRequest {
   string user_id = 1;
   string token = 2;
@@ -65,6 +70,7 @@ message TokenCheckResponse {
   bool status = 1;
 }
 
+// ======================== Refresh Token ========================
 message RefreshTokenRequest {
   string user_id = 1;
   string token = 2;
@@ -73,6 +79,7 @@ message RefreshTokenResponse {
   string token = 1;
 }
 
+// ======================== Delete ========================
 message DeleteUserRequest {
   string user_id = 1;
 }
@@ -81,6 +88,7 @@ message DeleteUserResponse {
   bool status = 1;
 }
 
+// ======================== Update User =====================
 message UpdateUserRequest {
   string user_id = 1;
 //  не трогать если пустой

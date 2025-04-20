@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"time"
 	"xlink/common/callers"
-	"xlink/user_service/pkg/api/shortener"
+	"xlink/common/gen/shortener"
 )
 
 type ShortenerRepositoryGRPC struct {
