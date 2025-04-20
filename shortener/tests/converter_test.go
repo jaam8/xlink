@@ -43,7 +43,7 @@ func TestLinkModelFromLinkRequest(t *testing.T) {
 		GroupId:   &groupUUID,
 		Generated: true,
 		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
+		TargetUrl: "http://qwertysdijvnisdnc",
 		CreatedAt: createdAtTime,
 		ExpireAt:  expireAtTime,
 	}
@@ -94,7 +94,7 @@ func TestLinkModelFromLinkRequestWithId(t *testing.T) {
 		GroupId:   &groupUUID,
 		Generated: true,
 		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
+		TargetUrl: "http://qwertysdijvnisdnc",
 		CreatedAt: createdAtTime,
 		ExpireAt:  expireAtTime,
 	}

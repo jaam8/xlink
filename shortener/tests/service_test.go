@@ -109,7 +109,7 @@ func TestCreateNewLink(t *testing.T) {
 		GroupId:   &groupUUID,
 		Generated: true,
 		ShortLink: utils.GenerateShortURL(),
-		Url:       "http://qwertysdijvnisdnc",
+		TargetUrl: "http://qwertysdijvnisdnc",
 		CreatedAt: time.Now(),
 		ExpireAt:  expireAtTime,
 	}
@@ -120,7 +120,7 @@ func TestCreateNewLink(t *testing.T) {
 		GroupId:   &groupUUID,
 		Generated: testCreateLinkRequest4.Generated,
 		ShortLink: utils.GenerateShortURL(),
-		Url:       "http://qwertysdijvnisdnc",
+		TargetUrl: "http://qwertysdijvnisdnc",
 		CreatedAt: time.Now(),
 		ExpireAt:  expireAtTime,
 	}
@@ -151,7 +151,7 @@ func TestCreateNewLink(t *testing.T) {
 	assert.Equal(t, expectedModel.GroupId.String(), *testCreateNewLinkResponse1.GroupId)
 	assert.Equal(t, expectedModel.Generated, testCreateNewLinkResponse1.Generated)
 	assert.Equal(t, expectedModel.ShortLink, testCreateNewLinkResponse1.ShortLink)
-	assert.Equal(t, expectedModel.Url, testCreateNewLinkResponse1.Url)
+	assert.Equal(t, expectedModel.TargetUrl, testCreateNewLinkResponse1.Url)
 	assert.Equal(t, expectedModel.CreatedAt.String(), testCreateNewLinkResponse1.CreatedAt)
 	assert.Equal(t, expectedModel.ExpireAt.String(), testCreateNewLinkResponse1.ExpireAt)
 
@@ -160,7 +160,7 @@ func TestCreateNewLink(t *testing.T) {
 	assert.Equal(t, expectedModel.GroupId.String(), *testCreateNewLinkResponse2.GroupId)
 	assert.Equal(t, expectedModel.Generated, testCreateNewLinkResponse2.Generated)
 	assert.Equal(t, expectedModel.ShortLink, testCreateNewLinkResponse2.ShortLink)
-	assert.Equal(t, expectedModel.Url, testCreateNewLinkResponse2.Url)
+	assert.Equal(t, expectedModel.TargetUrl, testCreateNewLinkResponse2.Url)
 	assert.Equal(t, expectedModel.CreatedAt.String(), testCreateNewLinkResponse2.CreatedAt)
 	assert.Equal(t, expectedModel.ExpireAt.String(), testCreateNewLinkResponse2.ExpireAt)
 
@@ -169,7 +169,7 @@ func TestCreateNewLink(t *testing.T) {
 	assert.Equal(t, expectedModel.GroupId.String(), *testCreateNewLinkResponse3.GroupId)
 	assert.Equal(t, expectedModel.Generated, testCreateNewLinkResponse3.Generated)
 	assert.Equal(t, expectedModel.ShortLink, testCreateNewLinkResponse3.ShortLink)
-	assert.Equal(t, expectedModel.Url, testCreateNewLinkResponse3.Url)
+	assert.Equal(t, expectedModel.TargetUrl, testCreateNewLinkResponse3.Url)
 	assert.Equal(t, expectedModel.CreatedAt.String(), testCreateNewLinkResponse3.CreatedAt)
 	assert.Equal(t, expectedModel.ExpireAt.String(), testCreateNewLinkResponse3.ExpireAt)
 
@@ -178,7 +178,7 @@ func TestCreateNewLink(t *testing.T) {
 	assert.Equal(t, expectedModel4.GroupId.String(), *testCreateNewLinkResponse4.GroupId)
 	assert.Equal(t, expectedModel4.Generated, testCreateNewLinkResponse4.Generated)
 	assert.Equal(t, expectedModel4.ShortLink, testCreateNewLinkResponse4.ShortLink)
-	assert.Equal(t, expectedModel4.Url, testCreateNewLinkResponse4.Url)
+	assert.Equal(t, expectedModel4.TargetUrl, testCreateNewLinkResponse4.Url)
 	assert.Equal(t, expectedModel4.CreatedAt.String(), testCreateNewLinkResponse4.CreatedAt)
 	assert.Equal(t, expectedModel4.ExpireAt.String(), testCreateNewLinkResponse4.ExpireAt)
 
@@ -233,7 +233,7 @@ func TestUpdateLink(t *testing.T) {
 		GroupId:   &groupUUID,
 		Generated: true,
 		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
+		TargetUrl: "http://qwertysdijvnisdnc",
 		CreatedAt: createdAtTime,
 		ExpireAt:  expireAtTime,
 	}
@@ -251,7 +251,7 @@ func TestUpdateLink(t *testing.T) {
 	assert.Equal(t, expectedModel.GroupId.String(), *testUpdateLinkResponse.GroupId)
 	assert.Equal(t, expectedModel.Generated, testUpdateLinkResponse.Generated)
 	assert.Equal(t, expectedModel.ShortLink, testUpdateLinkResponse.ShortLink)
-	assert.Equal(t, expectedModel.Url, testUpdateLinkResponse.Url)
+	assert.Equal(t, expectedModel.TargetUrl, testUpdateLinkResponse.Url)
 	assert.Equal(t, expectedModel.CreatedAt.String(), testUpdateLinkResponse.CreatedAt)
 	assert.Equal(t, expectedModel.ExpireAt.String(), testUpdateLinkResponse.ExpireAt)
 
@@ -299,7 +299,7 @@ func TestDeleteLink(t *testing.T) {
 		GroupId:   &groupUUID,
 		Generated: true,
 		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
+		TargetUrl: "http://qwertysdijvnisdnc",
 		CreatedAt: createdAtTime,
 		ExpireAt:  expireAtTime,
 	}
@@ -360,12 +360,12 @@ func TestRedirect(t *testing.T) {
 		GroupId:   &groupUUID,
 		Generated: true,
 		ShortLink: "http://qwerty",
-		Url:       "http://qwertysdijvnisdnc",
+		TargetUrl: "http://qwertysdijvnisdnc",
 		CreatedAt: createdAtTime,
 		ExpireAt:  expireAtTime,
 	}
 
-	testShortenerCacheRepository.On("GetUrl", mock.AnythingOfType("string")).Return(expectedModel.Url, nil)
+	testShortenerCacheRepository.On("GetUrl", mock.AnythingOfType("string")).Return(expectedModel.TargetUrl, nil)
 	//testShortenerSenderRepository.On("SendRedirectInfo").Return()
 
 	testRedirectResponse, err := s.Redirect(ctx, &testRedirectRequest)
@@ -374,7 +374,7 @@ func TestRedirect(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedModel.Url, testRedirectResponse.Url)
+	assert.Equal(t, expectedModel.TargetUrl, testRedirectResponse.Url)
 
 	testShortenerStorageRepository.AssertExpectations(t)
 

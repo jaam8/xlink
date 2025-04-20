@@ -43,7 +43,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkById(linkId uuid.UUID) (mode
 
 	_ = s.PostgresPool.QueryRow(context.Background(), sql, args...).
 		Scan(&link.Id, &link.UserId, &link.Generated,
-			&link.ShortLink, &link.Url, &link.CreatedAt, &link.ExpireAt)
+			&link.ShortLink, &link.TargetUrl, &link.CreatedAt, &link.ExpireAt)
 
 	if link.Id == uuid.Nil {
 		return models.Link{}, fmt.Errorf("link not found with id '%s'", linkId)
@@ -63,7 +63,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkByShortUrl(shortUrl string) 
 
 	_ = s.PostgresPool.QueryRow(context.Background(), sql, args...).
 		Scan(&link.Id, &link.UserId, &link.Generated,
-			&link.ShortLink, &link.Url, &link.CreatedAt, &link.ExpireAt)
+			&link.ShortLink, &link.TargetUrl, &link.CreatedAt, &link.ExpireAt)
 
 	if link.Id == uuid.Nil {
 		return models.Link{}, fmt.Errorf("link not found with shortUrl '%s'", shortUrl)
@@ -76,7 +76,7 @@ func (s *ShortenerStorageRepositoryPostgres) CreateLink(newLink *models.Link) (m
 	sql, args, err := squirrel.Insert("schema_name.urls").
 		Columns("user_id", "generated",
 			"short_link", "url", "expire_at").
-		Values(newLink.UserId, newLink.Generated, newLink.ShortLink, newLink.Url, newLink.ExpireAt).
+		Values(newLink.UserId, newLink.Generated, newLink.ShortLink, newLink.TargetUrl, newLink.ExpireAt).
 		Suffix("RETURNING id, created_at").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -100,7 +100,7 @@ func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *m
 	updateBuilder := squirrel.Update("schema_name.urls").
 		Where(squirrel.Eq{"id": newLinkWithExistingId.Id}).
 		Set("user_id", newLinkWithExistingId.UserId).
-		Set("url", newLinkWithExistingId.Url)
+		Set("url", newLinkWithExistingId.TargetUrl)
 
 	if newLinkWithExistingId.Generated != nil {
 		updateBuilder = updateBuilder.Set("generated", newLinkWithExistingId.Generated)

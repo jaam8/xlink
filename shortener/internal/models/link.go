@@ -10,7 +10,7 @@ type Link struct {
 	UserId    uuid.UUID  `json:"user_id"`
 	Generated *bool      `json:"generated"`
 	ShortLink *string    `json:"short_link"`
-	Url       string     `json:"url"`
+	TargetUrl string     `json:"url"`
 	CreatedAt time.Time  `json:"created_at"`
 	ExpireAt  *time.Time `json:"expire_at"`
 }
