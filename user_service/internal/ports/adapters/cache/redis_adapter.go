@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v7"
 	"strings"
+	"time"
 	"xlink/user_service/internal/utils"
 )
 
@@ -16,7 +17,8 @@ const (
 )
 
 type UserCacheRepositoryRedis struct {
-	RedisClient *redis.Client
+	RedisClient     *redis.Client
+	CacheExpiration time.Duration
 }
 
 func getUserIdKey(userId string) string {
@@ -49,8 +51,8 @@ func stringToBool(val string) bool {
 	}
 }
 
-func NewUserCacheRepositoryRedis(redisClient *redis.Client) *UserCacheRepositoryRedis {
-	return &UserCacheRepositoryRedis{RedisClient: redisClient}
+func NewUserCacheRepositoryRedis(redisClient *redis.Client, cacheExpiration time.Duration) *UserCacheRepositoryRedis {
+	return &UserCacheRepositoryRedis{RedisClient: redisClient, CacheExpiration: cacheExpiration}
 }
 
 func (t *UserCacheRepositoryRedis) CheckToken(userId string, token string) (bool, error) {
@@ -79,7 +81,7 @@ func (t *UserCacheRepositoryRedis) GetToken(userId string) (string, error) {
 }
 
 func (t *UserCacheRepositoryRedis) SetToken(userId string, token string) error {
-	commandResult := t.RedisClient.Set(getUserIdKey(userId), token, 0)
+	commandResult := t.RedisClient.Set(getUserIdKey(userId), token, t.CacheExpiration)
 	if commandResult.Err() != nil {
 		return fmt.Errorf("couldn't cache token in redis: %v", commandResult.Err())
 	}
@@ -113,7 +115,7 @@ func (t *UserCacheRepositoryRedis) GetRole(userId string) (string, bool, bool, e
 func (t *UserCacheRepositoryRedis) SetRole(userId string, isStaff bool, isAdmin bool) error {
 	rolesString := fmt.Sprintf("%s%s%s", boolToString(isStaff), sep, boolToString(isAdmin))
 
-	commandResult := t.RedisClient.Set(getRolesKey(userId), rolesString, 0)
+	commandResult := t.RedisClient.Set(getRolesKey(userId), rolesString, t.CacheExpiration)
 	if commandResult.Err() != nil {
 		return fmt.Errorf("couldn't cache roles in redis: %v", commandResult.Err())
 	}
