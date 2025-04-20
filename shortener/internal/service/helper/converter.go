@@ -15,8 +15,8 @@ func LinkResponseFromLinkModel(link models.Link) *shortener.Link {
 		LinkId:    link.Id.String(),
 		UserId:    link.UserId.String(),
 		ShortLink: *link.ShortLink,
-		TargetUrl: *link.Url,
-		CreatedAt: timestamppb.New(*link.CreatedAt),
+		TargetUrl: link.Url,
+		CreatedAt: timestamppb.New(link.CreatedAt),
 		ExpireAt:  timestamppb.New(*link.ExpireAt),
 	}
 }
@@ -37,9 +37,9 @@ func LinkModelFromLinkCreateRequest(request LinkCreateRequest, expiration time.T
 	}
 
 	return &models.Link{
-		UserId:    &userId,
+		UserId:    userId,
 		ShortLink: &shortLink,
-		Url:       &targetUrl,
+		Url:       targetUrl,
 		ExpireAt:  &expiration,
 		Generated: &generated,
 	}, nil
@@ -72,14 +72,13 @@ func LinkModelFromLinkUpdateRequest(request LinkUpdateRequest) (*models.Link, er
 	generated := &generatedValue
 	shortLink = &shortLinkText
 
-	targetUrlText := request.GetTargetUrl()
-	targetUrl := &targetUrlText
+	targetUrl := request.GetTargetUrl()
 
 	expireAt := request.GetExpireAt().AsTime()
 
 	return &models.Link{
-		Id:        &linkId,
-		UserId:    &userId,
+		Id:        linkId,
+		UserId:    userId,
 		Generated: generated,
 		ShortLink: shortLink,
 		Url:       targetUrl,

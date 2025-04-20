@@ -96,7 +96,7 @@ func (s *Service) Redirect(ctx context.Context, request *shortener.RedirectReque
 			return &shortener.RedirectResponse{}, fmt.Errorf("error while getting link: %v", err)
 		}
 
-		originalUrl = *link.Url
+		originalUrl = link.Url
 
 		// we better cache the link, so we won't have to visit DB too often
 		go func() {
