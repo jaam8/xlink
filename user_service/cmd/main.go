@@ -50,7 +50,7 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to migrate postgres database: %w", err))
 	}
 
-	cacheRepo := cache.NewUserCacheRepositoryRedis(redisClient)
+	cacheRepo := cache.NewUserCacheRepositoryRedis(redisClient, time.Second*time.Duration(cfg.CacheExpirationSeconds))
 	storageRepo := storage.NewUserStorageRepositoryPostgres(postgresClient, int8(cfg.TokenLength))
 
 	shortenerRepo := shortener_adapters.NewShortenerRepositoryGRPC(

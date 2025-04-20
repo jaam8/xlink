@@ -13,6 +13,7 @@ service UserService {
   rpc CheckToken(TokenCheckRequest) returns (TokenCheckResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  rpc GetRole(GetRoleRequest) returns (GetRoleResponse);
 }
 
 // ======================== Create User ========================
@@ -99,4 +100,15 @@ message UpdateUserRequest {
 
 message UpdateUserResponse {
   bool status = 1;
+}
+
+// ======================== Role Check ======================
+message GetRoleRequest {
+  string user_id = 1;
+}
+
+message GetRoleResponse {
+  string role = 1;
+  bool is_staff = 2;
+  bool is_admin = 3;
 }
