@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "pkg/api/shortener";
+option go_package = "common/gen/shortener";
 
 package api;
 

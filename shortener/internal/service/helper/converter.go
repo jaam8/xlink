@@ -2,11 +2,10 @@ package helper
 
 import (
 	"fmt"
-	"time"
-	"xlink/shortener/internal/models"
-	"xlink/shortener/pkg/api/shortener"
-
 	"github.com/google/uuid"
+	"time"
+	"xlink/common/gen/shortener"
+	"xlink/shortener/internal/models"
 )
 
 func LinkResponseFromLinkModel(link models.Link) *shortener.Link {
