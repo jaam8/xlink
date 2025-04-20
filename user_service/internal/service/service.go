@@ -202,3 +202,15 @@ func (s *Service) DeleteUser(ctx context.Context, req *user_service.DeleteUserRe
 
 	return &user_service.DeleteUserResponse{Status: status}, nil
 }
+
+func (s *Service) GetRole(ctx context.Context, req *user_service.GetRoleRequest) (*user_service.GetRoleResponse, error) {
+	role, isStaff, isAdmin, err := s.storageRepo.GetRole(req.UserId)
+	if err != nil {
+		return &user_service.GetRoleResponse{}, fmt.Errorf("couldn't get role for userId='%s': %v", req.UserId, err)
+	}
+	return &user_service.GetRoleResponse{
+		Role:    role,
+		IsStaff: isStaff,
+		IsAdmin: isAdmin,
+	}, nil
+}
