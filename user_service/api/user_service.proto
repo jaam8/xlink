@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+option go_package = "common/gen/user_service";
+
+package api;
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc GetUserIDByToken(GetUserIDByTokenRequest) returns (GetUserIDByTokenResponse);
+  rpc GetUserIDByTgID(GetUserIDByTgIDRequest) returns (GetUserIDByTgIDResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc CheckToken(TokenCheckRequest) returns (TokenCheckResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserRequest);
+}
+
+// ======================== Create User ========================
+message CreateUserRequest {
+  optional int64 tg_id = 1;
+  optional bool is_staff = 2;
+  optional bool is_admin = 3;
+}
+
+message CreateUserResponse {
+  string user_id = 1;
+  string token = 2;
+}
+
+// ======================== Get User ========================
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message GetUserResponse {
+  string user_id = 1;
+//  внутри проверям роль и отдаем строкой
+  string role = 2;
+  optional int64 tg_id = 3;
+  int32 link_count = 4;
+}
+
+// ======================== Get UserID By Token ========================
+message GetUserIDByTokenRequest {
+  string token = 1;
+}
+
+message GetUserIDByTokenResponse {
+  string user_id = 1;
+  bool status = 2;
+}
+
+// ======================== Get UserID By Tg ID ========================
+message GetUserIDByTgIDRequest {
+  int64 tg_id = 1;
+}
+
+message GetUserIDByTgIDResponse {
+  string user_id = 1;
+  bool status = 2;
+}
+
+// ======================== Check Token ========================
+message TokenCheckRequest {
+  string user_id = 1;
+  string token = 2;
+}
+
+message TokenCheckResponse {
+  bool status = 1;
+}
+
+// ======================== Refresh Token ========================
+message RefreshTokenRequest {
+  string user_id = 1;
+  string token = 2;
+}
+message RefreshTokenResponse {
+  string token = 1;
+}
+
+// ======================== Delete ========================
+message DeleteUserRequest {
+  string user_id = 1;
+}
+
+message DeleteUserResponse {
+  bool status = 1;
+}
+
+// ======================== Update User =====================
+message UpdateUserRequest {
+  string user_id = 1;
+//  не трогать если пустой
+  optional int64 tg_id = 2;
+  optional bool is_staff = 3;
+  optional bool is_admin = 4;
+}
+
+message UpdateUserResponse {
+  bool status = 1;
+}

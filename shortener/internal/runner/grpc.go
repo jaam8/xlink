@@ -7,11 +7,11 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"time"
+	"xlink/common/gen/shortener"
 	"xlink/common/grpc/interceptors"
 	"xlink/common/logger"
 	"xlink/shortener/internal/ports"
 	"xlink/shortener/internal/service"
-	"xlink/shortener/pkg/api/shortener"
 )
 
 func CreateGRPC(

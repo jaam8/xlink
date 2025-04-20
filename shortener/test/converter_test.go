@@ -3,9 +3,9 @@ package tests
 import (
 	"testing"
 	"time"
+	"xlink/common/gen/shortener"
 	"xlink/shortener/internal/models"
 	"xlink/shortener/internal/service/helper"
-	"xlink/shortener/pkg/api/shortener"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
