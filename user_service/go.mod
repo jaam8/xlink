@@ -1,4 +1,4 @@
-module xlink/token_service
+module xlink/user_service
 
 go 1.24.1
 
@@ -16,7 +16,6 @@ replace xlink/common => ../common
 
 require (
 	github.com/BurntSushi/toml v1.5.0 // indirect
-	github.com/chempik1234/common-chempik-pkg-golang v1.0.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/kr/pretty v0.3.1 // indirect

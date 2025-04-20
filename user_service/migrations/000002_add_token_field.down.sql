@@ -1,0 +1,1 @@
+alter table schema_name.users drop column token;

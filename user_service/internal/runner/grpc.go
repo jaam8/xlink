@@ -8,9 +8,9 @@ import (
 	"net"
 	"xlink/common/grpc/interceptors"
 	"xlink/common/logger"
-	"xlink/token_service/internal/ports"
-	"xlink/token_service/internal/service"
-	"xlink/token_service/pkg/api/token_service"
+	"xlink/user_service/internal/ports"
+	"xlink/user_service/internal/service"
+	"xlink/user_service/pkg/api/user_service"
 )
 
 func RunGRPC(ctx context.Context, server *grpc.Server, port int) {
@@ -32,9 +32,13 @@ func RunGRPC(ctx context.Context, server *grpc.Server, port int) {
 	}
 }
 
-func CreateGRPC(tokensRepo ports.TokensRepository) (*grpc.Server, error) {
-	grpcSrv := service.New(tokensRepo)
+func CreateGRPC(
+	cacheRepo ports.UsersCacheRepository,
+	storageRepo ports.UserStorageRepository,
+	shortenerRepo ports.ShortenerRepository,
+) (*grpc.Server, error) {
+	grpcSrv := service.New(cacheRepo, storageRepo, shortenerRepo)
 	server := grpc.NewServer(grpc.UnaryInterceptor(interceptors.AddLogMiddleware))
-	token_service.RegisterTokenServiceServer(server, grpcSrv)
+	user_service.RegisterUserServiceServer(server, grpcSrv)
 	return server, nil
 }
