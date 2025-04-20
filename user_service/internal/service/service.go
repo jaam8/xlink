@@ -204,10 +204,23 @@ func (s *Service) DeleteUser(ctx context.Context, req *user_service.DeleteUserRe
 }
 
 func (s *Service) GetRole(ctx context.Context, req *user_service.GetRoleRequest) (*user_service.GetRoleResponse, error) {
-	role, isStaff, isAdmin, err := s.storageRepo.GetRole(req.UserId)
+	// try to get from cache
+	role, isStaff, isAdmin, err := s.cacheRepo.GetRole(req.UserId)
+
+	// couldn't get from cache
 	if err != nil {
-		return &user_service.GetRoleResponse{}, fmt.Errorf("couldn't get role for userId='%s': %v", req.UserId, err)
+		role, isStaff, isAdmin, err = s.storageRepo.GetRole(req.UserId)
+
+		// couldn't get from postgres
+		if err != nil {
+			return &user_service.GetRoleResponse{}, fmt.Errorf("couldn't get role for userId='%s': %v", req.UserId, err)
+		}
+
+		go func() {
+			s.cacheRepo.SetRole(req.UserId, isStaff, isAdmin)
+		}()
 	}
+
 	return &user_service.GetRoleResponse{
 		Role:    role,
 		IsStaff: isStaff,

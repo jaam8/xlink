@@ -3,6 +3,9 @@ package ports
 type UsersCacheRepository interface {
 	CheckToken(userId string, token string) (bool, error)
 	SetToken(userId string, token string) error
+
+	GetRole(userId string) (string, bool, bool, error)
+	SetRole(userId string, isStaff bool, isAdmin bool) error
 }
 
 type UserStorageRepository interface {
