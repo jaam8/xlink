@@ -9,6 +9,7 @@ service ShortenerService {
   rpc CreateNewLink(CreateLinkRequest) returns (Link);
   rpc UpdateLink(UpdateLinkRequest) returns (Link);
   rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse);
+  rpc GetLinksCountByUserId(GetLinksCountByUserIdRequest) returns (GetLinksCountByUserIdResponse);
 }
 
 // ======================== Link ========================
@@ -56,4 +57,13 @@ message DeleteLinkRequest {
 
 message DeleteLinkResponse {
   bool status = 1;
+}
+
+// ===================== Get Link Count By User ID ========================
+message GetLinksCountByUserIdRequest {
+  string user_id = 1;
+}
+
+message GetLinksCountByUserIdResponse {
+  int32 count = 1;
 }

@@ -138,3 +138,21 @@ func (s *ShortenerStorageRepositoryPostgres) DeleteLink(linkId uuid.UUID) error 
 
 	return nil
 }
+
+func (s *ShortenerStorageRepositoryPostgres) GetLinksCountByUserId(userId uuid.UUID) (int32, error) {
+	var count int32
+	sql, args, err := squirrel.Select("count(*)").
+		From("schema_name.urls").
+		Where(squirrel.Eq{"user_id": userId}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return count, fmt.Errorf("couldn't build an SQL query: %w", err)
+	}
+
+	err = s.PostgresPool.QueryRow(context.Background(), sql, args...).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("couldn't get links count by user id '%s': %w", userId, err)
+	}
+	return count, nil
+}

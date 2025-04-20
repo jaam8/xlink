@@ -21,7 +21,7 @@ func GetValidatedId(request LinkBodyRequestOnlyId) (uuid.UUID, error) {
 	return id, nil
 }
 
-func GetValidatedUserId(request LinkBodyRequest) (uuid.UUID, error) {
+func GetValidatedUserId(request LinkBodyRequestOnlyUserId) (uuid.UUID, error) {
 	var userId uuid.UUID
 	var err error
 
@@ -33,7 +33,7 @@ func GetValidatedUserId(request LinkBodyRequest) (uuid.UUID, error) {
 	return userId, nil
 }
 
-func GetValidatedGroupId(request LinkBodyRequest, defaultValue *uuid.UUID) (*uuid.UUID, error) {
+func GetValidatedGroupId(request LinkBodyRequestOnlyGroupId, defaultValue *uuid.UUID) (*uuid.UUID, error) {
 	var err error
 
 	if request.GetGroupId() != "" {
@@ -48,7 +48,7 @@ func GetValidatedGroupId(request LinkBodyRequest, defaultValue *uuid.UUID) (*uui
 	return defaultValue, nil
 }
 
-func GetValidatedExpireAt(request LinkBodyRequest, defaultValue time.Time) (time.Time, error) {
+func GetValidatedExpireAt(request LinkBodyRequestOnlyExpireAt, defaultValue time.Time) (time.Time, error) {
 	var expireAt = defaultValue
 	var err error
 
