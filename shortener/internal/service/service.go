@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"xlink/common/gen/shortener"
 	"xlink/shortener/internal/models"
 	"xlink/shortener/internal/ports"
 	"xlink/shortener/internal/service/helper"
-	"xlink/shortener/pkg/api/shortener"
 
 	"go.uber.org/zap"
 	"xlink/common/logger"

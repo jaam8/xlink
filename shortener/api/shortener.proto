@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "pkg/api/shortener";
+option go_package = "common/gen/shortener";
 
 package api;
 
@@ -11,29 +11,7 @@ service ShortenerService {
   rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse);
 }
 
-message CreateLinkRequest {
-  string user_id = 1;
-  optional string group_id = 2;
-  bool generated = 3;
-  string short_link = 4;
-  string url = 5;
-  optional string expire_at = 6;
-}
-
-message UpdateLinkRequest {
-  string id = 1;
-  string user_id = 2;
-  optional string group_id = 3;
-  bool generated = 4;
-  string short_link = 5;
-  string url = 6;
-  optional string expire_at = 7;
-}
-
-message DeleteLinkRequest {
-  string id = 1;
-}
-
+// ======================== Link ========================
 message Link {
   string id = 1;
   string user_id = 2;
@@ -45,8 +23,35 @@ message Link {
   string expire_at = 8;
 }
 
+// ======================== Create ========================
+message CreateLinkRequest {
+  string user_id = 1;
+  optional string group_id = 2;
+  bool generated = 3;
+  string short_link = 4;
+  string url = 5;
+  optional string expire_at = 6;
+}
+
+// ======================== Update ========================
+message UpdateLinkRequest {
+  string id = 1;
+  string user_id = 2;
+  optional string group_id = 3;
+  bool generated = 4;
+  string short_link = 5;
+  string url = 6;
+  optional string expire_at = 7;
+}
+
+// ======================== Redirect ========================
 message Url {
   string url = 1;
+}
+
+// ======================== Delete ========================
+message DeleteLinkRequest {
+  string id = 1;
 }
 
 message DeleteLinkResponse {
