@@ -8,6 +8,7 @@ import (
 	"xlink/shortener/internal/models"
 	"xlink/shortener/internal/ports"
 	"xlink/shortener/internal/service/helper"
+	"xlink/shortener/internal/service/utils"
 
 	"go.uber.org/zap"
 	"xlink/common/logger"
@@ -39,6 +40,10 @@ func (s *Service) CreateNewLink(ctx context.Context, request *shortener.CreateLi
 	inputData, err := helper.LinkModelFromLinkRequest(request, time.Now().Add(s.defaultLinkExpireTime))
 	if err != nil {
 		return &shortener.Link{}, fmt.Errorf("error while validating link: %v", err)
+	}
+
+	if inputData.Generated {
+		inputData.ShortLink = utils.GenerateShortURL()
 	}
 
 	newLink, err := s.storageRepo.CreateLink(inputData)
