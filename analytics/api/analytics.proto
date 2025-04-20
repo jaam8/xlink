@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+option go_package = "common/gen/analytics";
+
+package api;
+
+service AnalyticsService {
+  rpc ClicksByRegion(GetClicksRequest) returns (ClicksByRegionResponse);
+  rpc ClicksByBrowser(GetClicksRequest) returns (ClicksByBrowserResponse);
+  rpc ClicksByDeviceType(GetClicksRequest) returns (ClicksByDeviceTypeResponse);
+  rpc ClicksByHour(GetClicksRequest) returns (ClicksByHourResponse);
+  rpc ClicksByDate(GetClicksRequest) returns (ClicksByDateResponse);
+  rpc ClicksByReferrer(GetClicksRequest) returns (ClicksByReferrerResponse);
+}
+
+message GetClicksRequest {
+  string user_id = 1;
+  string link_id = 2;
+  string start_date = 3; // "2025-04-01"
+  string end_date = 4;   // "2025-04-19"
+}
+
+// ========================== Region ==========================
+message ClicksByRegionResponse {
+  repeated RegionDayStats data = 1;
+}
+
+message RegionDayStats {
+  string date = 1;
+  repeated RegionClicks stats = 2;
+}
+
+message RegionClicks {
+  string region = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Browser ==========================
+message ClicksByBrowserResponse {
+  repeated BrowserDayStats data = 1;
+}
+
+message BrowserDayStats {
+  string date = 1;
+  repeated BrowserClicks stats = 2;
+}
+
+message BrowserClicks {
+  string browser = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Device Type ==========================
+message ClicksByDeviceTypeResponse {
+  repeated DeviceDayStats data = 1;
+}
+
+message DeviceDayStats {
+  string date = 1;
+  repeated DeviceClicks stats = 2;
+}
+
+message DeviceClicks {
+  string device_type = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Referrer ==========================
+message ClicksByReferrerResponse {
+  repeated ReferrerDayStats data = 1;
+}
+
+message ReferrerDayStats {
+  string date = 1;
+  repeated ReferrerClicks stats = 2;
+}
+
+message ReferrerClicks {
+  string referrer = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Hour ==========================
+message ClicksByHourResponse {
+  repeated HourStat stats = 1;
+}
+
+message HourStat {
+  uint32 hour = 1; // 0–23
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Date ==========================
+message ClicksByDateResponse {
+  repeated DateStat stats = 1;
+}
+
+message DateStat {
+  string date = 1; // "2025-04-13"
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
