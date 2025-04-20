@@ -6,11 +6,11 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"net"
+	"xlink/common/gen/user_service"
 	"xlink/common/grpc/interceptors"
 	"xlink/common/logger"
 	"xlink/user_service/internal/ports"
 	"xlink/user_service/internal/service"
-	"xlink/user_service/pkg/api/user_service"
 )
 
 func RunGRPC(ctx context.Context, server *grpc.Server, port int) {

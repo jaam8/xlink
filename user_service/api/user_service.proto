@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "pkg/api/user_service";
+option go_package = "common/gen/user_service";
 
 package api;
 
