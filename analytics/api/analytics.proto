@@ -7,6 +7,7 @@ package api;
 service AnalyticsService {
   rpc ClicksByRegion(GetClicksRequest) returns (ClicksByRegionResponse);
   rpc ClicksByBrowser(GetClicksRequest) returns (ClicksByBrowserResponse);
+  rpc ClicksByOS(GetClicksRequest) returns (ClicksByOSResponse);
   rpc ClicksByDeviceType(GetClicksRequest) returns (ClicksByDeviceTypeResponse);
   rpc ClicksByHour(GetClicksRequest) returns (ClicksByHourResponse);
   rpc ClicksByDate(GetClicksRequest) returns (ClicksByDateResponse);
@@ -64,6 +65,22 @@ message DeviceDayStats {
 
 message DeviceClicks {
   string device_type = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== OS ==========================
+message ClicksByOSResponse {
+  repeated OSDayStats data = 1;
+}
+
+message OSDayStats {
+  string date = 1;
+  repeated OSClicks stats = 2;
+}
+
+message OSClicks {
+  string os = 1;
   uint64 clicks = 2;
   uint64 unique_clicks = 3;
 }
