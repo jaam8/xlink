@@ -8,11 +8,20 @@ stages:
 variables:
   COVERAGE_THRESHOLD: 30
 
-lint:
+lint_user_service:
   stage: lint
   image: golang:1.24.1
   script:
     - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    - cd user_service
+    - golangci-lint run ./...
+
+lint_shortener:
+  stage: lint
+  image: golang:1.24.1
+  script:
+    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    - cd shortener
     - golangci-lint run ./...
 
 
@@ -21,7 +30,6 @@ build:
   script:
     - echo "🔨 Building all services"
     - cd shortener && go build -v ./...
-    - cd ../tg_bot && go build -v ./...
     - cd ../user_service && go build -v ./...
 
 test-shortener:
