@@ -25,7 +25,6 @@ postgres:
 redis:
   host: localhost
   port: 6379
-  db: 0
   user: ""
   password: ""
   user_password: ""
