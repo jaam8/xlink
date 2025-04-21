@@ -83,35 +83,52 @@ func (s *Service) DeleteLink(ctx context.Context, request *shortener.DeleteLinkR
 }
 
 func (s *Service) Redirect(ctx context.Context, request *shortener.RedirectRequest) (*shortener.RedirectResponse, error) {
-	var originalUrl string
-	var shortUrl = request.ShortLink
-	var err error
-
-	originalUrl, err = s.cachingRepo.GetUrl(shortUrl)
+	var shortLink = request.ShortLink
+	targetUrl, err := s.cachingRepo.GetUrl(shortLink)
 	if err != nil {
 		// if it's not in cache, then we get in from relational DB
 		var link models.Link
-		link, err = s.storageRepo.GetLinkByShortUrl(shortUrl)
+		link, err = s.storageRepo.GetLinkByShortUrl(shortLink)
 		if err != nil {
 			return &shortener.RedirectResponse{}, fmt.Errorf("error while getting link: %v", err)
 		}
 
-		originalUrl = link.TargetUrl
+		targetUrl = link.TargetUrl
 
 		// we better cache the link, so we won't have to visit DB too often
 		go func() {
-			cacheErr := s.cachingRepo.SetUrl(shortUrl, originalUrl)
+			cacheErr := s.cachingRepo.SetUrl(shortLink, targetUrl)
 			if cacheErr != nil {
-				logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't cache link", zap.String("key", shortUrl), zap.String("value", originalUrl))
+				logger.GetLoggerFromCtx(ctx).Error(ctx,
+					"couldn't cache link",
+					zap.String("key", shortLink),
+					zap.String("value", targetUrl))
 			}
 		}()
 	}
 
 	go func() {
-		s.senderRepo.SendRedirectInfo()
+		click, err := helper.RedirectRequestToClick(request)
+		if err != nil {
+			logger.GetLoggerFromCtx(ctx).Error(ctx,
+				"failed to parse click",
+				zap.Error(err),
+				zap.String("short_link", shortLink),
+				zap.String("visitor_token", request.GetVisitorToken()),
+				zap.Time("clicked_at", request.GetClickedAt().AsTime()))
+		}
+		err = s.senderRepo.SendClick(ctx, click)
+		if err != nil {
+			logger.GetLoggerFromCtx(ctx).Error(ctx,
+				"failed to send click to kafka",
+				zap.Error(err),
+				zap.String("short_link", shortLink),
+				zap.String("visitor_token", request.GetVisitorToken()),
+				zap.Time("clicked_at", request.GetClickedAt().AsTime()))
+		}
 	}()
 
-	return &shortener.RedirectResponse{TargetUrl: originalUrl}, nil
+	return &shortener.RedirectResponse{TargetUrl: targetUrl}, nil
 }
 
 func (s *Service) GetLinksCountByUserId(ctx context.Context, request *shortener.GetLinksCountByUserIdRequest) (*shortener.GetLinksCountByUserIdResponse, error) {
