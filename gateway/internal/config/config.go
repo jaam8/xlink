@@ -26,15 +26,19 @@ type TimeoutsConfig struct {
 	FileGenerator int `yaml:"file_generator" env:"FILE_GENERATOR"`
 }
 
+type GrpcPoolConfig struct {
+	MaxConnections             int  `yaml:"max_connections" env:"MAX_CONNECTIONS" env-default:"10"`
+	MinConnections             int  `yaml:"min_connections" env:"MIN_CONNECTIONS" env-default:"1"`
+	MaxRetries                 uint `yaml:"max_retries" env:"MAX_RETRIES" env-default:"3"`
+	BaseRetryDelayMilliseconds uint `yaml:"base_retry_delay_milliseconds" env:"BASE_RETRY_DELAY_MILLISECONDS" env-default:"200"`
+}
+
 type Config struct {
-	UpstreamNames              UpstreamNamesConfig `yaml:"upstream_names" env-prefix:"UPSTREAM_NAME_"`
-	UpstreamPorts              UpstreamPortsConfig `yaml:"upstream_ports" env-prefix:"UPSTREAM_PORT_"`
-	Timeouts                   TimeoutsConfig      `yaml:"timeouts" env-prefix:"TIMEOUT_"`
-	HTTPPort                   int                 `yaml:"http_port" env:"HTTP_PORT" env-default:"8080"`
-	MaxConnections             int                 `yaml:"max_connections" env:"MAX_CONNECTIONS" env-default:"10"`
-	MinConnections             int                 `yaml:"min_connections" env:"MIN_CONNECTIONS" env-default:"1"`
-	MaxRetries                 uint                `yaml:"max_retries" env:"MAX_RETRIES" env-default:"3"`
-	BaseRetryDelayMilliseconds uint                `yaml:"base_retry_delay_milliseconds" env:"BASE_RETRY_DELAY_MILLISECONDS" env-default:"200"`
+	UpstreamNames UpstreamNamesConfig `yaml:"upstream_names" env-prefix:"UPSTREAM_NAME_"`
+	UpstreamPorts UpstreamPortsConfig `yaml:"upstream_ports" env-prefix:"UPSTREAM_PORT_"`
+	GrpcPool      GrpcPoolConfig      `yaml:"grpc_pool" env-prefix:"GRPC_POOL_"`
+	Timeouts      TimeoutsConfig      `yaml:"timeouts" env-prefix:"TIMEOUT_"`
+	HTTPPort      int                 `yaml:"http_port" env:"HTTP_PORT" env-default:"8080"`
 }
 
 func New() (Config, error) {
