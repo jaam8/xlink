@@ -60,7 +60,7 @@ func (u *UserStorageRepositoryPostgres) CreateUser(telegramId *int64, isStaff *b
 	token := utils.GenerateToken(u.tokenLength)
 	err := u.pool.QueryRow(context.Background(), query, telegramId, isStaff, isAdmin, token).Scan(&id)
 	if err != nil {
-		return "", "", fmt.Errorf("(postgres) couldn't create user (tgId=%s, isStaff=%b, isAdmin=%b): %v",
+		return "", "", fmt.Errorf("(postgres) couldn't create user (tgId=%d, isStaff=%b, isAdmin=%b): %v",
 			telegramId, isStaff, isAdmin, err)
 	}
 	return id, token, nil
