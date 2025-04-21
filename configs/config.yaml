@@ -23,7 +23,7 @@ postgres:
 
 
 redis:
-  host: localhost
+  host: redis
   port: 6379
   user: ""
   password: ""
@@ -44,7 +44,7 @@ gateway:
 
 
 user_service:
-  port_grpc: 50051
+  grpc_port: 50051
   redis_db: 0
   token_len: 32
   cache_expiration_seconds: 3600
@@ -52,9 +52,11 @@ user_service:
 
 
 shortener:
-  port_grpc: 50052
+  grpc_port: 50052
   redis_db: 1
-  kafka_topic: redirect.events
+  kafka_topic: redirect-events
+  kafka_num_partitions: 1
+  kafka_replication_factor: 1
   upstream_names: shortener_upstream
   upstream_ports: 50060
   timeouts: 10000
@@ -65,7 +67,7 @@ shortener:
 
 analytics:
   port_grpc: 50053
-  kafka_topic: redirect.events
+  kafka_topic: redirect-events
   kafka_group_id: analytics-consumer
   upstream_names: analytics_upstream
   upstream_ports: 50061
