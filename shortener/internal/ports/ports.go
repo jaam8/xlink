@@ -1,6 +1,7 @@
 package ports
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"xlink/shortener/internal/models"
 )
@@ -17,8 +18,9 @@ type ShortenerStorageRepository interface {
 	CreateLink(newLink *models.Link) (models.Link, error)
 	UpdateLink(newLinkWithExistingId *models.Link) (models.Link, error)
 	DeleteLink(linkId uuid.UUID) error
+	GetLinksCountByUserId(userId uuid.UUID) (int32, error)
 }
 
 type ShortenerSenderRepository interface {
-	SendRedirectInfo()
+	SendClick(ctx context.Context, click *models.Click) error
 }

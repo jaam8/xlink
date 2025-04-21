@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"net"
 	"net/url"
 	"strings"
 	"time"
@@ -9,11 +10,11 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetValidatedId(request LinkBodyRequestOnlyId) (uuid.UUID, error) {
+func GetValidatedId(request LinkRequestOnlyLinkId) (uuid.UUID, error) {
 	var id uuid.UUID
 	var err error
 
-	id, err = uuid.Parse(request.GetId())
+	id, err = uuid.Parse(request.GetLinkId())
 	if err != nil {
 		return uuid.UUID{}, fmt.Errorf("invalid id (can't parse uuid): %w", err)
 	}
@@ -21,7 +22,7 @@ func GetValidatedId(request LinkBodyRequestOnlyId) (uuid.UUID, error) {
 	return id, nil
 }
 
-func GetValidatedUserId(request LinkBodyRequest) (uuid.UUID, error) {
+func GetValidatedUserId(request LinkRequestOnlyUserId) (uuid.UUID, error) {
 	var userId uuid.UUID
 	var err error
 
@@ -33,29 +34,13 @@ func GetValidatedUserId(request LinkBodyRequest) (uuid.UUID, error) {
 	return userId, nil
 }
 
-func GetValidatedGroupId(request LinkBodyRequest, defaultValue *uuid.UUID) (*uuid.UUID, error) {
-	var err error
-
-	if request.GetGroupId() != "" {
-		var parsed uuid.UUID
-		parsed, err = uuid.Parse(request.GetGroupId())
-		if err != nil {
-			return nil, fmt.Errorf("invalid group id (can't parse uuid): %w", err)
-		}
-		return &parsed, nil
-	}
-
-	return defaultValue, nil
-}
-
-func GetValidatedExpireAt(request LinkBodyRequest, defaultValue time.Time) (time.Time, error) {
+func GetValidatedExpireAt(request LinkRequestOnlyExpireAt, defaultValue time.Time) (time.Time, error) {
 	var expireAt = defaultValue
-	var err error
 
-	if request.GetExpireAt() != "" {
-		expireAt, err = time.Parse(time.RFC3339, request.GetExpireAt())
-		if err != nil {
-			return time.Time{}, fmt.Errorf("invalid expire at (can't parse RFC 3339): %w", err)
+	if request.GetExpireAt() != nil {
+		expireAt = request.GetExpireAt().AsTime()
+		if expireAt.Before(time.Now()) {
+			return time.Time{}, fmt.Errorf("expire at time is out of date")
 		}
 	}
 
@@ -75,4 +60,27 @@ func ValidateUrl(str string) error {
 		return fmt.Errorf("invalid url %s: %w", str, err)
 	}
 	return nil
+}
+
+func ValidateShortLink(str string) (string, error) {
+	shortLink, err := url.Parse(str)
+	if err != nil {
+		return "", fmt.Errorf("invalid short_link %s: %v", str, err)
+	}
+	return shortLink.String(), nil
+}
+
+func ValidateIPAddress(ipAddress string) (string, error) {
+	ip := net.ParseIP(ipAddress)
+	if ip == nil {
+		return "", fmt.Errorf("invalid ip address: %s", ipAddress)
+	}
+	return ip.String(), nil
+}
+
+func ValidateNotEmptyStr(str string) (string, error) {
+	if len(strings.TrimSpace(str)) == 0 {
+		return "", fmt.Errorf("string cannot be empty")
+	}
+	return str, nil
 }

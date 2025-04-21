@@ -1,54 +1,80 @@
 syntax = "proto3";
 
-option go_package = "pkg/api/shortener";
+option go_package = "common/gen/shortener";
 
 package api;
 
+import "google/protobuf/timestamp.proto";
+
 service ShortenerService {
-  rpc Redirect(Url) returns (Url);
+  rpc Redirect(RedirectRequest) returns (RedirectResponse);
   rpc CreateNewLink(CreateLinkRequest) returns (Link);
   rpc UpdateLink(UpdateLinkRequest) returns (Link);
   rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse);
+  rpc GetLinksCountByUserId(GetLinksCountByUserIdRequest) returns (GetLinksCountByUserIdResponse);
 }
 
+// ======================== Link ========================
+message Link {
+  string link_id = 1;
+  string user_id = 2;
+  string short_link = 3;
+  string target_url = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp expire_at = 6;
+}
+
+// ======================== Create ========================
 message CreateLinkRequest {
   string user_id = 1;
-  optional string group_id = 2;
-  bool generated = 3;
-  string short_link = 4;
-  string url = 5;
-  optional string expire_at = 6;
+  optional string short_link = 2;
+  string target_url = 3;
 }
 
+// ======================== Update ========================
 message UpdateLinkRequest {
-  string id = 1;
+  string link_id = 1;
   string user_id = 2;
-  optional string group_id = 3;
-  bool generated = 4;
-  string short_link = 5;
-  string url = 6;
-  optional string expire_at = 7;
+  bool regenerate = 3;
+  optional string short_link = 4;
+  string target_url = 5;
+  optional google.protobuf.Timestamp expire_at = 6;
 }
 
+// ======================== Redirect ========================
+message UserAgent {
+  string browser = 1;
+  string device_type = 2;
+  string os = 3;
+}
+
+message RedirectRequest {
+  string short_link = 1;
+  google.protobuf.Timestamp clicked_at = 2;
+  string referrer = 3;
+  string ip_address = 4;
+  string visitor_token = 5;
+  UserAgent user_agent = 6;
+}
+
+message RedirectResponse {
+  string target_url = 1;
+}
+
+// ======================== Delete ========================
 message DeleteLinkRequest {
-  string id = 1;
-}
-
-message Link {
-  string id = 1;
-  string user_id = 2;
-  optional string group_id = 3;
-  bool generated = 4;
-  string short_link = 5;
-  string url = 6;
-  string created_at = 7;
-  string expire_at = 8;
-}
-
-message Url {
-  string url = 1;
+  string link_id = 1;
 }
 
 message DeleteLinkResponse {
   bool status = 1;
+}
+
+// ===================== Get Link Count By User ID ========================
+message GetLinksCountByUserIdRequest {
+  string user_id = 1;
+}
+
+message GetLinksCountByUserIdResponse {
+  int32 count = 1;
 }

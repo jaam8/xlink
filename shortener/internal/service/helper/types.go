@@ -1,19 +1,42 @@
 package helper
 
-type LinkBodyRequest interface {
+import "google.golang.org/protobuf/types/known/timestamppb"
+
+type LinkCreateRequest interface {
+	LinkRequestOnlyUserId
+	LinkRequestOnlyShortLink
+	LinkRequestOnlyTargetUrl
+}
+
+type LinkUpdateRequest interface {
+	LinkRequestOnlyLinkId
+	LinkRequestOnlyUserId
+	LinkRequestOnlyRegenerate
+	LinkRequestOnlyShortLink
+	LinkRequestOnlyTargetUrl
+	LinkRequestOnlyExpireAt
+}
+
+type LinkRequestOnlyLinkId interface {
+	GetLinkId() string
+}
+
+type LinkRequestOnlyUserId interface {
 	GetUserId() string
-	GetGroupId() string
-	GetGenerated() bool
+}
+
+type LinkRequestOnlyShortLink interface {
 	GetShortLink() string
-	GetUrl() string
-	GetExpireAt() string
 }
 
-type LinkBodyRequestOnlyId interface {
-	GetId() string
+type LinkRequestOnlyTargetUrl interface {
+	GetTargetUrl() string
 }
 
-type LinkBodyRequestWithId interface {
-	LinkBodyRequest
-	LinkBodyRequestOnlyId
+type LinkRequestOnlyRegenerate interface {
+	GetRegenerate() bool
+}
+
+type LinkRequestOnlyExpireAt interface {
+	GetExpireAt() *timestamppb.Timestamp
 }

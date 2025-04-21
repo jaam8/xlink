@@ -1,28 +1,26 @@
-generate_token_service:
-	protoc -I ./token_service \
-		--go_out=./token_service \
-		--go-grpc_out=./token_service \
-		./token_service/api/token_service.proto
+generate_user_service:
+	protoc -I ./user_service \
+		--go_out=. \
+		--go-grpc_out=. \
+		./user_service/api/user_service.proto
 
 generate_shortener:
 	protoc -I ./shortener \
-		--go_out=./shortener \
-		--go-grpc_out=./shortener \
+		--go_out=. \
+		--go-grpc_out=. \
 		./shortener/api/shortener.proto
 
-generate_tg_bot:
-	protoc -I ./tg_bot \
-	--go_out=./tg_bot \
-	--go-grpc_out=./tg_bot \
-	./tg_bot/api/tg_bot.proto
+generate_analytics:
+	protoc -I ./analytics \
+	--go_out=. \
+	--go-grpc_out=. \
+	./analytics/api/analytics.proto
+
+yaml_to_env:
+	go run scripts/yaml_to_env.go
 
 copy_env:
-	cp ports.env.example ports.env
-	cp postgres.env.example postgres.env
-	cp redis.env.example redis.env
-	cp shortener.env.example shortener.env
-	cp tg_bot.env.example tg_bot.env
-	cp token_service.env.example token_service.env
+	cp configs/.env.example configs/.env
 
 .PHONY: build-all
 build-all:
@@ -32,6 +30,5 @@ build-all:
 	wait
 
 env_for_build:
-	touch build/docker/.env
-	grep -E '^(TOKENS_PORT_GRPC|SHORTENER_PORT_GRPC|POSTGRES_PORT|REDIS_PORT)=' \
-	configs/ports.env > build/docker/.env
+	make yaml_to_env
+	cp configs/.env build/docker/.env

@@ -14,7 +14,6 @@ type Config struct {
 	Port     uint16 `yaml:"port" env:"PORT" env-default:"6379"`
 	Username string `yaml:"user" env:"USER"`
 	Password string `yaml:"user_password" env:"USER_PASSWORD"`
-	Database int    `yaml:"db" env:"DB" env-default:"0"`
 
 	MaxRetries int `yaml:"max_retries" env:"MAX_RETRIES" env-default:"3"`
 	PoolSize   int `yaml:"pool_size" env:"POOL_SIZE" env-default:"10"`
@@ -25,12 +24,12 @@ type Config struct {
 }
 
 // NewRedisClient try to connect to Redis and get the client
-func NewRedisClient(ctx context.Context, config Config) (*redis.Client, error) {
+func NewRedisClient(ctx context.Context, config Config, redisDB int) (*redis.Client, error) {
 	option := &redis.Options{
 		Addr:         fmt.Sprintf("%s:%d", config.Host, config.Port),
 		Username:     config.Username,
 		Password:     config.Password,
-		DB:           config.Database,
+		DB:           redisDB,
 		MaxRetries:   config.MaxRetries,
 		DialTimeout:  time.Duration(config.DialTimeoutSeconds) * time.Second,
 		ReadTimeout:  time.Duration(config.ReadTimeoutSeconds) * time.Second,
