@@ -60,7 +60,7 @@ func (u *UserStorageRepositoryPostgres) CreateUser(telegramId *int64, isStaff *b
 	token := utils.GenerateToken(u.tokenLength)
 	err := u.pool.QueryRow(context.Background(), query, telegramId, isStaff, isAdmin, token).Scan(&id)
 	if err != nil {
-		return "", "", fmt.Errorf("(postgres) couldn't create user (tgId=%s, isStaff=%b, isAdmin=%b): %v",
+		return "", "", fmt.Errorf("(postgres) couldn't create user (tgId=%d, isStaff=%b, isAdmin=%b): %v",
 			telegramId, isStaff, isAdmin, err)
 	}
 	return id, token, nil
@@ -112,9 +112,9 @@ func (u *UserStorageRepositoryPostgres) GetUserIDByTgId(tgId int64) (string, boo
 	if err != nil {
 		var formattedError error
 		if errors.Is(err, pgx.ErrNoRows) {
-			formattedError = fmt.Errorf("(postgres) telegram_id='%s' doesn't exist", tgId)
+			formattedError = fmt.Errorf("(postgres) telegram_id='%d' doesn't exist", tgId)
 		} else {
-			formattedError = fmt.Errorf("(postgres) couldn't get userId by tgId='%s': %v", tgId, err)
+			formattedError = fmt.Errorf("(postgres) couldn't get userId by tgId='%d': %v", tgId, err)
 		}
 
 		return "", false, formattedError
