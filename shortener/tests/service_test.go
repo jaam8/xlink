@@ -57,7 +57,10 @@ func (m *mokShortenerStorageRepository) GetLinksCountByUserId(userId uuid.UUID) 
 
 type mokShortenerSenderRepository struct{ mock.Mock }
 
-func (m *mokShortenerSenderRepository) SendRedirectInfo() {}
+func (m *mokShortenerSenderRepository) SendClick(ctx context.Context, click *models.Click) error {
+	args := m.Called(ctx, click)
+	return args.Error(0)
+}
 
 const (
 	testdefaultLinkExpireTime = 1 * time.Second
