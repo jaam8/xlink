@@ -74,15 +74,23 @@ func main() {
 
 	//region user v1
 	userGroup := v1Group.Group("/user")
-	userGroup.Post("/create", userServiceHandler.CreateUser)             //
-	userGroup.Get("/:id", userServiceHandler.GetUser)                    // staff | admin
-	userGroup.Post("/get/by-token", userServiceHandler.GetUserIDByToken) // admin
-	userGroup.Post("/get/by-tg-id", userServiceHandler.GetUserIdByTgId)  // staff | admin
-	userGroup.Patch("/:id", userServiceHandler.UpdateUser)               //
-	userGroup.Post("/token/check", userServiceHandler.CheckToken)        // admin
-	userGroup.Post("/token/refresh", userServiceHandler.RefreshToken)    //
-	userGroup.Delete("/:id", userServiceHandler.DeleteUser)              // staff | admin
-	userGroup.Get("/role/:id", userServiceHandler.GetRole)               // staff | admin
+	userAdminGroup := userGroup.Group("/admin")
+	userStaffGroup := userGroup.Group("/staff")
+
+	userAdminGroup.Use(middlewares.RoleMiddleware(false, true, userService))
+	userStaffGroup.Use(middlewares.RoleMiddleware(true, false, userService))
+
+	userGroup.Post("/create", userServiceHandler.CreateUser)          //
+	userGroup.Patch("/:id", userServiceHandler.UpdateUser)            //
+	userGroup.Post("/token/refresh", userServiceHandler.RefreshToken) //
+
+	userStaffGroup.Get("/:id", userServiceHandler.GetUser)                   // staff | admin
+	userStaffGroup.Post("/get/by-tg-id", userServiceHandler.GetUserIdByTgId) // staff | admin
+	userStaffGroup.Delete("/:id", userServiceHandler.DeleteUser)             // staff | admin
+	userStaffGroup.Get("/role/:id", userServiceHandler.GetRole)              // staff | admin
+
+	userAdminGroup.Post("/get/by-token", userServiceHandler.GetUserIDByToken) // admin
+	userAdminGroup.Post("/token/check", userServiceHandler.CheckToken)        // admin
 	//endregion user v1
 	//endregion v1
 	//endregion api
