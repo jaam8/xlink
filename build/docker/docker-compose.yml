@@ -1,60 +1,64 @@
 
 services:
-  token_service:
+  user_service:
+    container_name: user_service
     build:
       context: ../../
-      dockerfile: build/docker/Dockerfile.token_service
+      dockerfile: build/docker/Dockerfile.user_service
     env_file:
-      - ../../configs/ports.env
-      - ../../configs/token_service.env
+      - ../../configs/.env
     ports:
-      - ${TOKENS_PORT_GRPC}:50051
+      - ${USER_SERVICE_GRPC_PORT}:50051
     depends_on:
       - postgres
       - redis
+      - kafka
     volumes:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
 
   shortener:
+    container_name: shortener
     build:
       context: ../../
       dockerfile: build/docker/Dockerfile.shortener
     env_file:
-      - ../../configs/ports.env
-      - ../../configs/shortener.env
+      - ../../configs/.env
     ports:
-      - ${SHORTENER_PORT_GRPC}:50052
+      - ${SHORTENER_GRPC_PORT}:50052
     depends_on:
       - postgres
-      - token_service
+      - user_service
+      - kafka
+      - zookeeper
     volumes:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
 
-  tg_bot:
-    build:
-      context: ../../
-      dockerfile: build/docker/Dockerfile.tg_bot
-    ports:
-      - "50053:50053"
-    env_file:
-      - ../../configs/tg_bot.env
-    depends_on:
-      - postgres
-      - shortener
-      - token_service
-    volumes:
-      - go-mod-cache:/go/pkg/mod
-      - go-build-cache:/root/.cache/go-build
+#  tg_bot:
+#    container_name: tg_bot
+#    build:
+#      context: ../../
+#      dockerfile: build/docker/Dockerfile.tg_bot
+#    ports:
+#      - "50053:50053"
+#    env_file:
+#      - ../../configs/.env
+#    depends_on:
+#      - postgres
+#      - shortener
+#      - user_service
+#    volumes:
+#      - go-mod-cache:/go/pkg/mod
+#      - go-build-cache:/root/.cache/go-build
 
   postgres:
     image: postgres:latest
+    container_name: postgres
     ports:
       - ${POSTGRES_PORT}:5432
     env_file:
-      - ../../configs/ports.env
-      - ../../configs/postgres.env
+      - ../../configs/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -67,12 +71,10 @@ services:
 
   redis:
     image: redis:latest
-    env_file:
-      - ../../configs/ports.env
-      - ../../configs/redis.env
+    container_name: redis
     ports:
       - ${REDIS_PORT}:6379
-
+    hostname: ${REDIS_HOST}
     volumes:
       - redis_data:/data
     healthcheck:
@@ -81,6 +83,54 @@ services:
       timeout: 1s
       retries: 3
     restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    hostname: ${ZOOKEEPER_HOST}
+    ports:
+      - ${ZOOKEEPER_PORT}:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    hostname: ${KAFKA_HOST}
+    ports:
+      - ${KAFKA_PORT}:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ${ZOOKEEPER_HOST}:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: [ "CMD", "kafka-topics", "--bootstrap-server", "kafka:9092", "--list" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: ${KAFKA_HOST}:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: ${ZOOKEEPER_HOST}:2181
+      KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: PLAINTEXT
 
 
 volumes:
