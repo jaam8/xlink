@@ -16,6 +16,9 @@ generate_analytics:
 	--go-grpc_out=. \
 	./analytics/api/analytics.proto
 
+yaml_to_env:
+	go run scripts/yaml_to_env.go
+
 copy_env:
 	cp configs/ports.env.example configs/ports.env
 	cp configs/postgres.env.example configs/postgres.env
@@ -34,6 +37,5 @@ build-all:
 	wait
 
 env_for_build:
-	touch build/docker/.env
-	grep -E '^(TOKENS_PORT_GRPC|SHORTENER_PORT_GRPC|POSTGRES_PORT|REDIS_PORT)=' \
-	configs/ports.env > build/docker/.env
+	make yaml_to_env
+	cp configs/.env build/docker/.env
