@@ -5,26 +5,29 @@ LABEL authors="jaam8"
 WORKDIR /build
 
 COPY go.mod ./
-COPY token_service/go.* ./token_service/
+COPY user_service/go.* ./user_service/
 COPY common/go.* ./common/
 
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    go work init ./common ./token_service && go mod download
+    go work init ./common ./user_service && go mod download
 
-COPY token_service/ ./token_service/
+COPY user_service/ ./user_service/
 COPY common/ ./common/
+COPY configs/ ./configs/
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -o token-service token_service/cmd/main.go
+    go build -o user-service user_service/cmd/main.go
 
 FROM gcr.io/distroless/base-debian12 AS runner
 
 WORKDIR /app
 
-COPY --from=builder /build/token-service .
+COPY --from=builder /build/configs/config.yaml ../configs/config.yaml
+COPY --from=builder /build/user_service/migrations ../user_service/migrations
+COPY --from=builder /build/user-service .
 
-CMD ["./token-service"]
+CMD ["./user-service"]

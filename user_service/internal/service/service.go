@@ -137,8 +137,10 @@ func (s *Service) GetUser(ctx context.Context, req *user_service.GetUserRequest)
 
 	go func() {
 		defer waitGroup.Done()
-		linkCount, shortenerErr = s.shortenerRepo.GetLinksCountByUserId(userId)
+		linkCount, shortenerErr = s.shortenerRepo.GetLinksCountByUserId(req.UserId)
 	}()
+
+	waitGroup.Wait()
 
 	if storageErr != nil {
 		return &user_service.GetUserResponse{},

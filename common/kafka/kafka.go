@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"fmt"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 	"time"
@@ -9,15 +10,14 @@ import (
 )
 
 type Config struct {
-	Host           string   `yaml:"host" env:"HOST" env-default:"kafka"`
-	Port           uint16   `yaml:"port" env:"PORT" env-default:"9092"`
-	Brokers        []string `yaml:"brokers" env:"BROKERS" env-separator:","`
-	Topic          string   `yaml:"topic" env:"TOPIC"`
-	GroupID        string   `yaml:"group_id" env:"GROUP_ID"`
-	MinBytes       int      `yaml:"min_bytes" env:"MIN_BYTES" env-default:"10"`
-	MaxBytes       int      `yaml:"max_bytes" env:"MAX_BYTES" env-default:"1048576"` // 1MB
-	MaxWaitMs      int      `yaml:"max_wait_ms" env:"MAX_WAIT_MS" env-default:"500"`
-	CommitInterval int      `yaml:"commit_interval_ms" env:"COMMIT_INTERVAL_MS" env-default:"1000"`
+	Host    string   `yaml:"host" env:"HOST" env-default:"kafka"`
+	Port    uint16   `yaml:"port" env:"PORT" env-default:"9092"`
+	Brokers []string `yaml:"brokers" env:"BROKERS" env-separator:","`
+
+	MinBytes       int `yaml:"min_bytes" env:"MIN_BYTES" env-default:"10"`
+	MaxBytes       int `yaml:"max_bytes" env:"MAX_BYTES" env-default:"1048576"` // 1MB
+	MaxWaitMs      int `yaml:"max_wait_ms" env:"MAX_WAIT_MS" env-default:"500"`
+	CommitInterval int `yaml:"commit_interval_ms" env:"COMMIT_INTERVAL_MS" env-default:"1000"`
 }
 
 func NewReader(ctx context.Context, cfg Config, topic, groupID string) *kafka.Reader {
@@ -54,4 +54,45 @@ func NewWriter(ctx context.Context, cfg Config, topic string) *kafka.Writer {
 		zap.String("topic", topic),
 	)
 	return w
+}
+
+func CreateTopicIfNotExists(cfg Config, topic string, numPartitions, replicationFactor int) error {
+	conn, err := kafka.Dial("tcp", cfg.Brokers[0])
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	controller, err := conn.Controller()
+	if err != nil {
+		return err
+	}
+
+	controllerConn, err := kafka.Dial("tcp",
+		fmt.Sprintf("%s:%d", controller.Host, controller.Port))
+	if err != nil {
+		return err
+	}
+
+	defer controllerConn.Close()
+
+	return controllerConn.CreateTopics(kafka.TopicConfig{
+		Topic:             topic,
+		NumPartitions:     numPartitions,
+		ReplicationFactor: replicationFactor,
+	})
+}
+
+func CreateTopicWithRetry(cfg Config, topic string, numPartitions, replicationFactor int) error {
+	var err error
+	for i := 0; i < 10; i++ {
+		err = CreateTopicIfNotExists(cfg, topic, numPartitions, replicationFactor)
+		if err == nil {
+			return nil
+		}
+
+		fmt.Printf("Attempt %d failed: %v\n", i+1, err)
+		time.Sleep(time.Second * time.Duration(i))
+	}
+	return err
 }

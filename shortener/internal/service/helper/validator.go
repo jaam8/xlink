@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"net"
 	"net/url"
 	"strings"
 	"time"
@@ -59,4 +60,27 @@ func ValidateUrl(str string) error {
 		return fmt.Errorf("invalid url %s: %w", str, err)
 	}
 	return nil
+}
+
+func ValidateShortLink(str string) (string, error) {
+	shortLink, err := url.Parse(str)
+	if err != nil {
+		return "", fmt.Errorf("invalid short_link %s: %v", str, err)
+	}
+	return shortLink.String(), nil
+}
+
+func ValidateIPAddress(ipAddress string) (string, error) {
+	ip := net.ParseIP(ipAddress)
+	if ip == nil {
+		return "", fmt.Errorf("invalid ip address: %s", ipAddress)
+	}
+	return ip.String(), nil
+}
+
+func ValidateNotEmptyStr(str string) (string, error) {
+	if len(strings.TrimSpace(str)) == 0 {
+		return "", fmt.Errorf("string cannot be empty")
+	}
+	return str, nil
 }

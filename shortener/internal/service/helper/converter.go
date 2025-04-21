@@ -15,7 +15,7 @@ func LinkResponseFromLinkModel(link models.Link) *shortener.Link {
 		LinkId:    link.Id.String(),
 		UserId:    link.UserId.String(),
 		ShortLink: *link.ShortLink,
-		TargetUrl: link.Url,
+		TargetUrl: link.TargetUrl,
 		CreatedAt: timestamppb.New(link.CreatedAt),
 		ExpireAt:  timestamppb.New(*link.ExpireAt),
 	}
@@ -39,7 +39,7 @@ func LinkModelFromLinkCreateRequest(request LinkCreateRequest, expiration time.T
 	return &models.Link{
 		UserId:    userId,
 		ShortLink: &shortLink,
-		Url:       targetUrl,
+		TargetUrl: targetUrl,
 		ExpireAt:  &expiration,
 		Generated: &generated,
 	}, nil
@@ -81,7 +81,53 @@ func LinkModelFromLinkUpdateRequest(request LinkUpdateRequest) (*models.Link, er
 		UserId:    userId,
 		Generated: generated,
 		ShortLink: shortLink,
-		Url:       targetUrl,
+		TargetUrl: targetUrl,
 		ExpireAt:  &expireAt,
+	}, nil
+}
+
+func RedirectRequestToClick(request *shortener.RedirectRequest) (*models.Click, error) {
+	shortLink, err := ValidateShortLink(request.GetShortLink())
+	if err != nil {
+		return nil, err
+	}
+	clickedAt := request.GetClickedAt().AsTime()
+	referrer, err := ValidateNotEmptyStr(request.GetReferrer())
+	if err != nil {
+		return nil, fmt.Errorf("invalid referrer: %w", err)
+	}
+	ipAddress, err := ValidateIPAddress(request.GetIpAddress())
+	if err != nil {
+		return nil, err
+	}
+	visitorToken, err := ValidateNotEmptyStr(request.GetVisitorToken())
+	if err != nil {
+		return nil, fmt.Errorf("invalid visitor_token: %w", err)
+	}
+	userAgent := request.GetUserAgent()
+	if userAgent == nil {
+		return nil, fmt.Errorf("invalid user agent: user agent is nil")
+	}
+	browser, err := ValidateNotEmptyStr(userAgent.GetBrowser())
+	if err != nil {
+		return nil, fmt.Errorf("invalid browser: %w", err)
+	}
+	deviceType, err := ValidateNotEmptyStr(userAgent.GetDeviceType())
+	if err != nil {
+		return nil, fmt.Errorf("invalid device type: %w", err)
+	}
+	os, err := ValidateNotEmptyStr(userAgent.GetOs())
+	if err != nil {
+		return nil, fmt.Errorf("invalid os: %w", err)
+	}
+	return &models.Click{
+		ShortLink:    shortLink,
+		ClickedAt:    clickedAt,
+		Referrer:     referrer,
+		IPAddress:    ipAddress,
+		VisitorToken: visitorToken,
+		Browser:      browser,
+		DeviceType:   deviceType,
+		Os:           os,
 	}, nil
 }

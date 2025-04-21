@@ -5,7 +5,7 @@ create schema if not exists schema_name;
 create table if not exists schema_name.urls
 (
     id          uuid        not null
-        default get_random_uuid()
+        default gen_random_uuid()
         constraint urls_pk
         primary key,
     user_id     uuid        not null,
