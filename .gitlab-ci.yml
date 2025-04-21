@@ -1,0 +1,58 @@
+stages:
+  - lint
+  - build
+  - test
+  - deploy
+
+# Процент покрытия тестов
+variables:
+  COVERAGE_THRESHOLD: 30
+
+lint:
+  stage: lint
+  image: golang:1.22
+  script:
+    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    - golangci-lint run ./...
+
+
+build:
+  stage: build
+  script:
+    - echo "🔨 Building all services"
+    - cd shortener && go build -v ./...
+    - cd ../tg_bot && go build -v ./...
+    - cd ../user_service && go build -v ./...
+
+test-shortener:
+  stage: test
+  script:
+    - cd shortener
+    - go test ./... -coverprofile=coverage.out
+    - |
+      COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+      echo "📊 Shortener coverage: ${COVERAGE}%"
+      if (( $(echo "$COVERAGE < $COVERAGE_THRESHOLD" | bc -l) )); then
+        echo "❌ Coverage too low for shortener: ${COVERAGE}%"
+        exit 1
+      fi
+
+test-user-service:
+  stage: test
+  script:
+    - cd user_service
+    - go test ./... -coverprofile=coverage.out
+    - |
+      COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+      echo "📊 User Service coverage: ${COVERAGE}%"
+      if (( $(echo "$COVERAGE < $COVERAGE_THRESHOLD" | bc -l) )); then
+        echo "❌ Coverage too low for user_service: ${COVERAGE}%"
+        exit 1
+      fi
+
+deploy:
+  stage: deploy
+  environment: production
+  script:
+    - echo "🚀 Deploying application..."
+    - echo "✅ Application successfully deployed."
