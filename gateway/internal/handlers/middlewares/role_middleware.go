@@ -3,6 +3,7 @@ package middlewares
 import (
 	"github.com/gofiber/fiber/v2"
 	"xlink/common/gen/user_service"
+	"xlink/gateway/internal/handlers"
 )
 
 type RoleCheckerService interface {
@@ -13,22 +14,28 @@ type RoleCheckerService interface {
 func RoleMiddleware(requireIsStaff bool, requireIsAdmin bool, service RoleCheckerService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		if requireIsStaff || requireIsAdmin {
-			token := c.Get("Authorization")
-			if token == "" {
-				return c.Status(fiber.StatusUnauthorized).
-					JSON(fiber.Map{"error": "missing Authorization header"})
+			var userId string
+			userIdValue := c.Context().Value(handlers.UserIdKey)
+
+			if userIdValue == nil {
+				token := c.Get("Authorization")
+				if token == "" {
+					return c.Status(fiber.StatusUnauthorized).
+						JSON(fiber.Map{"error": "missing Authorization header"})
+				}
+
+				userIdData, err := service.GetUserIDByToken(&user_service.GetUserIDByTokenRequest{Token: token})
+				if err != nil {
+					return c.Status(fiber.StatusUnauthorized).
+						JSON(fiber.Map{"error": "invalid token (couldn't be found)"})
+				}
+
+				userId = userIdData.UserId
+			} else {
+				userId = userIdValue.(string)
 			}
 
-			userIdData, err := service.GetUserIDByToken(&user_service.GetUserIDByTokenRequest{Token: token})
-			if err != nil {
-				return c.Status(fiber.StatusUnauthorized).
-					JSON(fiber.Map{"error": "invalid token (couldn't be found)"})
-			}
-
-			userId := userIdData.UserId
-
-			var userRoleData *user_service.GetRoleResponse
-			userRoleData, err = service.GetRole(&user_service.GetRoleRequest{UserId: userId})
+			userRoleData, err := service.GetRole(&user_service.GetRoleRequest{UserId: userId})
 			if err != nil {
 				return c.Status(fiber.StatusUnauthorized).
 					JSON(fiber.Map{"error": "invalid token (roles info couldn't be found)"})
