@@ -20,14 +20,7 @@ yaml_to_env:
 	go run scripts/yaml_to_env.go
 
 copy_env:
-	cp configs/ports.env.example configs/ports.env
-	cp configs/postgres.env.example configs/postgres.env
-	cp configs/redis.env.example configs/redis.env
-	cp configs/kafka.env.example configs/kafka.env
-	cp configs/shortener.env.example configs/shortener.env
-	cp configs/tg_bot.env.example configs/tg_bot.env
-	cp configs/user_service.env.example configs/user_service.env
-	cp configs/analytics.env.example configs/analytics.env
+	cp configs/.env.example configs/.env
 
 .PHONY: build-all
 build-all:
