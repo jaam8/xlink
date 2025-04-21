@@ -8,12 +8,21 @@ stages:
 variables:
   COVERAGE_THRESHOLD: 30
 
+lint_common:
+  stage: lint
+  image: golang:1.24.1
+  script:
+    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    - cd common
+    - golangci-lint run ./...
+
 lint_user_service:
   stage: lint
   image: golang:1.24.1
   script:
     - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     - cd user_service
+    - go build ./...
     - golangci-lint run ./...
 
 lint_shortener:
