@@ -22,7 +22,7 @@ func (s *UserServiceRepositoryGRPC) CreateUser(request *user_service.CreateUserR
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint:all
 
 	client := user_service.NewUserServiceClient(conn)
 
@@ -39,7 +39,7 @@ func (s *UserServiceRepositoryGRPC) GetUser(request *user_service.GetUserRequest
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint:all
 
 	client := user_service.NewUserServiceClient(conn)
 
@@ -56,7 +56,7 @@ func (s *UserServiceRepositoryGRPC) GetUserIDByToken(request *user_service.GetUs
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint:all
 
 	client := user_service.NewUserServiceClient(conn)
 
@@ -73,7 +73,7 @@ func (s *UserServiceRepositoryGRPC) GetUserIDByTgID(request *user_service.GetUse
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint:all
 
 	client := user_service.NewUserServiceClient(conn)
 
@@ -90,7 +90,7 @@ func (s *UserServiceRepositoryGRPC) UpdateUser(request *user_service.UpdateUserR
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint:all
 
 	client := user_service.NewUserServiceClient(conn)
 
@@ -107,7 +107,7 @@ func (s *UserServiceRepositoryGRPC) CheckToken(request *user_service.TokenCheckR
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint:all
 
 	client := user_service.NewUserServiceClient(conn)
 
@@ -124,7 +124,7 @@ func (s *UserServiceRepositoryGRPC) RefreshToken(request *user_service.RefreshTo
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint:all
 
 	client := user_service.NewUserServiceClient(conn)
 
@@ -141,13 +141,30 @@ func (s *UserServiceRepositoryGRPC) GetRole(request *user_service.GetRoleRequest
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint:all
 
 	client := user_service.NewUserServiceClient(conn)
 
 	response, grpcErr := client.GetRole(context.Background(), request)
 	if grpcErr != nil {
 		return nil, fmt.Errorf("error in GetRole grpc: %v", grpcErr)
+	}
+
+	return response, nil
+}
+
+func (s *UserServiceRepositoryGRPC) DeleteUser(request *user_service.DeleteUserRequest) (*user_service.DeleteUserResponse, error) {
+	conn, err := s.grpcPool.GetConn()
+	if err != nil {
+		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
+	}
+	defer conn.Close() //nolint:all
+
+	client := user_service.NewUserServiceClient(conn)
+
+	response, grpcErr := client.DeleteUser(context.Background(), request)
+	if grpcErr != nil {
+		return nil, fmt.Errorf("error in DeleteUser grpc: %v", grpcErr)
 	}
 
 	return response, nil

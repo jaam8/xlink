@@ -11,4 +11,5 @@ type UserServiceRepository interface {
 	CheckToken(request *user_service.TokenCheckRequest) (*user_service.TokenCheckResponse, error)
 	RefreshToken(request *user_service.RefreshTokenRequest) (*user_service.RefreshTokenResponse, error)
 	GetRole(request *user_service.GetRoleRequest) (*user_service.GetRoleResponse, error)
+	DeleteUser(request *user_service.DeleteUserRequest) (*user_service.DeleteUserResponse, error)
 }
