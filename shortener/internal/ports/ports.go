@@ -1,6 +1,7 @@
 package ports
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"xlink/shortener/internal/models"
 )
@@ -21,5 +22,5 @@ type ShortenerStorageRepository interface {
 }
 
 type ShortenerSenderRepository interface {
-	SendRedirectInfo()
+	SendClick(ctx context.Context, click *models.Click) error
 }

@@ -33,40 +33,53 @@ func main() {
 	redisCfg := cfg.Redis
 	postgresCfg := cfg.Postgres
 	kafkaCfg := cfg.Kafka
+	shortenerCfg := cfg.Shortener
 
-	redisClient, err := redis.NewRedisClient(ctx, redisCfg, cfg.Shortener.RedisDB)
+	redisClient, err := redis.NewRedisClient(ctx, redisCfg, shortenerCfg.RedisDB)
+	//defer redisClient.Close()
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to connect to Redis database: %w", err))
 	}
 
 	postgresClient, err := postgres.New(ctx, postgresCfg)
+	defer postgresClient.Close()
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to connect to Postgres database: %w", err))
 	}
 
-	kafkaProducer := kafka.NewWriter(ctx, kafkaCfg, cfg.Shortener.KafkaTopic)
-	// postgres migration
+	kafkaProducer := kafka.NewWriter(ctx, kafkaCfg, shortenerCfg.KafkaTopic)
+	defer kafkaProducer.Close()
+
+	err = kafka.CreateTopicWithRetry(
+		cfg.Kafka,
+		shortenerCfg.KafkaTopic,
+		shortenerCfg.KafkaNumPartitions,
+		shortenerCfg.KafkaReplicationFactor)
+	if err != nil {
+		log.Fatal(fmt.Errorf("failed to create topic: %w", err))
+	}
+	//postgres migration
 	err = postgres.Migrate(ctx, postgresCfg, cfg.Shortener.MigrationsPath)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to migrate postgres database: %w", err))
 	}
 
 	repositoryRedis := cache.NewShortenerCacheRepositoryRedis(
-		redisClient, time.Duration(cfg.Shortener.ExpirationSeconds)*time.Second,
+		redisClient, time.Duration(shortenerCfg.ExpirationSeconds)*time.Second,
 	)
 	repositoryPostgres := storage.NewShortenerStorageRepositoryPostgres(postgresClient)
 	senderRepositoryMock := sender.NewShortenerSenderRepository(kafkaProducer)
 
 	grpcServer, err := runner.CreateGRPC(
 		repositoryRedis, repositoryPostgres, senderRepositoryMock,
-		time.Minute*time.Duration(cfg.Shortener.DefaultLinkExpirationMinutes),
+		time.Minute*time.Duration(shortenerCfg.DefaultLinkExpirationMinutes),
 	)
 
 	if err != nil {
 		log.Fatalf("failed to create gRPC server: %v", err)
 	}
 
-	go runner.RunGRPC(ctx, grpcServer, cfg.Shortener.GRPCPort)
+	go runner.RunGRPC(ctx, grpcServer, shortenerCfg.GRPCPort)
 
 	<-ctx.Done()
 
