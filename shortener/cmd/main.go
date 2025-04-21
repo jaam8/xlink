@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"xlink/common/kafka"
 	"xlink/common/logger"
 	"xlink/common/postgres"
 	"xlink/common/redis"
@@ -31,8 +32,9 @@ func main() {
 
 	redisCfg := cfg.Redis
 	postgresCfg := cfg.Postgres
+	kafkaCfg := cfg.Kafka
 
-	redisClient, err := redis.NewRedisClient(ctx, redisCfg)
+	redisClient, err := redis.NewRedisClient(ctx, redisCfg, cfg.Shortener.RedisDB)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to connect to Redis database: %w", err))
 	}
@@ -42,27 +44,29 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to connect to Postgres database: %w", err))
 	}
 
+	kafkaProducer := kafka.NewWriter(ctx, kafkaCfg, cfg.Shortener.KafkaTopic)
 	// postgres migration
-	err = postgres.Migrate(ctx, postgresCfg, postgresCfg.MigrationsPath)
+	err = postgres.Migrate(ctx, postgresCfg, cfg.Shortener.MigrationsPath)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to migrate postgres database: %w", err))
 	}
 
 	repositoryRedis := cache.NewShortenerCacheRepositoryRedis(
-		redisClient, time.Duration(cfg.ExpirationSeconds)*time.Second,
+		redisClient, time.Duration(cfg.Shortener.ExpirationSeconds)*time.Second,
 	)
 	repositoryPostgres := storage.NewShortenerStorageRepositoryPostgres(postgresClient)
-	senderRepositoryMock := sender.NewShortenerSenderRepositoryMock()
+	senderRepositoryMock := sender.NewShortenerSenderRepository(kafkaProducer)
 
 	grpcServer, err := runner.CreateGRPC(
 		repositoryRedis, repositoryPostgres, senderRepositoryMock,
-		time.Minute*time.Duration(cfg.DefaultLinkExpirationMinutes),
+		time.Minute*time.Duration(cfg.Shortener.DefaultLinkExpirationMinutes),
 	)
+
 	if err != nil {
 		log.Fatalf("failed to create gRPC server: %v", err)
 	}
 
-	go runner.RunGRPC(ctx, grpcServer, cfg.GRPCPort)
+	go runner.RunGRPC(ctx, grpcServer, cfg.Shortener.GRPCPort)
 
 	<-ctx.Done()
 
