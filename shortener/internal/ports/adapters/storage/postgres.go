@@ -42,7 +42,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkById(linkId uuid.UUID) (mode
 	var link = models.Link{}
 
 	_ = s.PostgresPool.QueryRow(context.Background(), sql, args...).
-		Scan(&link.Id, &link.UserId, &link.GroupId, &link.Generated,
+		Scan(&link.Id, &link.UserId, &link.Generated,
 			&link.ShortLink, &link.Url, &link.CreatedAt, &link.ExpireAt)
 
 	if link.Id == uuid.Nil {
@@ -62,7 +62,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkByShortUrl(shortUrl string) 
 	var link models.Link = models.Link{}
 
 	_ = s.PostgresPool.QueryRow(context.Background(), sql, args...).
-		Scan(&link.Id, &link.UserId, &link.GroupId, &link.Generated,
+		Scan(&link.Id, &link.UserId, &link.Generated,
 			&link.ShortLink, &link.Url, &link.CreatedAt, &link.ExpireAt)
 
 	if link.Id == uuid.Nil {
@@ -74,9 +74,9 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkByShortUrl(shortUrl string) 
 
 func (s *ShortenerStorageRepositoryPostgres) CreateLink(newLink *models.Link) (models.Link, error) {
 	sql, args, err := squirrel.Insert("schema_name.urls").
-		Columns("user_id", "group_id", "generated",
+		Columns("user_id", "generated",
 			"short_link", "url", "expire_at").
-		Values(newLink.UserId, newLink.GroupId, newLink.Generated, newLink.ShortLink, newLink.Url, newLink.ExpireAt).
+		Values(newLink.UserId, newLink.Generated, newLink.ShortLink, newLink.Url, newLink.ExpireAt).
 		Suffix("RETURNING id, created_at").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -97,16 +97,24 @@ func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *m
 		return models.Link{}, fmt.Errorf("couldn't update an existing link: %w", err)
 	}
 
-	sql, args, err := squirrel.Update("schema_name.urls").
+	updateBuilder := squirrel.Update("schema_name.urls").
 		Where(squirrel.Eq{"id": newLinkWithExistingId.Id}).
 		Set("user_id", newLinkWithExistingId.UserId).
-		Set("group_id", newLinkWithExistingId.GroupId).
-		Set("generated", newLinkWithExistingId.Generated).
-		Set("short_link", newLinkWithExistingId.ShortLink).
-		Set("url", newLinkWithExistingId.Url).
-		Set("expire_at", newLinkWithExistingId.ExpireAt).
-		PlaceholderFormat(squirrel.Dollar).
-		ToSql()
+		Set("url", newLinkWithExistingId.Url)
+
+	if newLinkWithExistingId.Generated != nil {
+		updateBuilder = updateBuilder.Set("generated", newLinkWithExistingId.Generated)
+	}
+
+	if newLinkWithExistingId.ShortLink != nil {
+		updateBuilder = updateBuilder.Set("short_link", newLinkWithExistingId.ShortLink)
+	}
+
+	if newLinkWithExistingId.ExpireAt != nil {
+		updateBuilder = updateBuilder.Set("expire_at", newLinkWithExistingId.ExpireAt)
+	}
+
+	sql, args, err := updateBuilder.PlaceholderFormat(squirrel.Dollar).ToSql()
 
 	if err != nil {
 		return models.Link{}, fmt.Errorf("couldn't build an SQL query: %w", err)

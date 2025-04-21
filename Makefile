@@ -16,13 +16,18 @@ generate_analytics:
 	--go-grpc_out=. \
 	./analytics/api/analytics.proto
 
+yaml_to_env:
+	go run scripts/yaml_to_env.go
+
 copy_env:
-	cp ports.env.example ports.env
-	cp postgres.env.example postgres.env
-	cp redis.env.example redis.env
-	cp shortener.env.example shortener.env
-	cp tg_bot.env.example tg_bot.env
-	cp token_service.env.example token_service.env
+	cp configs/ports.env.example configs/ports.env
+	cp configs/postgres.env.example configs/postgres.env
+	cp configs/redis.env.example configs/redis.env
+	cp configs/kafka.env.example configs/kafka.env
+	cp configs/shortener.env.example configs/shortener.env
+	cp configs/tg_bot.env.example configs/tg_bot.env
+	cp configs/user_service.env.example configs/user_service.env
+	cp configs/analytics.env.example configs/analytics.env
 
 .PHONY: build-all
 build-all:
@@ -32,6 +37,5 @@ build-all:
 	wait
 
 env_for_build:
-	touch build/docker/.env
-	grep -E '^(TOKENS_PORT_GRPC|SHORTENER_PORT_GRPC|POSTGRES_PORT|REDIS_PORT)=' \
-	configs/ports.env > build/docker/.env
+	make yaml_to_env
+	cp configs/.env build/docker/.env

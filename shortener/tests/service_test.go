@@ -7,6 +7,7 @@ import (
 	"xlink/common/gen/shortener"
 	"xlink/shortener/internal/models"
 	"xlink/shortener/internal/service"
+	"xlink/shortener/internal/service/utils"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -49,6 +50,11 @@ func (m *mokShortenerStorageRepository) DeleteLink(linkId uuid.UUID) error {
 	return args.Error(0)
 }
 
+func (m *mokShortenerStorageRepository) GetLinksCountByUserId(userId uuid.UUID) (int32, error) {
+	args := m.Called(userId)
+	return args.Get(0).(int32), args.Error(1)
+}
+
 type mokShortenerSenderRepository struct{ mock.Mock }
 
 func (m *mokShortenerSenderRepository) SendRedirectInfo() {}
@@ -88,33 +94,93 @@ func TestCreateNewLink(t *testing.T) {
 		ExpireAt:  &expireAtStr,
 	}
 
+	testCreateLinkRequest4 := shortener.CreateLinkRequest{
+		UserId:    userIDStr,
+		GroupId:   &groupIDStr,
+		Generated: false,
+		ShortLink: "http://qwerty",
+		Url:       "http://qwertysdijvnisdnc",
+		ExpireAt:  &expireAtStr,
+	}
+
 	expectedModel := models.Link{
 		Id:        uuid.New(),
 		UserId:    userUUID,
 		GroupId:   &groupUUID,
 		Generated: true,
-		ShortLink: "http://qwerty",
+		ShortLink: utils.GenerateShortURL(),
 		Url:       "http://qwertysdijvnisdnc",
 		CreatedAt: time.Now(),
 		ExpireAt:  expireAtTime,
 	}
 
-	testShortenerStorageRepository.On("CreateLink", mock.AnythingOfType("*models.Link")).Return(expectedModel, nil)
+	expectedModel4 := models.Link{
+		Id:        uuid.New(),
+		UserId:    userUUID,
+		GroupId:   &groupUUID,
+		Generated: testCreateLinkRequest4.Generated,
+		ShortLink: utils.GenerateShortURL(),
+		Url:       "http://qwertysdijvnisdnc",
+		CreatedAt: time.Now(),
+		ExpireAt:  expireAtTime,
+	}
 
-	testCreateNewLinkResponse, err := s.CreateNewLink(ctx, &testCreateLinkRequest)
+	testShortenerStorageRepository.On("CreateLink", mock.AnythingOfType("*models.Link")).Return(expectedModel, nil).Times(3)
+	testShortenerStorageRepository.On("CreateLink", mock.AnythingOfType("*models.Link")).Return(expectedModel4, nil)
+
+	testCreateNewLinkResponse1, err := s.CreateNewLink(ctx, &testCreateLinkRequest)
+	if err != nil {
+		t.Fatalf("testCreateNewLinkResponse is wrong, got:%v", err)
+	}
+	testCreateNewLinkResponse2, err := s.CreateNewLink(ctx, &testCreateLinkRequest)
+	if err != nil {
+		t.Fatalf("testCreateNewLinkResponse is wrong, got:%v", err)
+	}
+	testCreateNewLinkResponse3, err := s.CreateNewLink(ctx, &testCreateLinkRequest)
+	if err != nil {
+		t.Fatalf("testCreateNewLinkResponse is wrong, got:%v", err)
+	}
+	testCreateNewLinkResponse4, err := s.CreateNewLink(ctx, &testCreateLinkRequest4)
 	if err != nil {
 		t.Fatalf("testCreateNewLinkResponse is wrong, got:%v", err)
 	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedModel.Id.String(), testCreateNewLinkResponse.Id)
-	assert.Equal(t, expectedModel.UserId.String(), testCreateNewLinkResponse.UserId)
-	assert.Equal(t, expectedModel.GroupId.String(), *testCreateNewLinkResponse.GroupId)
-	assert.Equal(t, expectedModel.Generated, testCreateNewLinkResponse.Generated)
-	assert.Equal(t, expectedModel.ShortLink, testCreateNewLinkResponse.ShortLink)
-	assert.Equal(t, expectedModel.Url, testCreateNewLinkResponse.Url)
-	assert.Equal(t, expectedModel.CreatedAt.String(), testCreateNewLinkResponse.CreatedAt)
-	assert.Equal(t, expectedModel.ExpireAt.String(), testCreateNewLinkResponse.ExpireAt)
+	assert.Equal(t, expectedModel.Id.String(), testCreateNewLinkResponse1.Id)
+	assert.Equal(t, expectedModel.UserId.String(), testCreateNewLinkResponse1.UserId)
+	assert.Equal(t, expectedModel.GroupId.String(), *testCreateNewLinkResponse1.GroupId)
+	assert.Equal(t, expectedModel.Generated, testCreateNewLinkResponse1.Generated)
+	assert.Equal(t, expectedModel.ShortLink, testCreateNewLinkResponse1.ShortLink)
+	assert.Equal(t, expectedModel.Url, testCreateNewLinkResponse1.Url)
+	assert.Equal(t, expectedModel.CreatedAt.String(), testCreateNewLinkResponse1.CreatedAt)
+	assert.Equal(t, expectedModel.ExpireAt.String(), testCreateNewLinkResponse1.ExpireAt)
+
+	assert.Equal(t, expectedModel.Id.String(), testCreateNewLinkResponse2.Id)
+	assert.Equal(t, expectedModel.UserId.String(), testCreateNewLinkResponse2.UserId)
+	assert.Equal(t, expectedModel.GroupId.String(), *testCreateNewLinkResponse2.GroupId)
+	assert.Equal(t, expectedModel.Generated, testCreateNewLinkResponse2.Generated)
+	assert.Equal(t, expectedModel.ShortLink, testCreateNewLinkResponse2.ShortLink)
+	assert.Equal(t, expectedModel.Url, testCreateNewLinkResponse2.Url)
+	assert.Equal(t, expectedModel.CreatedAt.String(), testCreateNewLinkResponse2.CreatedAt)
+	assert.Equal(t, expectedModel.ExpireAt.String(), testCreateNewLinkResponse2.ExpireAt)
+
+	assert.Equal(t, expectedModel.Id.String(), testCreateNewLinkResponse3.Id)
+	assert.Equal(t, expectedModel.UserId.String(), testCreateNewLinkResponse3.UserId)
+	assert.Equal(t, expectedModel.GroupId.String(), *testCreateNewLinkResponse3.GroupId)
+	assert.Equal(t, expectedModel.Generated, testCreateNewLinkResponse3.Generated)
+	assert.Equal(t, expectedModel.ShortLink, testCreateNewLinkResponse3.ShortLink)
+	assert.Equal(t, expectedModel.Url, testCreateNewLinkResponse3.Url)
+	assert.Equal(t, expectedModel.CreatedAt.String(), testCreateNewLinkResponse3.CreatedAt)
+	assert.Equal(t, expectedModel.ExpireAt.String(), testCreateNewLinkResponse3.ExpireAt)
+
+	assert.Equal(t, expectedModel4.Id.String(), testCreateNewLinkResponse4.Id)
+	assert.Equal(t, expectedModel4.UserId.String(), testCreateNewLinkResponse4.UserId)
+	assert.Equal(t, expectedModel4.GroupId.String(), *testCreateNewLinkResponse4.GroupId)
+	assert.Equal(t, expectedModel4.Generated, testCreateNewLinkResponse4.Generated)
+	assert.Equal(t, expectedModel4.ShortLink, testCreateNewLinkResponse4.ShortLink)
+	assert.Equal(t, expectedModel4.Url, testCreateNewLinkResponse4.Url)
+	assert.Equal(t, expectedModel4.CreatedAt.String(), testCreateNewLinkResponse4.CreatedAt)
+	assert.Equal(t, expectedModel4.ExpireAt.String(), testCreateNewLinkResponse4.ExpireAt)
 
 	testShortenerStorageRepository.AssertExpectations(t)
 
@@ -312,4 +378,34 @@ func TestRedirect(t *testing.T) {
 
 	testShortenerStorageRepository.AssertExpectations(t)
 
+}
+
+func TestGetLinksCountByUserId(t *testing.T) {
+	testShortenerCacheRepository := new(mokShortenerCacheRepository)
+	testShortenerStorageRepository := new(mokShortenerStorageRepository)
+	testShortenerSenderRepository := new(mokShortenerSenderRepository)
+
+	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
+
+	ctx := context.Background()
+
+	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
+
+	testGetLinksCountByUserIdRequest := shortener.GetLinksCountByUserIdRequest{
+		UserId: idStr,
+	}
+
+	var expectedModel int32 = 7
+
+	testShortenerStorageRepository.On("GetLinksCountByUserId", mock.AnythingOfType("uuid.UUID")).Return(expectedModel, nil)
+
+	testGetLinksCountByUserIdResponse, err := s.GetLinksCountByUserId(ctx, &testGetLinksCountByUserIdRequest)
+	if err != nil {
+		t.Fatalf("testUpdateLinkResponse is wrong, got:%v", err)
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedModel, testGetLinksCountByUserIdResponse.Count)
+
+	testShortenerStorageRepository.AssertExpectations(t)
 }

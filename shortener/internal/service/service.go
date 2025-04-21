@@ -3,14 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
 	"time"
 	"xlink/common/gen/shortener"
+	"xlink/common/logger"
 	"xlink/shortener/internal/models"
 	"xlink/shortener/internal/ports"
 	"xlink/shortener/internal/service/helper"
-
-	"go.uber.org/zap"
-	"xlink/common/logger"
 )
 
 type Service struct {
@@ -36,7 +35,7 @@ func New(
 }
 
 func (s *Service) CreateNewLink(ctx context.Context, request *shortener.CreateLinkRequest) (*shortener.Link, error) {
-	inputData, err := helper.LinkModelFromLinkRequest(request, time.Now().Add(s.defaultLinkExpireTime))
+	inputData, err := helper.LinkModelFromLinkCreateRequest(request, time.Now().Add(s.defaultLinkExpireTime))
 	if err != nil {
 		return &shortener.Link{}, fmt.Errorf("error while validating link: %v", err)
 	}
@@ -47,7 +46,7 @@ func (s *Service) CreateNewLink(ctx context.Context, request *shortener.CreateLi
 }
 
 func (s *Service) UpdateLink(ctx context.Context, request *shortener.UpdateLinkRequest) (*shortener.Link, error) {
-	inputData, err := helper.LinkModelFromLinkRequestWithId(request, time.Now().Add(s.defaultLinkExpireTime))
+	inputData, err := helper.LinkModelFromLinkUpdateRequest(request)
 	if err != nil {
 		return &shortener.Link{}, fmt.Errorf("error while validating link: %v", err)
 	}
@@ -75,7 +74,7 @@ func (s *Service) DeleteLink(ctx context.Context, request *shortener.DeleteLinkR
 		return &shortener.DeleteLinkResponse{Status: false}, fmt.Errorf("error while deleting link from storage: %v", err)
 	}
 
-	err = s.cachingRepo.DeleteUrl(cacheKeyToDelete)
+	err = s.cachingRepo.DeleteUrl(*cacheKeyToDelete)
 	if err != nil {
 		return &shortener.DeleteLinkResponse{Status: false}, fmt.Errorf("error while deleting link from caching: %v", err)
 	}
@@ -83,9 +82,9 @@ func (s *Service) DeleteLink(ctx context.Context, request *shortener.DeleteLinkR
 	return &shortener.DeleteLinkResponse{Status: true}, nil
 }
 
-func (s *Service) Redirect(ctx context.Context, request *shortener.Url) (*shortener.Url, error) {
+func (s *Service) Redirect(ctx context.Context, request *shortener.RedirectRequest) (*shortener.RedirectResponse, error) {
 	var originalUrl string
-	var shortUrl = request.Url
+	var shortUrl = request.ShortLink
 	var err error
 
 	originalUrl, err = s.cachingRepo.GetUrl(shortUrl)
@@ -94,7 +93,7 @@ func (s *Service) Redirect(ctx context.Context, request *shortener.Url) (*shorte
 		var link models.Link
 		link, err = s.storageRepo.GetLinkByShortUrl(shortUrl)
 		if err != nil {
-			return &shortener.Url{}, fmt.Errorf("error while getting link: %v", err)
+			return &shortener.RedirectResponse{}, fmt.Errorf("error while getting link: %v", err)
 		}
 
 		originalUrl = link.Url
@@ -112,7 +111,7 @@ func (s *Service) Redirect(ctx context.Context, request *shortener.Url) (*shorte
 		s.senderRepo.SendRedirectInfo()
 	}()
 
-	return &shortener.Url{Url: originalUrl}, nil
+	return &shortener.RedirectResponse{TargetUrl: originalUrl}, nil
 }
 
 func (s *Service) GetLinksCountByUserId(ctx context.Context, request *shortener.GetLinksCountByUserIdRequest) (*shortener.GetLinksCountByUserIdResponse, error) {

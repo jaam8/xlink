@@ -1,0 +1,74 @@
+kafka:
+  host: kafka
+  port: 9092
+  brokers:
+    - kafka:9092
+  min_bytes: 10
+  max_bytes: 1048576
+  max_wait_ms: 500
+  commit_interval_ms: 1000
+
+zookeeper:
+  host: zookeeper
+  port: 2181
+
+postgres:
+  host: postgres
+  port: 5432
+  db: xlink
+  user: postgres
+  password: "1234"
+  max_conns: 10
+  min_conns: 5
+
+
+redis:
+  host: localhost
+  port: 6379
+  user: ""
+  password: ""
+  user_password: ""
+  max_retries: 3
+  pool_size: 10
+  dial_timeout_seconds: 5
+  read_timeout_seconds: 3
+  write_timeout_seconds: 3
+
+nginx:
+  port_http: 81
+  port_grpc: 50050
+  entry_port: 80
+
+gateway:
+  port: 3000
+
+
+user_service:
+  port_grpc: 50051
+  redis_db: 0
+  token_len: 32
+  cache_expiration_seconds: 3600
+  migrations_path: file:///user_service/migrations
+
+
+shortener:
+  port_grpc: 50052
+  redis_db: 1
+  kafka_topic: redirect.events
+  upstream_names: shortener_upstream
+  upstream_ports: 50060
+  timeouts: 10000
+  expiration_seconds: 500
+  default_link_expiration_minutes: 1440
+  migrations_path: file:///shortener/migrations
+
+
+analytics:
+  port_grpc: 50053
+  kafka_topic: redirect.events
+  kafka_group_id: analytics-consumer
+  upstream_names: analytics_upstream
+  upstream_ports: 50061
+  timeouts: 10000
+
+expiration_seconds: 0
