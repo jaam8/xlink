@@ -11,7 +11,6 @@ import (
 
 const (
 	userIdKeyPrefix = "user-id-"
-	tokenKeyPrefix  = "token-"
 	roleKeyPrefix   = "role-"
 	sep             = ";"
 )
@@ -23,10 +22,6 @@ type UserCacheRepositoryRedis struct {
 
 func getUserIdKey(userId string) string {
 	return userIdKeyPrefix + userId
-}
-
-func getTokenKey(token string) string {
-	return tokenKeyPrefix + token
 }
 
 func getRolesKey(userId string) string {

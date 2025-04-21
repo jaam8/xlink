@@ -43,7 +43,8 @@ func (s *ShortenerRepositoryGRPC) GetLinksCountByUserId(userId string) (int32, e
 	if err != nil {
 		return 0, fmt.Errorf("cannot connect to shortener by gRPC: %v", err)
 	}
-	defer conn.Close()
+
+	defer conn.Close() //nolint:all
 
 	resultChan := make(chan int32)
 

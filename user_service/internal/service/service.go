@@ -217,7 +217,7 @@ func (s *Service) GetRole(ctx context.Context, req *user_service.GetRoleRequest)
 		}
 
 		go func() {
-			s.cacheRepo.SetRole(req.UserId, isStaff, isAdmin)
+			_ = s.cacheRepo.SetRole(req.UserId, isStaff, isAdmin) //nolint:all
 		}()
 	}
 
