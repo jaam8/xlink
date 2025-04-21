@@ -34,7 +34,7 @@ func main() {
 	redisCfg := cfg.Redis
 	postgresCfg := cfg.Postgres
 
-	redisClient, err := redis.NewRedisClient(ctx, redisCfg)
+	redisClient, err := redis.NewRedisClient(ctx, redisCfg, cfg.UserService.RedisDB)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to connect to Redis database: %w", err))
 	}
@@ -45,18 +45,20 @@ func main() {
 	}
 
 	// postgres migration
-	err = postgres.Migrate(ctx, postgresCfg, postgresCfg.MigrationsPath)
+	err = postgres.Migrate(ctx, postgresCfg, cfg.UserService.MigrationsPath)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to migrate postgres database: %w", err))
 	}
 
-	cacheRepo := cache.NewUserCacheRepositoryRedis(redisClient, time.Second*time.Duration(cfg.CacheExpirationSeconds))
-	storageRepo := storage.NewUserStorageRepositoryPostgres(postgresClient, int8(cfg.TokenLength))
+	cacheRepo := cache.NewUserCacheRepositoryRedis(redisClient,
+		time.Second*time.Duration(cfg.UserService.CacheExpirationSeconds))
+
+	storageRepo := storage.NewUserStorageRepositoryPostgres(postgresClient, int8(cfg.UserService.TokenLength))
 
 	shortenerRepo := shortener_adapters.NewShortenerRepositoryGRPC(
-		fmt.Sprintf("%s:%s", cfg.UpstreamNames.Shortener, cfg.UpstreamPorts.Shortener),
+		fmt.Sprintf("%s:%s", cfg.Shortener.UpstreamNames, cfg.Shortener.UpstreamPorts),
 		[]grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())},
-		time.Millisecond*time.Duration(cfg.Timeouts.Shortener),
+		time.Millisecond*time.Duration(cfg.Shortener.Timeouts),
 	)
 
 	grpcServer, err := runner.CreateGRPC(cacheRepo, storageRepo, shortenerRepo)
@@ -64,7 +66,7 @@ func main() {
 		log.Fatalf("failed to create gRPC server: %v", err)
 	}
 
-	go runner.RunGRPC(ctx, grpcServer, cfg.GRPCPort)
+	go runner.RunGRPC(ctx, grpcServer, cfg.UserService.GRPCPort)
 
 	<-ctx.Done()
 
