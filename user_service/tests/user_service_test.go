@@ -311,7 +311,7 @@ func TestGetRole(t *testing.T) {
 	userId := "user123"
 	err := cacheRepo.SetRole(userId, true, false)
 	if err != nil {
-		t.Error("failed to set role:%v", err)
+		t.Errorf("failed to set role:%v", err)
 	}
 
 	req := &user_service.GetRoleRequest{UserId: userId}
@@ -361,7 +361,7 @@ func TestCheckToken_FromCache(t *testing.T) {
 	token := "token123"
 	err := cache.SetToken(userId, token)
 	if err != nil {
-		t.Error("failed to set role:%v", err)
+		t.Errorf("failed to set role:%v", err)
 	}
 
 	svc := service.New(cache, storage, shortener)
