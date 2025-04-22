@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 	"slices"
 	"sync"
+	"time"
 	"xlink/common/logger"
 )
 
@@ -17,44 +19,43 @@ type GrpcPool struct {
 	config Config
 }
 
-func NewGrpcPool(ctx context.Context, config Config) (*GrpcPool, error) {
-	pool := make([]*grpc.ClientConn, config.MaxConnections)
+func NewConnection(config Config) (*grpc.ClientConn, error) {
+	_, cancel := context.WithTimeout(context.Background(), config.DialTimeout)
+	defer cancel()
+	return grpc.NewClient(config.Address, config.DialOptions...)
+}
 
-	connectionsLeft := config.MaxConnections
+func NewGrpcPool(ctx context.Context, config Config) (*GrpcPool, error) {
+	pool := &GrpcPool{
+		idle:   make([]*grpc.ClientConn, config.MaxConnections),
+		active: make([]*grpc.ClientConn, config.MaxConnections),
+		mu:     sync.Mutex{},
+		config: config,
+	}
+
+	if pool.config.DialTimeout == 0 {
+		pool.config.DialTimeout = time.Second * 5
+	}
+
+	successfulConnections := 0
 	for i := 0; i < config.MaxConnections; i++ {
-		grpcConn, err := grpc.NewClient(config.Address, config.DialOptions...)
+		grpcConn, err := NewConnection(pool.config)
 		if err != nil {
 			logger.GetOrCreateLoggerFromCtx(ctx).
 				Info(ctx, "couldn't connect to grpc",
 					zap.String("address", config.Address), zap.Error(err))
-		} else {
-			connectionsLeft--
 		}
-
-		pool[i] = grpcConn
+		successfulConnections++
+		pool.idle[i] = grpcConn
 	}
 
-	if connectionsLeft > config.MaxConnections-config.MinConnections {
-		wg := sync.WaitGroup{}
-		wg.Add(connectionsLeft)
-		for _, grpcConn := range pool {
-			go func() {
-				defer wg.Done()
-				if grpcConn != nil {
-					grpcConn.Close()
-				}
-			}()
-		}
-
-		wg.Wait()
+	if successfulConnections < config.MinConnections {
+		_ = pool.Close() //nolint:all
 		return nil, fmt.Errorf("couldn't create at least %d connections: got %d",
-			config.MinConnections, config.MaxConnections-connectionsLeft)
+			config.MinConnections, successfulConnections)
 	}
 
-	return &GrpcPool{
-		idle:   pool,
-		config: config,
-	}, nil
+	return pool, nil
 }
 
 func (p *GrpcPool) GetConn() (*grpc.ClientConn, error) {
@@ -64,16 +65,30 @@ func (p *GrpcPool) GetConn() (*grpc.ClientConn, error) {
 	var err error
 	var grpcConn *grpc.ClientConn
 
-	if len(p.idle) == 0 {
-		grpcConn, err = grpc.NewClient(p.config.Address, p.config.DialOptions...)
-		if err != nil {
-			return nil, fmt.Errorf("couldn't connect to grpc at address %s: %v", p.config.Address, err)
-		}
-	} else {
+	if len(p.idle) > 0 {
 		grpcConn, p.idle = p.idle[0], p.idle[1:]
+		p.active = append(p.active, grpcConn)
+	} else {
+		grpcConn, err = NewConnection(p.config)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't create new grpc connection at address %s: %v", p.config.Address, err)
+		}
 	}
 
 	p.active = append(p.active, grpcConn)
+
+	// warning, but not returning on pool exhaust
+	if len(p.active) > p.config.MaxConnections {
+		loggerCtx, loggerErr := logger.New(context.Background())
+		if loggerErr == nil {
+			logger.GetLoggerFromCtx(loggerCtx).
+				Warn(loggerCtx, "grpc pool overload",
+					zap.Int("MaxConnections", p.config.MaxConnections),
+					zap.Int("ActualConnections", len(p.active)),
+				)
+		}
+	}
+
 	return grpcConn, nil
 }
 
@@ -84,10 +99,41 @@ func (p *GrpcPool) Restore(grpcConn *grpc.ClientConn) error {
 	for ind, connPointer := range p.active {
 		if connPointer == grpcConn {
 			p.active = slices.Delete(p.active, ind, ind+1)
-			p.idle = append(p.idle, grpcConn)
+
+			// append to idle only if connection is alive to use it later
+			if grpcConn.GetState() != connectivity.Shutdown {
+				p.idle = append(p.idle, grpcConn)
+			}
+
+			_ = grpcConn.Close() //nolint:all
 			return nil
 		}
 	}
 
-	return fmt.Errorf("couldn't restore connection: conn not found in []active")
+	return fmt.Errorf("conn not found in []active connections")
+}
+
+func (p *GrpcPool) Close() error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	var errs []error
+	for _, grpcConn := range p.idle {
+		if err := grpcConn.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	for _, grpcConn := range p.active {
+		if err := grpcConn.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	p.active = nil
+	p.idle = nil
+
+	if len(errs) > 0 {
+		return fmt.Errorf("couldn't close all connections: %v", errs)
+	}
+	return nil
 }

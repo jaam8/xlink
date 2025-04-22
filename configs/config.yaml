@@ -74,3 +74,9 @@ analytics:
   timeouts: 10000
 
 expiration_seconds: 0
+
+grpc_pool:
+  max_connections: 10
+  min_connections: 1
+  max_retries: 3
+  base_retry_delay_milliseconds: 300

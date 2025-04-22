@@ -34,14 +34,16 @@ func GetValidatedUserId(request LinkRequestOnlyUserId) (uuid.UUID, error) {
 	return userId, nil
 }
 
-func GetValidatedExpireAt(request LinkRequestOnlyExpireAt, defaultValue time.Time) (time.Time, error) {
-	var expireAt = defaultValue
+func GetValidatedExpireAt(request LinkRequestOnlyExpireAt) (*time.Time, error) {
+	var expireAt *time.Time = nil
 
 	if request.GetExpireAt() != nil {
-		expireAt = request.GetExpireAt().AsTime()
-		if expireAt.Before(time.Now()) {
-			return time.Time{}, fmt.Errorf("expire at time is out of date")
+		expireAtValue := request.GetExpireAt().AsTime()
+		if expireAtValue.Before(time.Now()) {
+			return nil, fmt.Errorf("expire at time is out of date")
 		}
+
+		expireAt = &expireAtValue
 	}
 
 	return expireAt, nil
