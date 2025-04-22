@@ -8,7 +8,20 @@ stages:
 variables:
   COVERAGE_THRESHOLD: 30
 
+.default-go-job: &default-go-job
+  image: golang:1.24.1
+  cache:
+    key: ${CI_JOB_NAME}
+    paths:
+      - /go/pkg/mod
+      - /root/.cache/go-build
+      - /go/bin
+  before_script:
+    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+
 lint_common:
+  <<: *default-go-job
   stage: lint
   image: golang:1.24.1
   script:
@@ -16,7 +29,17 @@ lint_common:
     - cd common
     - golangci-lint run ./...
 
+lint_analytics:
+  <<: *default-go-job
+  stage: lint
+  image: golang:1.24.1
+  script:
+    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    - cd analytics
+    - golangci-lint run ./...
+
 lint_user_service:
+  <<: *default-go-job
   stage: lint
   image: golang:1.24.1
   script:
@@ -26,6 +49,7 @@ lint_user_service:
     - golangci-lint run ./...
 
 lint_shortener:
+  <<: *default-go-job
   stage: lint
   image: golang:1.24.1
   script:
@@ -35,6 +59,7 @@ lint_shortener:
 
 
 build:
+  <<: *default-go-job
   stage: build
   script:
     - echo "🔨 Building all services"
@@ -42,6 +67,7 @@ build:
     - cd ../user_service && go build -v ./...
 
 test-shortener:
+  <<: *default-go-job
   stage: test
   script:
     - cd shortener
@@ -55,6 +81,7 @@ test-shortener:
       fi
 
 test-user-service:
+  <<: *default-go-job
   stage: test
   script:
     - cd user_service
