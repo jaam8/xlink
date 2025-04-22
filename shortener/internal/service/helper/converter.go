@@ -74,7 +74,8 @@ func LinkModelFromLinkUpdateRequest(request LinkUpdateRequest) (*models.Link, er
 
 	targetUrl := request.GetTargetUrl()
 
-	expireAt := request.GetExpireAt().AsTime()
+	var expireAt *time.Time
+	expireAt, err = GetValidatedExpireAt(request)
 
 	return &models.Link{
 		Id:        linkId,
@@ -82,7 +83,7 @@ func LinkModelFromLinkUpdateRequest(request LinkUpdateRequest) (*models.Link, er
 		Generated: generated,
 		ShortLink: shortLink,
 		TargetUrl: targetUrl,
-		ExpireAt:  &expireAt,
+		ExpireAt:  expireAt,
 	}, nil
 }
 
