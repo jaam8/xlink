@@ -34,6 +34,17 @@ func New(
 	}
 }
 
+func (s *Service) GetLink(ctx context.Context, request *shortener.GetLinkRequest) (*shortener.Link, error) {
+	linkId, err := helper.GetValidatedId(request)
+	if err != nil {
+		return &shortener.Link{}, fmt.Errorf("error while validating link_id: %w", err)
+	}
+
+	link, err := s.storageRepo.GetLinkById(linkId)
+
+	return helper.LinkResponseFromLinkModel(link), nil
+}
+
 func (s *Service) CreateNewLink(ctx context.Context, request *shortener.CreateLinkRequest) (*shortener.Link, error) {
 	inputData, err := helper.LinkModelFromLinkCreateRequest(request, time.Now().Add(s.defaultLinkExpireTime))
 	if err != nil {
