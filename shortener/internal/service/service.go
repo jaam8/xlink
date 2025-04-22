@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"time"
 	"xlink/common/gen/shortener"
@@ -34,30 +35,61 @@ func New(
 	}
 }
 
+func (s *Service) GetLink(ctx context.Context, request *shortener.GetLinkRequest) (*shortener.Link, error) {
+	var err error
+	var linkId uuid.UUID
+	linkId, err = helper.GetValidatedId(request)
+	if err != nil {
+		return &shortener.Link{}, fmt.Errorf("error while validating link_id: %w", err)
+	}
+
+	var link models.Link
+	link, err = s.storageRepo.GetLinkById(linkId)
+	if err != nil {
+		return &shortener.Link{}, fmt.Errorf("error while getting link by id: %w", err)
+	}
+
+	return helper.LinkResponseFromLinkModel(link), nil
+}
+
 func (s *Service) CreateNewLink(ctx context.Context, request *shortener.CreateLinkRequest) (*shortener.Link, error) {
-	inputData, err := helper.LinkModelFromLinkCreateRequest(request, time.Now().Add(s.defaultLinkExpireTime))
+	var err error
+	var inputData *models.Link
+	inputData, err = helper.LinkModelFromLinkCreateRequest(request, time.Now().Add(s.defaultLinkExpireTime))
 	if err != nil {
 		return &shortener.Link{}, fmt.Errorf("error while validating link: %v", err)
 	}
 
-	newLink, err := s.storageRepo.CreateLink(inputData)
+	var newLink models.Link
+	newLink, err = s.storageRepo.CreateLink(inputData)
+	if err != nil {
+		return &shortener.Link{}, fmt.Errorf("error while creating new link: %w", err)
+	}
 
 	return helper.LinkResponseFromLinkModel(newLink), nil
 }
 
 func (s *Service) UpdateLink(ctx context.Context, request *shortener.UpdateLinkRequest) (*shortener.Link, error) {
-	inputData, err := helper.LinkModelFromLinkUpdateRequest(request)
+	var err error
+	var inputData *models.Link
+	inputData, err = helper.LinkModelFromLinkUpdateRequest(request)
 	if err != nil {
 		return &shortener.Link{}, fmt.Errorf("error while validating link: %v", err)
 	}
 
-	newLink, err := s.storageRepo.UpdateLink(inputData)
+	var newLink models.Link
+	newLink, err = s.storageRepo.UpdateLink(inputData)
+	if err != nil {
+		return &shortener.Link{}, fmt.Errorf("error while updating link by id: %w", err)
+	}
 
 	return helper.LinkResponseFromLinkModel(newLink), nil
 }
 
 func (s *Service) DeleteLink(ctx context.Context, request *shortener.DeleteLinkRequest) (*shortener.DeleteLinkResponse, error) {
-	id, err := helper.GetValidatedId(request)
+	var err error
+	var id uuid.UUID
+	id, err = helper.GetValidatedId(request)
 	if err != nil {
 		return &shortener.DeleteLinkResponse{Status: false}, fmt.Errorf("error while getting id: %v", err)
 	}
@@ -83,8 +115,11 @@ func (s *Service) DeleteLink(ctx context.Context, request *shortener.DeleteLinkR
 }
 
 func (s *Service) Redirect(ctx context.Context, request *shortener.RedirectRequest) (*shortener.RedirectResponse, error) {
+	var err error
 	var shortLink = request.ShortLink
-	targetUrl, err := s.cachingRepo.GetUrl(shortLink)
+	var targetUrl string
+
+	targetUrl, err = s.cachingRepo.GetUrl(shortLink)
 	if err != nil {
 		// if it's not in cache, then we get in from relational DB
 		var link models.Link
@@ -108,7 +143,8 @@ func (s *Service) Redirect(ctx context.Context, request *shortener.RedirectReque
 	}
 
 	go func() {
-		click, err := helper.RedirectRequestToClick(request)
+		var click *models.Click
+		click, err = helper.RedirectRequestToClick(request)
 		if err != nil {
 			logger.GetLoggerFromCtx(ctx).Error(ctx,
 				"failed to parse click",
@@ -132,7 +168,9 @@ func (s *Service) Redirect(ctx context.Context, request *shortener.RedirectReque
 }
 
 func (s *Service) GetLinksCountByUserId(ctx context.Context, request *shortener.GetLinksCountByUserIdRequest) (*shortener.GetLinksCountByUserIdResponse, error) {
-	userId, err := helper.GetValidatedUserId(request)
+	var err error
+	var userId uuid.UUID
+	userId, err = helper.GetValidatedUserId(request)
 	if err != nil {
 		return &shortener.GetLinksCountByUserIdResponse{Count: 0},
 			fmt.Errorf("error while getting user id: %v", err)
