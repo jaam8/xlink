@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 	"xlink/common/gen/shortener"
+	"xlink/common/gen/user_service"
 	"xlink/common/logger"
 	"xlink/gateway/internal/handlers"
 	"xlink/gateway/internal/handlers/helpers"
@@ -17,10 +18,14 @@ import (
 
 type ShortenerServiceHandler struct {
 	shortenerService *services.ShortenerService
+	userService      *services.UserService
 }
 
-func NewShortenerServiceHandler(shortenerService *services.ShortenerService) *ShortenerServiceHandler {
-	return &ShortenerServiceHandler{shortenerService: shortenerService}
+func NewShortenerServiceHandler(
+	shortenerService *services.ShortenerService,
+	userService *services.UserService,
+) *ShortenerServiceHandler {
+	return &ShortenerServiceHandler{shortenerService: shortenerService, userService: userService}
 }
 
 func (h *ShortenerServiceHandler) Redirect(ctx *fiber.Ctx) error {
@@ -80,6 +85,15 @@ func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {
 	var body schemas.CreateLinkSchema
 	if err := ctx.BodyParser(&body); err != nil {
 		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
+	}
+
+	if _, err := helpers.ParseUUID(body.UserId); err != nil {
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid user id: %v", err).Error())
+	}
+
+	if _, err := h.userService.GetUser(&user_service.GetUserRequest{UserId: body.UserId}); err != nil {
+		return helpers.BadRequest(ctx, fmt.Errorf("couldn't find user with given id='%s': %v",
+			body.UserId, err).Error())
 	}
 
 	request := &shortener.CreateLinkRequest{

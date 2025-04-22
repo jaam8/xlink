@@ -7,12 +7,16 @@ import (
 	"time"
 )
 
-func ParseUUIDField(c *fiber.Ctx, fieldName string) (uuid.UUID, error) {
-	uuidField, err := uuid.Parse(c.Params(fieldName))
+func ParseUUID(value string) (uuid.UUID, error) {
+	uuidField, err := uuid.Parse(value)
 	if err != nil {
 		return uuid.UUID{}, err
 	}
 	return uuidField, nil
+}
+
+func ParseUUIDField(c *fiber.Ctx, fieldName string) (uuid.UUID, error) {
+	return ParseUUID(c.Params(fieldName))
 }
 
 func ParseDateTimeField(c *fiber.Ctx, fieldName string) (time.Time, error) {
