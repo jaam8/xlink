@@ -89,7 +89,7 @@ func main() {
 
 	//region handlers
 	userServiceHandler := http_handlers.NewUserServiceHandler(userService)
-	shortenerServiceHandler := http_handlers.NewShortenerServiceHandler(shortenerService)
+	shortenerServiceHandler := http_handlers.NewShortenerServiceHandler(shortenerService, userService)
 	//endregion handlers
 
 	//region routing
