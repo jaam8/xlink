@@ -11,14 +11,15 @@ variables:
 .default-go-job: &default-go-job
   image: golang:1.24.1
   cache:
-    key: ${CI_JOB_NAME}
+    key:
+      files:
+        - go.sum
     paths:
       - /go/pkg/mod
       - /root/.cache/go-build
       - /go/bin
   before_script:
     - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-
 
 lint_common:
   <<: *default-go-job
