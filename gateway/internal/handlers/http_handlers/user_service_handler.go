@@ -257,3 +257,91 @@ func (h *UserServiceHandler) GetRole(ctx *fiber.Ctx) error {
 		Info(ctx.Context(), "got roles for user", zap.String("id", userId.String()))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
+
+func (h *UserServiceHandler) CreateUserAdmin(ctx *fiber.Ctx) error {
+	var body schemas.CreateUserSchemaAdmin
+	if err := ctx.BodyParser(&body); err != nil {
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
+	}
+
+	request := &user_service.CreateUserRequest{
+		TgId:    body.TgId,
+		IsStaff: body.IsStaff,
+		IsAdmin: body.IsAdmin,
+	}
+
+	response, err := h.userService.CreateUser(request)
+
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+		return helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't get user_service response"))
+	}
+
+	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		Info(ctx.Context(), "created user (by admin)", zap.String("id", response.UserId))
+	return ctx.Status(fiber.StatusCreated).JSON(response)
+}
+
+func (h *UserServiceHandler) UpdateUserAdmin(ctx *fiber.Ctx) error {
+	userId, err := helpers.ParseUUIDField(ctx, "id")
+	if err != nil {
+		return helpers.BadRequest(ctx, "invalid user id: must be a valid uuid")
+	}
+
+	var body schemas.UpdateUserSchemaAdmin
+	if err = ctx.BodyParser(&body); err != nil {
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
+	}
+
+	request := &user_service.UpdateUserRequest{
+		UserId:  userId.String(),
+		TgId:    body.TgId,
+		IsStaff: body.IsStaff,
+		IsAdmin: body.IsAdmin,
+	}
+
+	response, err := h.userService.UpdateUser(request)
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+		return helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't get user_service response: %v", err))
+	}
+
+	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		Info(ctx.Context(),
+			"updated user (by admin)",
+			zap.String("id", userId.String()),
+			zap.Bool("status", response.Status),
+		)
+	return ctx.Status(fiber.StatusCreated).JSON(response)
+}
+
+func (h *UserServiceHandler) DeleteUserAdmin(ctx *fiber.Ctx) error {
+	userId, err := helpers.ParseUUIDField(ctx, "id")
+	if err != nil {
+		return helpers.BadRequest(ctx, "invalid user id: must be a valid uuid")
+	}
+
+	request := &user_service.DeleteUserRequest{
+		UserId: userId.String(),
+	}
+
+	response, err := h.userService.DeleteUser(request)
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+		return helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't get user_service response: %v", err))
+	}
+
+	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		Info(ctx.Context(),
+			"deleted user (by admin)",
+			zap.String("id", userId.String()),
+			zap.Bool("status", response.Status),
+		)
+	return ctx.Status(fiber.StatusOK).JSON(response)
+}

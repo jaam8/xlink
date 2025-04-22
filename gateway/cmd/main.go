@@ -119,6 +119,9 @@ func main() {
 	userStaffGroup.Delete("/:id", userServiceHandler.DeleteUser)             // staff | admin
 	userStaffGroup.Get("/role/:id", userServiceHandler.GetRole)              // staff | admin
 
+	userAdminGroup.Post("/create", userServiceHandler.CreateUserAdmin)        // admin
+	userAdminGroup.Patch("/update/:id", userServiceHandler.UpdateUserAdmin)   // admin
+	userAdminGroup.Delete("/delete/:id", userServiceHandler.DeleteUserAdmin)  // admin
 	userAdminGroup.Post("/get/by-token", userServiceHandler.GetUserIDByToken) // admin
 	userAdminGroup.Post("/token/check", userServiceHandler.CheckToken)        // admin
 	//endregion user v1
