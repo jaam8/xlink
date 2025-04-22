@@ -13,6 +13,7 @@ service ShortenerService {
   rpc UpdateLink(UpdateLinkRequest) returns (Link);
   rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse);
   rpc GetLinksCountByUserId(GetLinksCountByUserIdRequest) returns (GetLinksCountByUserIdResponse);
+  rpc GetLinkOwnerByShortLink(GetLinkOwnerByShortLinkRequest) returns (GetLinkOwnerByShortLinkResponse);
 }
 
 // ======================== Link ========================
@@ -83,4 +84,13 @@ message GetLinksCountByUserIdRequest {
 
 message GetLinksCountByUserIdResponse {
   int32 count = 1;
+}
+
+// =================== Get Link Owner By ShortLink =======================
+message GetLinkOwnerByShortLinkRequest {
+  string short_link = 1;
+}
+
+message GetLinkOwnerByShortLinkResponse {
+  string link_owner = 1;
 }

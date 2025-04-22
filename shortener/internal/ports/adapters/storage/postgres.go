@@ -164,3 +164,21 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinksCountByUserId(userId uuid.U
 	}
 	return count, nil
 }
+
+func (s *ShortenerStorageRepositoryPostgres) GetLinkOwnerByShortLink(shortLink string) (string, error) {
+	var userId string
+	sql, args, err := squirrel.Select("user_id").
+		From("schema_name.urls").
+		Where(squirrel.Eq{"short_link": shortLink}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return "", fmt.Errorf("couldn't build an SQL query: %w", err)
+	}
+
+	err = s.PostgresPool.QueryRow(context.Background(), sql, args...).Scan(&userId)
+	if err != nil {
+		return "", fmt.Errorf("couldn't get link owner by short link '%s': %w", shortLink, err)
+	}
+	return userId, nil
+}
