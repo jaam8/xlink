@@ -1,10 +1,13 @@
 package models
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Click struct {
-	LinkID     string    `json:"link_id"`
-	LinkOwner  string    `json:"link_owner"`
+	LinkOwner  uuid.UUID `json:"link_owner"`
+	ShortLink  string    `json:"short_link"`
 	ClickedAt  time.Time `json:"clicked_at"`
 	Referrer   string    `json:"referrer"`
 	Region     string    `json:"region"`
@@ -14,7 +17,7 @@ type Click struct {
 	IsUnique   bool      `json:"is_unique"`
 }
 
-type RedirectClickInfo struct {
+type ClickEvent struct {
 	ShortLink    string    `json:"short_link"`
 	ClickedAt    time.Time `json:"clicked_at"`
 	Referrer     string    `json:"referrer"`
