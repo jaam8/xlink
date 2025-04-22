@@ -34,10 +34,10 @@ func TestLinkResponseFromLinkModel(t *testing.T) {
 
 	assert.Equal(t, model.Id.String(), resp.LinkId)
 	assert.Equal(t, model.UserId.String(), resp.UserId)
-	assert.Equal(t, model.ShortLink, resp.ShortLink)
+	assert.Equal(t, *model.ShortLink, resp.ShortLink)
 	assert.Equal(t, model.TargetUrl, resp.TargetUrl)
-	assert.Equal(t, *timestamppb.New(model.CreatedAt), resp.CreatedAt)
-	assert.Equal(t, *timestamppb.New(expireAt), resp.ExpireAt)
+	assert.Equal(t, timestamppb.New(model.CreatedAt), resp.CreatedAt)
+	assert.Equal(t, timestamppb.New(expireAt), resp.ExpireAt)
 }
 
 func TestLinkModelFromLinkCreateRequest_with_ready_shortlink(t *testing.T) {
@@ -68,7 +68,7 @@ func TestLinkModelFromLinkCreateRequest_with_ready_shortlink(t *testing.T) {
 		Generated: &generated,
 	}
 
-	testResponse, err := helper.LinkModelFromLinkCreateRequest(&testCreateLinkRequest, time.Now())
+	testResponse, err := helper.LinkModelFromLinkCreateRequest(&testCreateLinkRequest, expireAtTime)
 	if err != nil {
 		t.Fatalf("Unable to get link model, %v", err)
 	}
@@ -76,7 +76,7 @@ func TestLinkModelFromLinkCreateRequest_with_ready_shortlink(t *testing.T) {
 	assert.Equal(t, expectedModel.UserId, testResponse.UserId)
 	assert.Equal(t, expectedModel.ShortLink, testResponse.ShortLink)
 	assert.Equal(t, expectedModel.TargetUrl, testResponse.TargetUrl)
-	assert.Equal(t, expireAtTime, testResponse.CreatedAt)
+	assert.Equal(t, expireAtTime, *testResponse.ExpireAt)
 	assert.Equal(t, *expectedModel.Generated, *testResponse.Generated)
 
 }
@@ -111,7 +111,7 @@ func TestLinkModelFromLinkCreateRequest_without_ready_shortlink(t *testing.T) {
 		Generated: &generated,
 	}
 
-	testResponse, err := helper.LinkModelFromLinkCreateRequest(&testCreateLinkRequest, time.Now())
+	testResponse, err := helper.LinkModelFromLinkCreateRequest(&testCreateLinkRequest, expireAtTime)
 	if err != nil {
 		t.Fatalf("Unable to get link model, %v", err)
 	}
@@ -119,7 +119,7 @@ func TestLinkModelFromLinkCreateRequest_without_ready_shortlink(t *testing.T) {
 	assert.Equal(t, expectedModel.UserId, testResponse.UserId)
 	assert.NotEqual(t, *expectedModel.ShortLink, *testResponse.ShortLink)
 	assert.Equal(t, expectedModel.TargetUrl, testResponse.TargetUrl)
-	assert.Equal(t, expireAtTime, testResponse.CreatedAt)
+	assert.Equal(t, expireAtTime, *testResponse.ExpireAt)
 	assert.Equal(t, *expectedModel.Generated, *testResponse.Generated)
 
 }
@@ -179,7 +179,7 @@ func TestLinkModelFromLinkUpdateRequest_with_regenarating(t *testing.T) {
 	assert.Equal(t, expectedModel.UserId, testResponse.UserId)
 	assert.NotEqual(t, *expectedModel.ShortLink, *testResponse.ShortLink)
 	assert.Equal(t, expectedModel.TargetUrl, testResponse.TargetUrl)
-	assert.Equal(t, expireAtTime, testResponse.CreatedAt)
+	assert.Equal(t, expireAtTime.UTC(), *testResponse.ExpireAt)
 	assert.Equal(t, *expectedModel.Generated, *testResponse.Generated)
 
 }
@@ -236,7 +236,7 @@ func TestLinkModelFromLinkUpdateRequest_without_regenarating(t *testing.T) {
 	assert.Equal(t, expectedModel.UserId, testResponse.UserId)
 	assert.Equal(t, *expectedModel.ShortLink, *testResponse.ShortLink)
 	assert.Equal(t, expectedModel.TargetUrl, testResponse.TargetUrl)
-	assert.Equal(t, expireAtTime, testResponse.CreatedAt)
+	assert.Equal(t, expireAtTime.UTC(), *testResponse.ExpireAt)
 	assert.Equal(t, *expectedModel.Generated, *testResponse.Generated)
 
 }

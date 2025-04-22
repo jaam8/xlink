@@ -118,7 +118,7 @@ func TestCreateNewLink(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedModel.Id.String(), testCreateNewLinkResponse.LinkId)
 	assert.Equal(t, expectedModel.UserId.String(), testCreateNewLinkResponse.UserId)
-	assert.Equal(t, expectedModel.ShortLink, testCreateNewLinkResponse.ShortLink)
+	assert.Equal(t, *expectedModel.ShortLink, testCreateNewLinkResponse.ShortLink)
 	assert.Equal(t, expectedModel.TargetUrl, testCreateNewLinkResponse.TargetUrl)
 	assert.Equal(t, timestamppb.New(expectedModel.CreatedAt), testCreateNewLinkResponse.CreatedAt)
 	assert.Equal(t, timestamppb.New(*expectedModel.ExpireAt), testCreateNewLinkResponse.ExpireAt)
@@ -191,10 +191,10 @@ func TestUpdateLink(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedModel.Id.String(), testUpdateLinkResponse.LinkId)
 	assert.Equal(t, expectedModel.UserId.String(), testUpdateLinkResponse.UserId)
-	assert.Equal(t, expectedModel.ShortLink, testUpdateLinkResponse.ShortLink)
+	assert.Equal(t, *expectedModel.ShortLink, testUpdateLinkResponse.ShortLink)
 	assert.Equal(t, expectedModel.TargetUrl, testUpdateLinkResponse.TargetUrl)
-	assert.Equal(t, expectedModel.CreatedAt.String(), testUpdateLinkResponse.CreatedAt)
-	assert.Equal(t, expectedModel.ExpireAt.String(), testUpdateLinkResponse.ExpireAt)
+	assert.Equal(t, timestamppb.New(expectedModel.CreatedAt), testUpdateLinkResponse.CreatedAt)
+	assert.Equal(t, timestamppb.New(*expectedModel.ExpireAt), testUpdateLinkResponse.ExpireAt)
 
 	testShortenerStorageRepository.AssertExpectations(t)
 

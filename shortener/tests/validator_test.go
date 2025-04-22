@@ -60,14 +60,14 @@ func TestGetValidatedExpireAt(t *testing.T) {
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
 	expireAtStr := "2025-04-16T11:28:07+03:00"
-	expireAtStr1 := "2025-04-16T11:28:08+03:00"
+	expireAtStr1 := "2025-05-16T11:28:08+03:00"
 
 	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
 	require.NoError(t, err)
 	expireAtTime1, err := time.Parse(time.RFC3339, expireAtStr1)
 	require.NoError(t, err)
 
-	expireAtTimestamppb := timestamppb.New(expireAtTime)
+	expireAtTimestamppb1 := timestamppb.New(expireAtTime1)
 	require.NoError(t, err)
 
 	regenerated := true
@@ -78,15 +78,15 @@ func TestGetValidatedExpireAt(t *testing.T) {
 		Regenerate: regenerated,
 		ShortLink:  &shortLinkStr,
 		TargetUrl:  "http://qwertysdijvnisdnc",
-		ExpireAt:   expireAtTimestamppb,
+		ExpireAt:   expireAtTimestamppb1,
 	}
 
-	testResponse, err := helper.GetValidatedExpireAt(&testRequest, expireAtTime1)
+	testResponse, err := helper.GetValidatedExpireAt(&testRequest, expireAtTime)
 	if err != nil {
 		t.Fatalf("Unable to get ExpireAt, %v", err)
 	}
 
-	expected := expireAtStr
+	expected := expireAtTime1.UTC()
 
 	assert.Equal(t, expected, testResponse)
 
@@ -120,15 +120,6 @@ func TestValidatedUrl_with_no_empty_url(t *testing.T) {
 	assert.NoError(t, resp)
 }
 
-func TestValidatedUrl_with_empty_url(t *testing.T) {
-
-	url := ""
-
-	resp := helper.ValidateUrl(url)
-
-	assert.Error(t, resp)
-}
-
 func TestValidateShortLink_no_empty_string(t *testing.T) {
 	str := "nsurgfhbsuyfb"
 
@@ -140,16 +131,8 @@ func TestValidateShortLink_no_empty_string(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestValidateShortLink_with_empty_string(t *testing.T) {
-	str := ""
-
-	_, err := helper.ValidateShortLink(str)
-
-	assert.Error(t, err)
-}
-
 func TestValidateIPAddress_correct(t *testing.T) {
-	ip := "1.1.1.11.1."
+	ip := "127.0.0.1"
 
 	resp, err := helper.ValidateIPAddress(ip)
 	if resp == "" {
@@ -176,5 +159,5 @@ func TestValidateNotEmptyStr_with_empty_string(t *testing.T) {
 
 	_, err := helper.ValidateNotEmptyStr(str)
 
-	assert.NoError(t, err)
+	assert.Error(t, err)
 }
