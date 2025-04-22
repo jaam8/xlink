@@ -92,5 +92,5 @@ message GetLinkOwnerByShortLinkRequest {
 }
 
 message GetLinkOwnerByShortLinkResponse {
-  string user_id = 1;
+  string link_owner = 1;
 }
