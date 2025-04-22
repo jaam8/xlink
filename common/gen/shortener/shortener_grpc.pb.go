@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ShortenerService_Redirect_FullMethodName              = "/api.ShortenerService/Redirect"
-	ShortenerService_GetLink_FullMethodName               = "/api.ShortenerService/GetLink"
-	ShortenerService_CreateNewLink_FullMethodName         = "/api.ShortenerService/CreateNewLink"
-	ShortenerService_UpdateLink_FullMethodName            = "/api.ShortenerService/UpdateLink"
-	ShortenerService_DeleteLink_FullMethodName            = "/api.ShortenerService/DeleteLink"
-	ShortenerService_GetLinksCountByUserId_FullMethodName = "/api.ShortenerService/GetLinksCountByUserId"
+	ShortenerService_Redirect_FullMethodName                = "/api.ShortenerService/Redirect"
+	ShortenerService_GetLink_FullMethodName                 = "/api.ShortenerService/GetLink"
+	ShortenerService_CreateNewLink_FullMethodName           = "/api.ShortenerService/CreateNewLink"
+	ShortenerService_UpdateLink_FullMethodName              = "/api.ShortenerService/UpdateLink"
+	ShortenerService_DeleteLink_FullMethodName              = "/api.ShortenerService/DeleteLink"
+	ShortenerService_GetLinksCountByUserId_FullMethodName   = "/api.ShortenerService/GetLinksCountByUserId"
+	ShortenerService_GetLinkOwnerByShortLink_FullMethodName = "/api.ShortenerService/GetLinkOwnerByShortLink"
 )
 
 // ShortenerServiceClient is the client API for ShortenerService service.
@@ -37,6 +38,7 @@ type ShortenerServiceClient interface {
 	UpdateLink(ctx context.Context, in *UpdateLinkRequest, opts ...grpc.CallOption) (*Link, error)
 	DeleteLink(ctx context.Context, in *DeleteLinkRequest, opts ...grpc.CallOption) (*DeleteLinkResponse, error)
 	GetLinksCountByUserId(ctx context.Context, in *GetLinksCountByUserIdRequest, opts ...grpc.CallOption) (*GetLinksCountByUserIdResponse, error)
+	GetLinkOwnerByShortLink(ctx context.Context, in *GetLinkOwnerByShortLinkRequest, opts ...grpc.CallOption) (*GetLinkOwnerByShortLinkResponse, error)
 }
 
 type shortenerServiceClient struct {
@@ -107,6 +109,16 @@ func (c *shortenerServiceClient) GetLinksCountByUserId(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *shortenerServiceClient) GetLinkOwnerByShortLink(ctx context.Context, in *GetLinkOwnerByShortLinkRequest, opts ...grpc.CallOption) (*GetLinkOwnerByShortLinkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetLinkOwnerByShortLinkResponse)
+	err := c.cc.Invoke(ctx, ShortenerService_GetLinkOwnerByShortLink_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ShortenerServiceServer is the server API for ShortenerService service.
 // All implementations must embed UnimplementedShortenerServiceServer
 // for forward compatibility.
@@ -117,6 +129,7 @@ type ShortenerServiceServer interface {
 	UpdateLink(context.Context, *UpdateLinkRequest) (*Link, error)
 	DeleteLink(context.Context, *DeleteLinkRequest) (*DeleteLinkResponse, error)
 	GetLinksCountByUserId(context.Context, *GetLinksCountByUserIdRequest) (*GetLinksCountByUserIdResponse, error)
+	GetLinkOwnerByShortLink(context.Context, *GetLinkOwnerByShortLinkRequest) (*GetLinkOwnerByShortLinkResponse, error)
 	mustEmbedUnimplementedShortenerServiceServer()
 }
 
@@ -144,6 +157,9 @@ func (UnimplementedShortenerServiceServer) DeleteLink(context.Context, *DeleteLi
 }
 func (UnimplementedShortenerServiceServer) GetLinksCountByUserId(context.Context, *GetLinksCountByUserIdRequest) (*GetLinksCountByUserIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLinksCountByUserId not implemented")
+}
+func (UnimplementedShortenerServiceServer) GetLinkOwnerByShortLink(context.Context, *GetLinkOwnerByShortLinkRequest) (*GetLinkOwnerByShortLinkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLinkOwnerByShortLink not implemented")
 }
 func (UnimplementedShortenerServiceServer) mustEmbedUnimplementedShortenerServiceServer() {}
 func (UnimplementedShortenerServiceServer) testEmbeddedByValue()                          {}
@@ -274,6 +290,24 @@ func _ShortenerService_GetLinksCountByUserId_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ShortenerService_GetLinkOwnerByShortLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLinkOwnerByShortLinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShortenerServiceServer).GetLinkOwnerByShortLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShortenerService_GetLinkOwnerByShortLink_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShortenerServiceServer).GetLinkOwnerByShortLink(ctx, req.(*GetLinkOwnerByShortLinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ShortenerService_ServiceDesc is the grpc.ServiceDesc for ShortenerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +338,10 @@ var ShortenerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetLinksCountByUserId",
 			Handler:    _ShortenerService_GetLinksCountByUserId_Handler,
+		},
+		{
+			MethodName: "GetLinkOwnerByShortLink",
+			Handler:    _ShortenerService_GetLinkOwnerByShortLink_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

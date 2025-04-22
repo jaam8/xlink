@@ -68,10 +68,10 @@ func main() {
 		redisClient, time.Duration(shortenerCfg.ExpirationSeconds)*time.Second,
 	)
 	repositoryPostgres := storage.NewShortenerStorageRepositoryPostgres(postgresClient)
-	senderRepositoryMock := sender.NewShortenerSenderRepository(kafkaProducer)
+	senderRepository := sender.NewShortenerSenderRepository(kafkaProducer)
 
 	grpcServer, err := runner.CreateGRPC(
-		repositoryRedis, repositoryPostgres, senderRepositoryMock,
+		repositoryRedis, repositoryPostgres, senderRepository,
 		time.Minute*time.Duration(shortenerCfg.DefaultLinkExpirationMinutes),
 	)
 
