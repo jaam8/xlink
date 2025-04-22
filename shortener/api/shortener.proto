@@ -8,6 +8,7 @@ import "google/protobuf/timestamp.proto";
 
 service ShortenerService {
   rpc Redirect(RedirectRequest) returns (RedirectResponse);
+  rpc GetLink(GetLinkRequest) returns (Link);
   rpc CreateNewLink(CreateLinkRequest) returns (Link);
   rpc UpdateLink(UpdateLinkRequest) returns (Link);
   rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse);
@@ -22,6 +23,11 @@ message Link {
   string target_url = 4;
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp expire_at = 6;
+}
+
+// ======================== Get ===========================
+message GetLinkRequest {
+  string link_id = 1;
 }
 
 // ======================== Create ========================
