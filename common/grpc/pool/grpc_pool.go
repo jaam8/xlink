@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/connectivity"
 	"slices"
 	"sync"
+	"time"
 	"xlink/common/logger"
 )
 
@@ -19,6 +20,8 @@ type GrpcPool struct {
 }
 
 func NewConnection(config Config) (*grpc.ClientConn, error) {
+	_, cancel := context.WithTimeout(context.Background(), config.DialTimeout)
+	defer cancel()
 	return grpc.NewClient(config.Address, config.DialOptions...)
 }
 
@@ -28,6 +31,10 @@ func NewGrpcPool(ctx context.Context, config Config) (*GrpcPool, error) {
 		active: make([]*grpc.ClientConn, config.MaxConnections),
 		mu:     sync.Mutex{},
 		config: config,
+	}
+
+	if pool.config.DialTimeout == 0 {
+		pool.config.DialTimeout = time.Second * 5
 	}
 
 	successfulConnections := 0
