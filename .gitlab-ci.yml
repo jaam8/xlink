@@ -26,7 +26,6 @@ lint_common:
   stage: lint
   image: golang:1.24.1
   script:
-    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     - cd common
     - go build ./...
     - golangci-lint run ./...
@@ -36,7 +35,6 @@ lint_analytics:
   stage: lint
   image: golang:1.24.1
   script:
-    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     - cd analytics
     - go build ./...
     - golangci-lint run ./...
@@ -46,7 +44,6 @@ lint_user_service:
   stage: lint
   image: golang:1.24.1
   script:
-    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     - cd user_service
     - go build ./...
     - golangci-lint run ./...
@@ -56,7 +53,6 @@ lint_shortener:
   stage: lint
   image: golang:1.24.1
   script:
-    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     - cd shortener
     - go build ./...
     - golangci-lint run ./...
