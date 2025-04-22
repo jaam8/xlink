@@ -7,7 +7,6 @@ type CreateLinkSchema struct {
 }
 
 type UpdateLinkSchema struct {
-	UserId     string  `json:"user_id"`
 	Regenerate bool    `json:"regenerate"`
 	ShortLink  *string `json:"short_link,omitempty"`
 	TargetUrl  string  `json:"target_url"`
