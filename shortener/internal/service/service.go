@@ -198,5 +198,5 @@ func (s *Service) GetLinkOwnerByShortLink(ctx context.Context, request *shortene
 		return &shortener.GetLinkOwnerByShortLinkResponse{}, fmt.Errorf("error while getting user id: %v", err)
 	}
 
-	return &shortener.GetLinkOwnerByShortLinkResponse{UserId: userId}, nil
+	return &shortener.GetLinkOwnerByShortLinkResponse{LinkOwner: userId}, nil
 }
