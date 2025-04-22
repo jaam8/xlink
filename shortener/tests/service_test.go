@@ -268,55 +268,31 @@ func TestRedirect(t *testing.T) {
 
 	ctx := context.Background()
 
-	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
-	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
-	groupIDStr := "f9e71cb4-e1e1-4721-8eef-806338db1111"
-	createdAtStr := "2025-04-16T11:28:06+03:00"
-	expireAtStr := "2025-04-16T11:28:07+03:00"
+	shortLink := "abc123"
+	clickedAt := timestamppb.Now()
+	referrer := "https://example.com"
+	ipAdress := "127.0.0.1"
+	visitorToken := "segryureh747reh9er9h"
+	userAgent := shortener.UserAgent{Browser: "chrome", DeviceType: "mobile", Os: "android"}
 
-	idUUID, err := uuid.Parse(idStr)
-	require.NoError(t, err)
-
-	userUUID, err := uuid.Parse(userIDStr)
-	require.NoError(t, err)
-
-	groupUUID, err := uuid.Parse(groupIDStr)
-	require.NoError(t, err)
-
-	createdAtTime, err := time.Parse(time.RFC3339, createdAtStr)
-	require.NoError(t, err)
-
-	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
-	require.NoError(t, err)
-
-	testRedirectRequest := shortener.Url{
-		Url: "http://qwerty",
+	req := &shortener.RedirectRequest{
+		ShortLink:    shortLink,
+		ClickedAt:    clickedAt,
+		Referrer:     referrer,
+		IpAddress:    ipAdress,
+		VisitorToken: visitorToken,
+		UserAgent:    &userAgent,
 	}
 
-	expectedModel := models.Link{
-		Id:        idUUID,
-		UserId:    userUUID,
-		GroupId:   &groupUUID,
-		Generated: true,
-		ShortLink: "http://qwerty",
-		TargetUrl: "http://qwertysdijvnisdnc",
-		CreatedAt: createdAtTime,
-		ExpireAt:  expireAtTime,
-	}
+	targetUrl := "https://ignuyruyrnfucufnwbrewunygb"
 
-	testShortenerCacheRepository.On("GetUrl", mock.AnythingOfType("string")).Return(expectedModel.TargetUrl, nil)
-	//testShortenerSenderRepository.On("SendRedirectInfo").Return()
+	testShortenerCacheRepository.On("GetUrl", shortLink).Return(targetUrl, nil).Once()
 
-	testRedirectResponse, err := s.Redirect(ctx, &testRedirectRequest)
-	if err != nil {
-		t.Fatalf("testUpdateLinkResponse is wrong, got:%v", err)
-	}
-
+	resp, err := s.Redirect(ctx, req)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedModel.TargetUrl, testRedirectResponse.Url)
+	assert.Equal(t, targetUrl, resp.TargetUrl)
 
-	testShortenerStorageRepository.AssertExpectations(t)
-
+	testShortenerCacheRepository.AssertExpectations(t)
 }
 
 func TestGetLinksCountByUserId(t *testing.T) {
