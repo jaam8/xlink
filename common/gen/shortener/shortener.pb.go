@@ -712,7 +712,7 @@ func (x *GetLinkOwnerByShortLinkRequest) GetShortLink() string {
 
 type GetLinkOwnerByShortLinkResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	LinkOwner     string                 `protobuf:"bytes,1,opt,name=link_owner,json=linkOwner,proto3" json:"link_owner,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -747,9 +747,9 @@ func (*GetLinkOwnerByShortLinkResponse) Descriptor() ([]byte, []int) {
 	return file_api_shortener_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *GetLinkOwnerByShortLinkResponse) GetUserId() string {
+func (x *GetLinkOwnerByShortLinkResponse) GetLinkOwner() string {
 	if x != nil {
-		return x.UserId
+		return x.LinkOwner
 	}
 	return ""
 }
@@ -821,9 +821,10 @@ const file_api_shortener_proto_rawDesc = "" +
 	"\x05count\x18\x01 \x01(\x05R\x05count\"?\n" +
 	"\x1eGetLinkOwnerByShortLinkRequest\x12\x1d\n" +
 	"\n" +
-	"short_link\x18\x01 \x01(\tR\tshortLink\":\n" +
-	"\x1fGetLinkOwnerByShortLinkResponse\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId2\xe0\x03\n" +
+	"short_link\x18\x01 \x01(\tR\tshortLink\"@\n" +
+	"\x1fGetLinkOwnerByShortLinkResponse\x12\x1d\n" +
+	"\n" +
+	"link_owner\x18\x01 \x01(\tR\tlinkOwner2\xe0\x03\n" +
 	"\x10ShortenerService\x127\n" +
 	"\bRedirect\x12\x14.api.RedirectRequest\x1a\x15.api.RedirectResponse\x12)\n" +
 	"\aGetLink\x12\x13.api.GetLinkRequest\x1a\t.api.Link\x122\n" +
