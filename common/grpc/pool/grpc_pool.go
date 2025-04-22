@@ -50,7 +50,7 @@ func NewGrpcPool(ctx context.Context, config Config) (*GrpcPool, error) {
 	}
 
 	if successfulConnections < config.MinConnections {
-		pool.Close()
+		_ = pool.Close() //nolint:all
 		return nil, fmt.Errorf("couldn't create at least %d connections: got %d",
 			config.MinConnections, successfulConnections)
 	}
