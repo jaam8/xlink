@@ -1,6 +1,9 @@
 package ports
 
-import "xlink/common/gen/user_service"
+import (
+	"xlink/common/gen/shortener"
+	"xlink/common/gen/user_service"
+)
 
 type UserServiceRepository interface {
 	CreateUser(request *user_service.CreateUserRequest) (*user_service.CreateUserResponse, error)
@@ -12,4 +15,12 @@ type UserServiceRepository interface {
 	RefreshToken(request *user_service.RefreshTokenRequest) (*user_service.RefreshTokenResponse, error)
 	GetRole(request *user_service.GetRoleRequest) (*user_service.GetRoleResponse, error)
 	DeleteUser(request *user_service.DeleteUserRequest) (*user_service.DeleteUserResponse, error)
+}
+
+type ShortenerServiceRepository interface {
+	Redirect(request *shortener.RedirectRequest) (*shortener.RedirectResponse, error)
+	CreateNewLink(request *shortener.CreateLinkRequest) (*shortener.Link, error)
+	UpdateLink(request *shortener.UpdateLinkRequest) (*shortener.Link, error)
+	DeleteLink(request *shortener.DeleteLinkRequest) (*shortener.DeleteLinkResponse, error)
+	GetLinksCountByUserId(request *shortener.GetLinksCountByUserIdRequest) (*shortener.GetLinksCountByUserIdResponse, error)
 }

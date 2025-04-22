@@ -22,7 +22,7 @@ func NewUserServiceHandler(userService *services.UserService) *UserServiceHandle
 func (h *UserServiceHandler) CreateUser(ctx *fiber.Ctx) error {
 	var body schemas.CreateUserSchema
 	if err := ctx.BodyParser(&body); err != nil {
-		return helpers.BadRequest(ctx, "invalid body")
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
 	}
 
 	falseValue := false
@@ -48,7 +48,7 @@ func (h *UserServiceHandler) CreateUser(ctx *fiber.Ctx) error {
 }
 
 func (h *UserServiceHandler) GetUser(ctx *fiber.Ctx) error {
-	userId, err := helpers.ParseUUID(ctx, "id")
+	userId, err := helpers.ParseUUIDField(ctx, "id")
 	if err != nil {
 		return helpers.BadRequest(ctx, "invalid user id: must be a valid uuid")
 	}
@@ -96,7 +96,7 @@ func (h *UserServiceHandler) GetUserIDByToken(ctx *fiber.Ctx) error {
 func (h *UserServiceHandler) GetUserIdByTgId(ctx *fiber.Ctx) error {
 	var body schemas.UserIdByTgIdSchema
 	if err := ctx.BodyParser(&body); err != nil {
-		return helpers.BadRequest(ctx, "invalid body")
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
 	}
 
 	request := &user_service.GetUserIDByTgIDRequest{
@@ -117,14 +117,14 @@ func (h *UserServiceHandler) GetUserIdByTgId(ctx *fiber.Ctx) error {
 }
 
 func (h *UserServiceHandler) UpdateUser(ctx *fiber.Ctx) error {
-	userId, err := helpers.ParseUUID(ctx, "id")
+	userId, err := helpers.ParseUUIDField(ctx, "id")
 	if err != nil {
 		return helpers.BadRequest(ctx, "invalid user id: must be a valid uuid")
 	}
 
 	var body schemas.UpdateUserSchema
 	if err = ctx.BodyParser(&body); err != nil {
-		return helpers.BadRequest(ctx, "invalid body")
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
 	}
 
 	request := &user_service.UpdateUserRequest{
@@ -154,7 +154,7 @@ func (h *UserServiceHandler) UpdateUser(ctx *fiber.Ctx) error {
 func (h *UserServiceHandler) CheckToken(ctx *fiber.Ctx) error {
 	var body schemas.TokenCheckRequest
 	if err := ctx.BodyParser(&body); err != nil {
-		return helpers.BadRequest(ctx, "invalid body")
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
 	}
 
 	request := &user_service.TokenCheckRequest{
@@ -182,7 +182,7 @@ func (h *UserServiceHandler) CheckToken(ctx *fiber.Ctx) error {
 func (h *UserServiceHandler) RefreshToken(ctx *fiber.Ctx) error {
 	var body schemas.RefreshTokenSchema
 	if err := ctx.BodyParser(&body); err != nil {
-		return helpers.BadRequest(ctx, "invalid body")
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
 	}
 
 	request := &user_service.RefreshTokenRequest{
@@ -207,7 +207,7 @@ func (h *UserServiceHandler) RefreshToken(ctx *fiber.Ctx) error {
 }
 
 func (h *UserServiceHandler) DeleteUser(ctx *fiber.Ctx) error {
-	userId, err := helpers.ParseUUID(ctx, "id")
+	userId, err := helpers.ParseUUIDField(ctx, "id")
 	if err != nil {
 		return helpers.BadRequest(ctx, "invalid user id: must be a valid uuid")
 	}
@@ -238,7 +238,7 @@ func (h *UserServiceHandler) DeleteUser(ctx *fiber.Ctx) error {
 }
 
 func (h *UserServiceHandler) GetRole(ctx *fiber.Ctx) error {
-	userId, err := helpers.ParseUUID(ctx, "id")
+	userId, err := helpers.ParseUUIDField(ctx, "id")
 	if err != nil {
 		return helpers.BadRequest(ctx, "invalid user id: must be a valid uuid")
 	}

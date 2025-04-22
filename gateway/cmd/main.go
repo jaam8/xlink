@@ -15,6 +15,7 @@ import (
 	"xlink/gateway/internal/config"
 	"xlink/gateway/internal/handlers/http_handlers"
 	"xlink/gateway/internal/handlers/middlewares"
+	"xlink/gateway/internal/ports/adapters/shortener_service_adapters"
 	"xlink/gateway/internal/ports/adapters/user_service_adapters"
 	"xlink/gateway/internal/services"
 )
@@ -30,36 +31,65 @@ func main() {
 		logger.GetLoggerFromCtx(ctx).Fatal(ctx, "couldn't load configs", zap.Error(err))
 	}
 
+	//region user grpc pool
 	var usersGrpcPool *pool.GrpcPool
 
 	userServiceAddress := fmt.Sprintf("%s:%s", mainConfig.UpstreamNames.UserService, mainConfig.UpstreamPorts.UserService)
 
 	usersGrpcPool, err = pool.NewGrpcPool(ctx, pool.Config{
 		Address:        userServiceAddress,
-		MaxConnections: mainConfig.MaxConnections,
-		MinConnections: mainConfig.MinConnections,
+		MaxConnections: mainConfig.GrpcPool.MaxConnections,
+		MinConnections: mainConfig.GrpcPool.MinConnections,
 		DialOptions:    []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())},
 	})
 	if err != nil {
 		logger.GetLoggerFromCtx(ctx).Fatal(ctx, "couldn't create grpc pool for user service",
-			zap.Int("MaxConnections", mainConfig.MaxConnections),
-			zap.Int("MinConnections", mainConfig.MinConnections),
+			zap.Int("MaxConnections", mainConfig.GrpcPool.MaxConnections),
+			zap.Int("MinConnections", mainConfig.GrpcPool.MinConnections),
 			zap.String("Address", userServiceAddress),
 			zap.Error(err))
 	}
+	//endregion
+
+	//region shortener grpc pool
+	var shortenerGrpcPool *pool.GrpcPool
+
+	shortenerServiceAddress := fmt.Sprintf("%s:%s", mainConfig.UpstreamNames.Shortener, mainConfig.UpstreamPorts.Shortener)
+
+	shortenerGrpcPool, err = pool.NewGrpcPool(ctx, pool.Config{
+		Address:        shortenerServiceAddress,
+		MaxConnections: mainConfig.GrpcPool.MaxConnections,
+		MinConnections: mainConfig.GrpcPool.MinConnections,
+		DialOptions:    []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())},
+	})
+	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Fatal(ctx, "couldn't create grpc pool for shortener service",
+			zap.Int("MaxConnections", mainConfig.GrpcPool.MaxConnections),
+			zap.Int("MinConnections", mainConfig.GrpcPool.MinConnections),
+			zap.String("Address", shortenerServiceAddress),
+			zap.Error(err))
+	}
+	//endregion
 
 	//region repos
 	userServiceRepo := user_service_adapters.NewUserServiceRepositoryGRPC(usersGrpcPool)
+	shortenerServiceRepo := shortener_service_adapters.NewShortenerServiceRepositoryGRPC(shortenerGrpcPool)
 
 	userService := services.NewUserService(
 		userServiceRepo,
-		mainConfig.MaxRetries,
-		time.Millisecond*time.Duration(mainConfig.BaseRetryDelayMilliseconds),
+		mainConfig.GrpcPool.MaxRetries,
+		time.Millisecond*time.Duration(mainConfig.GrpcPool.BaseRetryDelayMilliseconds),
+	)
+	shortenerService := services.NewShortenerService(
+		shortenerServiceRepo,
+		mainConfig.GrpcPool.MaxRetries,
+		time.Millisecond*time.Duration(mainConfig.GrpcPool.BaseRetryDelayMilliseconds),
 	)
 	//endregion repos
 
 	//region handlers
 	userServiceHandler := http_handlers.NewUserServiceHandler(userService)
+	shortenerServiceHandler := http_handlers.NewShortenerServiceHandler(shortenerService)
 	//endregion handlers
 
 	//region routing
@@ -92,6 +122,27 @@ func main() {
 	userAdminGroup.Post("/get/by-token", userServiceHandler.GetUserIDByToken) // admin
 	userAdminGroup.Post("/token/check", userServiceHandler.CheckToken)        // admin
 	//endregion user v1
+
+	//region shortener v1
+	shortenerGroup := v1Group.Group("/s")
+
+	shortenerCRUDGroup := shortenerGroup.Group("/crud")
+	shortenerCRUDGroup.Use(middlewares.AuthMiddleware(userService))
+
+	shortenerAdminGroup := shortenerCRUDGroup.Group("/admin")
+	shortenerAdminGroup.Use(middlewares.RoleMiddleware(false, true, userService))
+
+	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("/owner")
+	shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("id", shortenerService))
+
+	shortenerGroup.Get("/:shortLink", shortenerServiceHandler.Redirect)        //
+	shortenerCRUDGroup.Post("/", shortenerServiceHandler.CreateNewLink)        // authenticated
+	shortenerOwnerOnlyGroup.Put("/:id", shortenerServiceHandler.UpdateLink)    // owner
+	shortenerOwnerOnlyGroup.Delete("/:id", shortenerServiceHandler.DeleteLink) // owner
+	shortenerAdminGroup.Put("/:id", shortenerServiceHandler.UpdateLink)        // admin
+	shortenerAdminGroup.Delete("/:id", shortenerServiceHandler.DeleteLink)     // admin
+	//endregion shortener v1
+
 	//endregion v1
 	//endregion api
 	//endregion routing

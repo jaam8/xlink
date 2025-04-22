@@ -11,7 +11,7 @@ type ShortenerOwnerChecker interface {
 
 func ShortenerOwnerOnlyMiddleware(idParamName string, shortenerService ShortenerOwnerChecker) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		_, err := helpers.ParseUUID(c, idParamName)
+		_, err := helpers.ParseUUIDField(c, idParamName)
 		if err != nil {
 			return helpers.BadRequest(c, fmt.Sprintf("invalid %s", idParamName))
 		}
