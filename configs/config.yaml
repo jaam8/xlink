@@ -40,8 +40,9 @@ nginx:
   entry_port: 80
 
 gateway:
-  port: 3000
-
+  http_port: 3000
+  upstream_ports: 3000
+  upstream_names: gateway_upstream
 
 user_service:
   grpc_port: 50051
