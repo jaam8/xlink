@@ -28,6 +28,7 @@ lint_common:
   script:
     - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     - cd common
+    - go build ./...
     - golangci-lint run ./...
 
 lint_analytics:
@@ -37,6 +38,7 @@ lint_analytics:
   script:
     - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     - cd analytics
+    - go build ./...
     - golangci-lint run ./...
 
 lint_user_service:
@@ -56,6 +58,7 @@ lint_shortener:
   script:
     - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     - cd shortener
+    - go build ./...
     - golangci-lint run ./...
 
 
