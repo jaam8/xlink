@@ -185,3 +185,18 @@ func (s *Service) GetLinksCountByUserId(ctx context.Context, request *shortener.
 
 	return &shortener.GetLinksCountByUserIdResponse{Count: count}, nil
 }
+
+func (s *Service) GetLinkOwnerByShortLink(ctx context.Context, request *shortener.GetLinkOwnerByShortLinkRequest) (*shortener.GetLinkOwnerByShortLinkResponse, error) {
+	shortLink, err := helper.ValidateNotEmptyStr(request.ShortLink)
+	if err != nil {
+		return &shortener.GetLinkOwnerByShortLinkResponse{}, fmt.Errorf("error while validating link: %v", err)
+	}
+
+	var userId string
+	userId, err = s.storageRepo.GetLinkOwnerByShortLink(shortLink)
+	if err != nil {
+		return &shortener.GetLinkOwnerByShortLinkResponse{}, fmt.Errorf("error while getting user id: %v", err)
+	}
+
+	return &shortener.GetLinkOwnerByShortLinkResponse{UserId: userId}, nil
+}

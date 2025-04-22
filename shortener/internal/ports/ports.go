@@ -19,6 +19,7 @@ type ShortenerStorageRepository interface {
 	UpdateLink(newLinkWithExistingId *models.Link) (models.Link, error)
 	DeleteLink(linkId uuid.UUID) error
 	GetLinksCountByUserId(userId uuid.UUID) (int32, error)
+	GetLinkOwnerByShortLink(shortLink string) (string, error)
 }
 
 type ShortenerSenderRepository interface {
