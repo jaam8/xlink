@@ -1,8 +1,8 @@
 create extension if not exists "pgcrypto";
 
-create schema if not exists schema_name;
+create schema if not exists shortener;
 
-create table if not exists schema_name.urls
+create table if not exists shortener.urls
 (
     id          uuid        not null
         default gen_random_uuid()
