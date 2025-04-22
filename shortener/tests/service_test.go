@@ -67,6 +67,68 @@ const (
 	testdefaultLinkExpireTime = 1 * time.Second
 )
 
+func TestGetLink(t *testing.T) {
+	testShortenerCacheRepository := new(mokShortenerCacheRepository)
+	testShortenerStorageRepository := new(mokShortenerStorageRepository)
+	testShortenerSenderRepository := new(mokShortenerSenderRepository)
+
+	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
+
+	ctx := context.Background()
+
+	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
+	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
+	shortLinkStr := "http://qwerty"
+	createdAtStr := "2025-04-16T11:28:06+03:00"
+	expireAtStr := "2025-04-16T11:28:07+03:00"
+
+	idUUID, err := uuid.Parse(idStr)
+	require.NoError(t, err)
+
+	userUUID, err := uuid.Parse(userIDStr)
+	require.NoError(t, err)
+
+	generated := false
+
+	createdAtTime, err := time.Parse(time.RFC3339, createdAtStr)
+	require.NoError(t, err)
+
+	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
+	require.NoError(t, err)
+
+	testGetLinkRequest := shortener.GetLinkRequest{
+		LinkId: idStr,
+	}
+
+	expectedModel := models.Link{
+		Id:        idUUID,
+		UserId:    userUUID,
+		Generated: &generated,
+		ShortLink: &shortLinkStr,
+		TargetUrl: "http://qwertysdijvnisdnc",
+		CreatedAt: createdAtTime,
+		ExpireAt:  &expireAtTime,
+	}
+
+	testShortenerStorageRepository.On("GetLinkById", mock.AnythingOfType("uuid.UUID")).Return(expectedModel, nil).Once()
+
+	testGetLinkResponse, err := s.GetLink(ctx, &testGetLinkRequest)
+	if err != nil {
+		t.Fatalf("testGetLinkResponse is wrong, got:%v", err)
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedModel.Id.String(), testGetLinkResponse.LinkId)
+	assert.Equal(t, expectedModel.UserId.String(), testGetLinkResponse.UserId)
+	assert.Equal(t, *expectedModel.ShortLink, testGetLinkResponse.ShortLink)
+	assert.Equal(t, expectedModel.TargetUrl, testGetLinkResponse.TargetUrl)
+	assert.Equal(t, timestamppb.New(expectedModel.CreatedAt), testGetLinkResponse.CreatedAt)
+	assert.Equal(t, timestamppb.New(*expectedModel.ExpireAt), testGetLinkResponse.ExpireAt)
+
+	testShortenerStorageRepository.AssertExpectations(t)
+
+}
+
 func TestCreateNewLink(t *testing.T) {
 	testShortenerCacheRepository := new(mokShortenerCacheRepository)
 	testShortenerStorageRepository := new(mokShortenerStorageRepository)
