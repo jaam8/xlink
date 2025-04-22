@@ -16,7 +16,7 @@ func ParseUUIDField(c *fiber.Ctx, fieldName string) (uuid.UUID, error) {
 }
 
 func ParseDateTimeField(c *fiber.Ctx, fieldName string) (time.Time, error) {
-	timeField, err := ParseDateTime(c.Params(fieldName))
+	return ParseDateTime(c.Params(fieldName))
 }
 
 func ParseDateTime(dateTime string) (time.Time, error) {
