@@ -29,5 +29,7 @@ func NotFoundError(c *fiber.Ctx, message string) error {
 }
 
 func ForbiddenError(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{})
+	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+		"error": "you don't have access to this resource",
+	})
 }
