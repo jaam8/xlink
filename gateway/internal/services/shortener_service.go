@@ -43,6 +43,27 @@ func (s *ShortenerService) Redirect(request *shortener.RedirectRequest) (*shorte
 	return response, nil
 }
 
+func (s *ShortenerService) GetLink(request *shortener.GetLinkRequest) (*shortener.Link, error) {
+	resultChan := make(chan *shortener.Link)
+
+	err := callers.Retry(func() error {
+		response, err := (*s.ShortenerServiceRepo).GetLink(request)
+		if err != nil {
+			return fmt.Errorf("error in timeout GetLink caller: %v", err)
+		}
+		resultChan <- response
+		return nil
+	}, s.MaxRetries, s.BaseDelay)
+
+	if err != nil {
+		return nil, fmt.Errorf("couldn't call GetLink: %v", err)
+	}
+
+	response := <-resultChan
+
+	return response, nil
+}
+
 func (s *ShortenerService) CreateNewLink(request *shortener.CreateLinkRequest) (*shortener.Link, error) {
 	resultChan := make(chan *shortener.Link)
 
