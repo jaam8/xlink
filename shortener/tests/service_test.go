@@ -207,7 +207,7 @@ func TestUpdateLink(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
-	expireAtStr := "2025-04-16T11:28:07+03:00"
+	expireAtStr := "2025-05-16T11:28:07+03:00"
 
 	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
 	require.NoError(t, err)
@@ -354,6 +354,7 @@ func TestRedirect(t *testing.T) {
 	targetUrl := "https://ignuyruyrnfucufnwbrewunygb"
 
 	testShortenerCacheRepository.On("GetUrl", shortLink).Return(targetUrl, nil).Once()
+	testShortenerSenderRepository.On("SendClick", mock.Anything, mock.Anything).Return(nil)
 
 	resp, err := s.Redirect(ctx, req)
 	assert.NoError(t, err)

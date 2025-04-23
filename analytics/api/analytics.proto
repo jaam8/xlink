@@ -1,0 +1,148 @@
+syntax = "proto3";
+
+option go_package = "common/gen/analytics";
+
+package api;
+
+import "google/protobuf/timestamp.proto";
+
+service AnalyticsService {
+  rpc ClicksByCountry(GetClicksRequest) returns (ClicksByCountryResponse);
+  rpc ClicksByRegion(GetClicksRequest) returns (ClicksByRegionResponse);
+  rpc ClicksByBrowser(GetClicksRequest) returns (ClicksByBrowserResponse);
+  rpc ClicksByOS(GetClicksRequest) returns (ClicksByOSResponse);
+  rpc ClicksByDeviceType(GetClicksRequest) returns (ClicksByDeviceTypeResponse);
+  rpc ClicksByHour(GetClicksRequest) returns (ClicksByHourResponse);
+  rpc ClicksByDate(GetClicksRequest) returns (ClicksByDateResponse);
+  rpc ClicksByReferrer(GetClicksRequest) returns (ClicksByReferrerResponse);
+}
+
+message GetClicksRequest {
+  string link_owner = 1;
+  string short_link = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+}
+
+// ========================== Country ==========================
+message ClicksByCountryResponse {
+  repeated CountryDayStats data = 1;
+}
+
+message CountryDayStats {
+  string date = 1;
+  repeated CountryClicks stats = 2;
+}
+
+message CountryClicks {
+  string country = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Region ==========================
+message ClicksByRegionResponse {
+  repeated RegionDayStats data = 1;
+}
+
+message RegionDayStats {
+  string date = 1;
+  repeated RegionClicks stats = 2;
+}
+
+message RegionClicks {
+  string region = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Browser ==========================
+message ClicksByBrowserResponse {
+  repeated BrowserDayStats data = 1;
+}
+
+message BrowserDayStats {
+  string date = 1;
+  repeated BrowserClicks stats = 2;
+}
+
+message BrowserClicks {
+  string browser = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Device Type ==========================
+message ClicksByDeviceTypeResponse {
+  repeated DeviceDayStats data = 1;
+}
+
+message DeviceDayStats {
+  string date = 1;
+  repeated DeviceClicks stats = 2;
+}
+
+message DeviceClicks {
+  string device_type = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== OS ==========================
+message ClicksByOSResponse {
+  repeated OSDayStats data = 1;
+}
+
+message OSDayStats {
+  string date = 1;
+  repeated OSClicks stats = 2;
+}
+
+message OSClicks {
+  string os = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Referrer ==========================
+message ClicksByReferrerResponse {
+  repeated ReferrerDayStats data = 1;
+}
+
+message ReferrerDayStats {
+  string date = 1;
+  repeated ReferrerClicks stats = 2;
+}
+
+message ReferrerClicks {
+  string referrer = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Hour ==========================
+message ClicksByHourResponse {
+  repeated HourDayStats stats = 1;
+}
+
+message HourDayStats {
+  string date = 1;
+  repeated HourStat stats = 2;
+}
+
+message HourStat {
+  uint32 hour = 1; // 0–23
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
+
+// ========================== Date ==========================
+message ClicksByDateResponse {
+  repeated DateStat stats = 1;
+}
+
+message DateStat {
+  string date = 1; // "2025-04-13"
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
+}
