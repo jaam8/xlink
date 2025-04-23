@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	data, err := os.ReadFile("configs/config.yaml")
+	data, err := os.ReadFile("../configs/config.yaml")
 	if err != nil {
 		log.Fatalf("failed to read YAML: %v", err)
 	}
@@ -42,7 +42,7 @@ func main() {
 		}
 	}
 
-	err = os.WriteFile("configs/.env", []byte(strings.Join(env, "\n")), 0644)
+	err = os.WriteFile("../configs/.env", []byte(strings.Join(env, "\n")), 0644)
 	if err != nil {
 		log.Fatalf("failed to write .env file: %v", err)
 	}

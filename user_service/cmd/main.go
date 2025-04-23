@@ -40,6 +40,8 @@ func main() {
 	}
 
 	postgresClient, err := postgres.New(ctx, postgresCfg)
+	// nolint
+	defer postgresClient.Close()
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to connect to Postgres database: %w", err))
 	}

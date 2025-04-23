@@ -24,7 +24,7 @@ func NewUserStorageRepositoryPostgres(pool *pgxpool.Pool, tokenLength int8) *Use
 
 func (u *UserStorageRepositoryPostgres) CheckToken(userId string, token string) (bool, error) {
 	// get count of users with given id & token, that should be equal to 0 or 1
-	query := `SELECT count(*) FROM schema_name.users u WHERE u.id=$1 AND u.token=$2`
+	query := `SELECT count(*) FROM user_service.users u WHERE u.id=$1 AND u.token=$2`
 
 	var usersCount int
 	err := u.pool.QueryRow(context.Background(), query, userId, token).Scan(&usersCount)
@@ -38,7 +38,7 @@ func (u *UserStorageRepositoryPostgres) CheckToken(userId string, token string) 
 }
 
 func (u *UserStorageRepositoryPostgres) RefreshToken(userId string, token string) (string, error) {
-	query := `UPDATE schema_name.users SET token=$1 WHERE id=$2 AND token=$3`
+	query := `UPDATE user_service.users SET token=$1 WHERE id=$2 AND token=$3`
 
 	newToken := utils.GenerateToken(u.tokenLength)
 	commandTag, err := u.pool.Exec(context.Background(), query, newToken, userId, token)
@@ -52,7 +52,7 @@ func (u *UserStorageRepositoryPostgres) RefreshToken(userId string, token string
 }
 
 func (u *UserStorageRepositoryPostgres) CreateUser(telegramId *int64, isStaff *bool, isAdmin *bool) (string, string, error) {
-	query := `INSERT INTO schema_name.users (telegram_id, is_staff, is_admin, token)
+	query := `INSERT INTO user_service.users (telegram_id, is_staff, is_admin, token)
 				VALUES ($1, $2, $3, $4)
 				RETURNING id`
 
@@ -67,7 +67,7 @@ func (u *UserStorageRepositoryPostgres) CreateUser(telegramId *int64, isStaff *b
 }
 
 func (u *UserStorageRepositoryPostgres) GetUser(userId string) (string, string, *int64, error) {
-	query := `SELECT telegramId, isStaff, isAdmin FROM schema_name.users WHERE id = $1`
+	query := `SELECT telegramId, isStaff, isAdmin FROM user_service.users WHERE id = $1`
 
 	var telegramId sql.NullInt64
 	var isStaff, isAdmin bool
@@ -84,7 +84,7 @@ func (u *UserStorageRepositoryPostgres) GetUser(userId string) (string, string, 
 }
 
 func (u *UserStorageRepositoryPostgres) GetUserIDByToken(token string) (string, bool, error) {
-	query := `SELECT id, count(*) FROM schema_name.users WHERE token = $1`
+	query := `SELECT id, count(*) FROM user_service.users WHERE token = $1`
 
 	var userId string
 
@@ -104,7 +104,7 @@ func (u *UserStorageRepositoryPostgres) GetUserIDByToken(token string) (string, 
 }
 
 func (u *UserStorageRepositoryPostgres) GetUserIDByTgId(tgId int64) (string, bool, error) {
-	query := `SELECT id, count(*) FROM schema_name.users WHERE telegram_id = $1`
+	query := `SELECT id, count(*) FROM user_service.users WHERE telegram_id = $1`
 
 	var userId string
 
@@ -127,7 +127,7 @@ func (u *UserStorageRepositoryPostgres) UpdateUser(userId string, telegramId *in
 
 	// if we don't check whether user exists,
 	// we won't know if rowsAffected=0 means 'doesn't exist' or 'wasn't updated'
-	queryUserExists := `SELECT id FROM schema_name.users WHERE id = $1`
+	queryUserExists := `SELECT id FROM user_service.users WHERE id = $1`
 	commandTag, err := u.pool.Exec(context.Background(), queryUserExists, userId)
 	if err != nil {
 		return false, fmt.Errorf("(postgres) couldn't check if user exists: %v", err)
@@ -137,7 +137,7 @@ func (u *UserStorageRepositoryPostgres) UpdateUser(userId string, telegramId *in
 	}
 
 	// query itself
-	query := `UPDATE schema_name.users WHERE id = $1`
+	query := `UPDATE user_service.users WHERE id = $1`
 	args := []any{userId}
 
 	if telegramId != nil {
@@ -167,7 +167,7 @@ func (u *UserStorageRepositoryPostgres) UpdateUser(userId string, telegramId *in
 }
 
 func (u *UserStorageRepositoryPostgres) DeleteUser(userId string) (bool, error) {
-	query := `DELETE FROM schema_name.users WHERE id = $1`
+	query := `DELETE FROM user_service.users WHERE id = $1`
 	commandTag, err := u.pool.Exec(context.Background(), query, userId)
 	if err != nil {
 		return false, fmt.Errorf("(postgres) couldn't delete user in postgres: %v", err)
@@ -180,7 +180,7 @@ func (u *UserStorageRepositoryPostgres) DeleteUser(userId string) (bool, error) 
 }
 
 func (u *UserStorageRepositoryPostgres) GetRole(userId string) (string, bool, bool, error) {
-	query := `SELECT is_staff, is_admin FROM schema_name.users WHERE id = $1`
+	query := `SELECT is_staff, is_admin FROM user_service.users WHERE id = $1`
 
 	var isStaff, isAdmin bool
 	var role string

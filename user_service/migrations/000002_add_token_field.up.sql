@@ -1,1 +1,0 @@
-alter table schema_name.users add column token text not null default "default";
