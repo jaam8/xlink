@@ -57,13 +57,13 @@ func Migrate(config Config, migrationsPath string) error {
 	if err = m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("failed to migrate database: %v", err)
 	}
-
+	log.Println("migrated successfully")
 	return nil
 }
 
 func (c *Config) GetConnString() string {
 	connString := fmt.Sprintf(
-		"clickhouse://%s:%s@%s:%d/%s?sslmode=disable",
+		"clickhouse://%s:%s@%s:%d/%s",
 		c.Username,
 		c.Password,
 		c.Host,
