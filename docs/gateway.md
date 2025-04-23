@@ -143,7 +143,7 @@
 
 | Input                                                                                                                                                       | Output                 | Summary                                                                              |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|--------------------------------------------------------------------------------------|
-| **shortLink** - string (in **query**) <br> _referrer_ - string (in **header**: "HTTP_REFERER") <br> _visitorToken_ - string (in **cookie**: "xlinkVisitor") | Redirect to target url | Send given **short link** and request info, then redirect to target url in response. |
+| **shortLink** - string (in **path**) <br> _referrer_ - string (in **header**: "HTTP_REFERER") <br> _visitorToken_ - string (in **cookie**: "xlinkVisitor") | Redirect to target url | Send given **short link** and request info, then redirect to target url in response. |
 
 - /api/v1/s/crud/ POST <- create
 
@@ -157,13 +157,13 @@
 
 | Input                                                                                                                              | Output                                                                                                                          | Summary                                                                                                                                             |
 |------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **link_id** - string (in **query**) <br> `{"regenerate": bool, "short_link": *string, "target_url": string, "expire_at": *string}` | `{"link_id": string, "user_id": string, "short_link": string, "target_url": string, "created_at": string, "expire_at": string}` | Update link with given data <br> **short_link** is generated if **generated** == true <br>  **user_id** is got from auth token (_GetUserIDByToken_) |
+| **link_id** - string (in **path**) <br> `{"regenerate": bool, "short_link": *string, "target_url": string, "expire_at": *string}` | `{"link_id": string, "user_id": string, "short_link": string, "target_url": string, "created_at": string, "expire_at": string}` | Update link with given data <br> **short_link** is generated if **generated** == true <br>  **user_id** is got from auth token (_GetUserIDByToken_) |
 
 - /api/v1/s/crud/owner/:id DELETE
 
 | Input                               | Output             | Summary                                                                                                        |
 |-------------------------------------|--------------------|----------------------------------------------------------------------------------------------------------------|
-| **link_id** - string (in **query**) | `{"status": bool}` | Delete link with given **link_id** (in **query**) <br> **user_id** is got from auth token (_GetUserIDByToken_) |
+| **link_id** - string (in **path**) | `{"status": bool}` | Delete link with given **link_id** (in **path**) <br> **user_id** is got from auth token (_GetUserIDByToken_) |
 
 #### For admins
 
@@ -171,21 +171,60 @@
 
 | Input                                                                                                                              | Output                                                                                                                          | Summary                                                                                                                                             |
 |------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **link_id** - string (in **query**) <br> `{"regenerate": bool, "short_link": *string, "target_url": string, "expire_at": *string}` | `{"link_id": string, "user_id": string, "short_link": string, "target_url": string, "created_at": string, "expire_at": string}` | Update link with given data <br> **short_link** is generated if **generated** == true <br>  **user_id** is got from auth token (_GetUserIDByToken_) |
+| **link_id** - string (in **path**) <br> `{"regenerate": bool, "short_link": *string, "target_url": string, "expire_at": *string}` | `{"link_id": string, "user_id": string, "short_link": string, "target_url": string, "created_at": string, "expire_at": string}` | Update link with given data <br> **short_link** is generated if **generated** == true <br>  **user_id** is got from auth token (_GetUserIDByToken_) |
 
 - /api/v1/s/crud/admin/:id DELETE
 
 | Input                               | Output             | Summary                                                                                                        |
 |-------------------------------------|--------------------|----------------------------------------------------------------------------------------------------------------|
-| **link_id** - string (in **query**) | `{"status": bool}` | Delete link with given **link_id** (in **query**) <br> **user_id** is got from auth token (_GetUserIDByToken_) |
+| **link_id** - string (in **path**) | `{"status": bool}` | Delete link with given **link_id** (in **path**) <br> **user_id** is got from auth token (_GetUserIDByToken_) |
 
 ### Analytics (auth'd users only)
 
 - /api/v1/analytics/by-country GET
+
+| Input                                                                                                                                                            | Output                                                                                                              | Summary                                            |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) | `{"data": [{"date": string, "stats": [{"country": string, "clicks": uint64, "unique_clicks": uint64}, ...]}, ...]}` | Get link stats, aggregated by clickers' countries  |
+
 - /api/v1/analytics/by-region GET
+
+| Input                                                                                                                                                            | Output              | Summary                                            |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|----------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' countries  |
+
 - /api/v1/analytics/by-browser GET
+
+| Input                                                                                                                                                            | Output              | Summary                                            |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|----------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' countries  |
+
 - /api/v1/analytics/by-os GET
+
+| Input                                                                                                                                                            | Output              | Summary                                    |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|--------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' OS |
+
 - /api/v1/analytics/by-device-type GET
+
+| Input                                                                                                                                                            | Output              | Summary                                             |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|-----------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' device type |
+
 - /api/v1/analytics/by-hour GET
+
+| Input                                                                                                                                                            | Output              | Summary                                  |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by click hour |
+
 - /api/v1/analytics/by-date GET
+
+| Input                                                                                                                                                            | Output              | Summary                                  |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by click date |
+
 - /api/v1/analytics/by-referrer GET
+
+| Input                                                                                                                                                            | Output              | Summary                                               |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|-------------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' HTTP_REFERRER |
