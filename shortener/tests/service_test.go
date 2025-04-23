@@ -56,6 +56,11 @@ func (m *mokShortenerStorageRepository) GetLinksCountByUserId(userId uuid.UUID) 
 	return args.Get(0).(int32), args.Error(1)
 }
 
+func (m *mokShortenerStorageRepository) GetLinkOwnerByShortLink(shortLink string) (string, error) {
+	args := m.Called(shortLink)
+	return args.Get(0).(string), args.Error(1)
+}
+
 type mokShortenerSenderRepository struct{ mock.Mock }
 
 func (m *mokShortenerSenderRepository) SendClick(ctx context.Context, click *models.Click) error {
@@ -385,4 +390,30 @@ func TestGetLinksCountByUserId(t *testing.T) {
 	assert.Equal(t, expectedModel, testGetLinksCountByUserIdResponse.Count)
 
 	testShortenerStorageRepository.AssertExpectations(t)
+}
+
+func TestGetLinkOwnerByShortLink(t *testing.T) {
+	testShortenerCacheRepository := new(mokShortenerCacheRepository)
+	testShortenerStorageRepository := new(mokShortenerStorageRepository)
+	testShortenerSenderRepository := new(mokShortenerSenderRepository)
+
+	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
+
+	ctx := context.Background()
+
+	shortLink := "qwerty"
+
+	req := shortener.GetLinkOwnerByShortLinkRequest{ShortLink: shortLink}
+
+	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
+
+	testShortenerStorageRepository.On("GetLinkOwnerByShortLink", mock.AnythingOfType("string")).Return(userIDStr, nil)
+
+	resp, err := s.GetLinkOwnerByShortLink(ctx, &req)
+	if err != nil {
+		t.Errorf("cant get link owner by short link:%v", err)
+	}
+
+	assert.Equal(t, userIDStr, resp.LinkOwner)
+
 }

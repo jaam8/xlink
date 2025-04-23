@@ -59,11 +59,8 @@ func TestGetValidatedExpireAt(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
-	expireAtStr := "2025-04-16T11:28:07+03:00"
 	expireAtStr1 := "2025-05-16T11:28:08+03:00"
 
-	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
-	require.NoError(t, err)
 	expireAtTime1, err := time.Parse(time.RFC3339, expireAtStr1)
 	require.NoError(t, err)
 
@@ -81,14 +78,14 @@ func TestGetValidatedExpireAt(t *testing.T) {
 		ExpireAt:   expireAtTimestamppb1,
 	}
 
-	testResponse, err := helper.GetValidatedExpireAt(&testRequest, expireAtTime)
+	testResponse, err := helper.GetValidatedExpireAt(&testRequest)
 	if err != nil {
 		t.Fatalf("Unable to get ExpireAt, %v", err)
 	}
 
 	expected := expireAtTime1.UTC()
 
-	assert.Equal(t, expected, testResponse)
+	assert.Equal(t, expected, *testResponse)
 
 }
 

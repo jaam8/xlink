@@ -77,12 +77,9 @@ func LinkModelFromLinkUpdateRequest(request LinkUpdateRequest) (*models.Link, er
 
 	var expireAt *time.Time
 	expireAt, err = GetValidatedExpireAt(request)
-<<<<<<< HEAD
 	if err != nil {
 		return nil, fmt.Errorf("couldn't parse create link request: invalid expire at: %v", err)
 	}
-=======
->>>>>>> e13ee28bf48ef667a01b91f29101bbef2e70c097
 
 	return &models.Link{
 		Id:        linkId,
