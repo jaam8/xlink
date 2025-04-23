@@ -13,7 +13,7 @@
 #### For staff
 
 - /api/v1/user/staff/:id GET
-- /api/v1/user/staff/get/by-tg-id GET
+- /api/v1/user/staff/get/by-tg-id/:tgId GET
 - /api/v1/user/staff/:id DELETE
 - /api/v1/user/staff/role/:id GET
 
@@ -58,29 +58,79 @@
 
 - /api/v1/user/create POST
 
-| Input | Output | Summary |
-|-------|--------|---------|
-|       |        |         |
-
-
+| Input               | Output                                 | Summary                                            |
+|---------------------|----------------------------------------|----------------------------------------------------|
+| `{"tg_id": *int64}` | `{"user_id": string, "token": string}` | Create user with `is_staff` & `is_admin` set to **false** |
 
 - /api/v1/user/:id PATCH
+
+| Input              | Output             | Summary                                                   |
+|--------------------|--------------------|-----------------------------------------------------------|
+| `{"tg_id": int64}` | `{"status": bool}` | Update user with `is_staff` & `is_admin` set to **false** |
+
 - /api/v1/user/token/refresh POST
+
+| Input                                  | Output                                 | Summary                                                                            |
+|----------------------------------------|----------------------------------------|------------------------------------------------------------------------------------|
+| `{"token": string, "user_id": string}` | `{"token": string}` | Refresh token with using `user_id` and `token` given in **body** (not auth header) |
 
 #### For staff
 
 - /api/v1/user/staff/:id GET
-- /api/v1/user/staff/get/by-tg-id GET
+
+| Input                      | Output                                                                       | Summary                                    |
+|----------------------------|------------------------------------------------------------------------------|--------------------------------------------|
+| **id** - string (in query) | `{"user_id": string, "role": string, "tg_id": *string, "link_count": int32}` | Get user by **user_id** given **in query** |
+
+- /api/v1/user/staff/get/by-tg-id/:tgId GET
+
+| Input                        | Output                                                                       | Summary                                 |
+|------------------------------|------------------------------------------------------------------------------|-----------------------------------------|
+| **tg_id** - int64 (in query) | `{"user_id": string, "status": bool}` | Get user by **tg_id** given **in query** |
+
 - /api/v1/user/staff/:id DELETE
+
+| Input                      | Output                                                                      | Summary                                  |
+|----------------------------|-----------------------------------------------------------------------------|------------------------------------------|
+| **id** - string (in query) | `{"status": bool}` | Delete user by **id** given **in query** |
+
 - /api/v1/user/staff/role/:id GET
+
+| Input                      | Output                                                 | Summary                                           |
+|----------------------------|--------------------------------------------------------|---------------------------------------------------|
+| **id** - string (in query) | `{"role": string, "is_admin": bool, "is_staff": bool}` | Get user roles data by **id** given **in query**  |
 
 #### For admins
 
 - /api/v1/user/admin/create POST
+
+| Input                                                   | Output                                 | Summary         |
+|---------------------------------------------------------|----------------------------------------|-----------------|
+| `{"tg_id": *int64, "is_admin": bool, "is_staff": bool}` | `{"user_id": string, "token": string}` | Create new user |
+
 - /api/v1/user/admin/update/:id PATCH
+
+| Input                                                   | Output                                 | Summary         |
+|---------------------------------------------------------|----------------------------------------|-----------------|
+| `{"tg_id": *int64, "is_admin": bool, "is_staff": bool}` | `{"user_id": string, "token": string}` | Create new user |
+
 - /api/v1/user/admin/delete/:id DELETE
+
+| Input                      | Output             | Summary                                  |
+|----------------------------|--------------------|------------------------------------------|
+| **id** - string (in query) | `{"status": bool}` | Delete user by **id** given **in query** |
+
 - /api/v1/user/admin/get/by-token POST <- POST потому что иначе токен передавался бы в url а это уязвимость
+
+| Input               | Output                                | Summary                                                                                                    |
+|---------------------|---------------------------------------|------------------------------------------------------------------------------------------------------------|
+| `{"token": string}` | `{"user_id": string, "status": bool}` | Get user by **token** given in **body**. Use of **body** and not **query** is for "at least better" safety |
+
 - /api/v1/user/admin/token/check POST <- POST по той же причине
+
+| Input                                 | Output             | Summary                                                                |
+|---------------------------------------|--------------------|------------------------------------------------------------------------|
+| `{"user_id": string, token": string}` | `{"status": bool}` | Check if user with given **user_id** has given **token** (in **body**) |
 
 ### Shortener
 
