@@ -4,15 +4,12 @@ LABEL authors="jaam8"
 
 WORKDIR /build
 
-COPY go.mod ./
 COPY tg_bot/go.* ./tg_bot/
 COPY common/go.* ./common/
-COPY shortener/go.* ./shortener/
-COPY token_service/go.* ./token_service/
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    go work init ./shortener ./token_service ./common ./tg_bot && \
+    go work init ./shortener ./user_service ./common ./tg_bot && \
     go mod download
 
 COPY . .
