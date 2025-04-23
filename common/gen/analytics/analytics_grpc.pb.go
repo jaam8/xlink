@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	AnalyticsService_ClicksByCountry_FullMethodName    = "/api.AnalyticsService/ClicksByCountry"
 	AnalyticsService_ClicksByRegion_FullMethodName     = "/api.AnalyticsService/ClicksByRegion"
 	AnalyticsService_ClicksByBrowser_FullMethodName    = "/api.AnalyticsService/ClicksByBrowser"
 	AnalyticsService_ClicksByOS_FullMethodName         = "/api.AnalyticsService/ClicksByOS"
@@ -32,6 +33,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AnalyticsServiceClient interface {
+	ClicksByCountry(ctx context.Context, in *GetClicksRequest, opts ...grpc.CallOption) (*ClicksByCountryResponse, error)
 	ClicksByRegion(ctx context.Context, in *GetClicksRequest, opts ...grpc.CallOption) (*ClicksByRegionResponse, error)
 	ClicksByBrowser(ctx context.Context, in *GetClicksRequest, opts ...grpc.CallOption) (*ClicksByBrowserResponse, error)
 	ClicksByOS(ctx context.Context, in *GetClicksRequest, opts ...grpc.CallOption) (*ClicksByOSResponse, error)
@@ -47,6 +49,16 @@ type analyticsServiceClient struct {
 
 func NewAnalyticsServiceClient(cc grpc.ClientConnInterface) AnalyticsServiceClient {
 	return &analyticsServiceClient{cc}
+}
+
+func (c *analyticsServiceClient) ClicksByCountry(ctx context.Context, in *GetClicksRequest, opts ...grpc.CallOption) (*ClicksByCountryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ClicksByCountryResponse)
+	err := c.cc.Invoke(ctx, AnalyticsService_ClicksByCountry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *analyticsServiceClient) ClicksByRegion(ctx context.Context, in *GetClicksRequest, opts ...grpc.CallOption) (*ClicksByRegionResponse, error) {
@@ -123,6 +135,7 @@ func (c *analyticsServiceClient) ClicksByReferrer(ctx context.Context, in *GetCl
 // All implementations must embed UnimplementedAnalyticsServiceServer
 // for forward compatibility.
 type AnalyticsServiceServer interface {
+	ClicksByCountry(context.Context, *GetClicksRequest) (*ClicksByCountryResponse, error)
 	ClicksByRegion(context.Context, *GetClicksRequest) (*ClicksByRegionResponse, error)
 	ClicksByBrowser(context.Context, *GetClicksRequest) (*ClicksByBrowserResponse, error)
 	ClicksByOS(context.Context, *GetClicksRequest) (*ClicksByOSResponse, error)
@@ -140,6 +153,9 @@ type AnalyticsServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAnalyticsServiceServer struct{}
 
+func (UnimplementedAnalyticsServiceServer) ClicksByCountry(context.Context, *GetClicksRequest) (*ClicksByCountryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClicksByCountry not implemented")
+}
 func (UnimplementedAnalyticsServiceServer) ClicksByRegion(context.Context, *GetClicksRequest) (*ClicksByRegionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ClicksByRegion not implemented")
 }
@@ -180,6 +196,24 @@ func RegisterAnalyticsServiceServer(s grpc.ServiceRegistrar, srv AnalyticsServic
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&AnalyticsService_ServiceDesc, srv)
+}
+
+func _AnalyticsService_ClicksByCountry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetClicksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AnalyticsServiceServer).ClicksByCountry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AnalyticsService_ClicksByCountry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AnalyticsServiceServer).ClicksByCountry(ctx, req.(*GetClicksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _AnalyticsService_ClicksByRegion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -315,6 +349,10 @@ var AnalyticsService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "api.AnalyticsService",
 	HandlerType: (*AnalyticsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ClicksByCountry",
+			Handler:    _AnalyticsService_ClicksByCountry_Handler,
+		},
 		{
 			MethodName: "ClicksByRegion",
 			Handler:    _AnalyticsService_ClicksByRegion_Handler,
