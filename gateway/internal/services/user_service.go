@@ -23,7 +23,7 @@ func NewUserService(userServiceRepo ports.UserServiceRepository, maxRetries uint
 }
 
 func (s *UserService) CreateUser(request *user_service.CreateUserRequest) (*user_service.CreateUserResponse, error) {
-	resultChan := make(chan *user_service.CreateUserResponse)
+	resultChan := make(chan *user_service.CreateUserResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).CreateUser(request)
@@ -39,12 +39,13 @@ func (s *UserService) CreateUser(request *user_service.CreateUserRequest) (*user
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *UserService) GetUser(request *user_service.GetUserRequest) (*user_service.GetUserResponse, error) {
-	resultChan := make(chan *user_service.GetUserResponse)
+	resultChan := make(chan *user_service.GetUserResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).GetUser(request)
@@ -60,11 +61,12 @@ func (s *UserService) GetUser(request *user_service.GetUserRequest) (*user_servi
 	}
 
 	response := <-resultChan
+	close(resultChan)
 	return response, nil
 }
 
 func (s *UserService) GetUserIDByToken(request *user_service.GetUserIDByTokenRequest) (*user_service.GetUserIDByTokenResponse, error) {
-	resultChan := make(chan *user_service.GetUserIDByTokenResponse)
+	resultChan := make(chan *user_service.GetUserIDByTokenResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).GetUserIDByToken(request)
@@ -80,11 +82,12 @@ func (s *UserService) GetUserIDByToken(request *user_service.GetUserIDByTokenReq
 	}
 
 	response := <-resultChan
+	close(resultChan)
 	return response, nil
 }
 
 func (s *UserService) GetUserIDByTgID(request *user_service.GetUserIDByTgIDRequest) (*user_service.GetUserIDByTgIDResponse, error) {
-	resultChan := make(chan *user_service.GetUserIDByTgIDResponse)
+	resultChan := make(chan *user_service.GetUserIDByTgIDResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).GetUserIDByTgID(request)
@@ -100,11 +103,12 @@ func (s *UserService) GetUserIDByTgID(request *user_service.GetUserIDByTgIDReque
 	}
 
 	response := <-resultChan
+	close(resultChan)
 	return response, nil
 }
 
 func (s *UserService) UpdateUser(request *user_service.UpdateUserRequest) (*user_service.UpdateUserResponse, error) {
-	resultChan := make(chan *user_service.UpdateUserResponse)
+	resultChan := make(chan *user_service.UpdateUserResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).UpdateUser(request)
@@ -120,11 +124,12 @@ func (s *UserService) UpdateUser(request *user_service.UpdateUserRequest) (*user
 	}
 
 	response := <-resultChan
+	close(resultChan)
 	return response, nil
 }
 
 func (s *UserService) CheckToken(request *user_service.TokenCheckRequest) (*user_service.TokenCheckResponse, error) {
-	resultChan := make(chan *user_service.TokenCheckResponse)
+	resultChan := make(chan *user_service.TokenCheckResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).CheckToken(request)
@@ -140,11 +145,12 @@ func (s *UserService) CheckToken(request *user_service.TokenCheckRequest) (*user
 	}
 
 	response := <-resultChan
+	close(resultChan)
 	return response, nil
 }
 
 func (s *UserService) RefreshToken(request *user_service.RefreshTokenRequest) (*user_service.RefreshTokenResponse, error) {
-	resultChan := make(chan *user_service.RefreshTokenResponse)
+	resultChan := make(chan *user_service.RefreshTokenResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).RefreshToken(request)
@@ -160,11 +166,12 @@ func (s *UserService) RefreshToken(request *user_service.RefreshTokenRequest) (*
 	}
 
 	response := <-resultChan
+	close(resultChan)
 	return response, nil
 }
 
 func (s *UserService) DeleteUser(request *user_service.DeleteUserRequest) (*user_service.DeleteUserResponse, error) {
-	resultChan := make(chan *user_service.DeleteUserResponse)
+	resultChan := make(chan *user_service.DeleteUserResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).DeleteUser(request)
@@ -180,11 +187,12 @@ func (s *UserService) DeleteUser(request *user_service.DeleteUserRequest) (*user
 	}
 
 	response := <-resultChan
+	close(resultChan)
 	return response, nil
 }
 
 func (s *UserService) GetRole(request *user_service.GetRoleRequest) (*user_service.GetRoleResponse, error) {
-	resultChan := make(chan *user_service.GetRoleResponse)
+	resultChan := make(chan *user_service.GetRoleResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).GetRole(request)
@@ -200,5 +208,6 @@ func (s *UserService) GetRole(request *user_service.GetRoleRequest) (*user_servi
 	}
 
 	response := <-resultChan
+	close(resultChan)
 	return response, nil
 }

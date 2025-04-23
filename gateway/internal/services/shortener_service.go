@@ -23,7 +23,7 @@ func NewShortenerService(shortenerServiceRepo ports.ShortenerServiceRepository, 
 }
 
 func (s *ShortenerService) Redirect(request *shortener.RedirectRequest) (*shortener.RedirectResponse, error) {
-	resultChan := make(chan *shortener.RedirectResponse)
+	resultChan := make(chan *shortener.RedirectResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).Redirect(request)
@@ -39,12 +39,13 @@ func (s *ShortenerService) Redirect(request *shortener.RedirectRequest) (*shorte
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *ShortenerService) GetLink(request *shortener.GetLinkRequest) (*shortener.Link, error) {
-	resultChan := make(chan *shortener.Link)
+	resultChan := make(chan *shortener.Link, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).GetLink(request)
@@ -60,12 +61,13 @@ func (s *ShortenerService) GetLink(request *shortener.GetLinkRequest) (*shortene
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *ShortenerService) CreateNewLink(request *shortener.CreateLinkRequest) (*shortener.Link, error) {
-	resultChan := make(chan *shortener.Link)
+	resultChan := make(chan *shortener.Link, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).CreateNewLink(request)
@@ -81,12 +83,13 @@ func (s *ShortenerService) CreateNewLink(request *shortener.CreateLinkRequest) (
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *ShortenerService) UpdateLink(request *shortener.UpdateLinkRequest) (*shortener.Link, error) {
-	resultChan := make(chan *shortener.Link)
+	resultChan := make(chan *shortener.Link, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).UpdateLink(request)
@@ -102,12 +105,13 @@ func (s *ShortenerService) UpdateLink(request *shortener.UpdateLinkRequest) (*sh
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *ShortenerService) DeleteLink(request *shortener.DeleteLinkRequest) (*shortener.DeleteLinkResponse, error) {
-	resultChan := make(chan *shortener.DeleteLinkResponse)
+	resultChan := make(chan *shortener.DeleteLinkResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).DeleteLink(request)
@@ -123,12 +127,13 @@ func (s *ShortenerService) DeleteLink(request *shortener.DeleteLinkRequest) (*sh
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *ShortenerService) GetLinksCountByUserId(request *shortener.GetLinksCountByUserIdRequest) (*shortener.GetLinksCountByUserIdResponse, error) {
-	resultChan := make(chan *shortener.GetLinksCountByUserIdResponse)
+	resultChan := make(chan *shortener.GetLinksCountByUserIdResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).GetLinksCountByUserId(request)
@@ -144,6 +149,7 @@ func (s *ShortenerService) GetLinksCountByUserId(request *shortener.GetLinksCoun
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }

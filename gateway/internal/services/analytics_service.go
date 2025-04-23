@@ -23,7 +23,7 @@ func NewAnalyticsService(analyticsServiceRepo ports.AnalyticsServiceRepository, 
 }
 
 func (s *AnalyticsService) ClicksByCountry(request *analytics.GetClicksRequest) (*analytics.ClicksByCountryResponse, error) {
-	resultChan := make(chan *analytics.ClicksByCountryResponse)
+	resultChan := make(chan *analytics.ClicksByCountryResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByCountry(request)
@@ -39,12 +39,13 @@ func (s *AnalyticsService) ClicksByCountry(request *analytics.GetClicksRequest) 
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *AnalyticsService) ClicksByRegion(request *analytics.GetClicksRequest) (*analytics.ClicksByRegionResponse, error) {
-	resultChan := make(chan *analytics.ClicksByRegionResponse)
+	resultChan := make(chan *analytics.ClicksByRegionResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByRegion(request)
@@ -60,12 +61,13 @@ func (s *AnalyticsService) ClicksByRegion(request *analytics.GetClicksRequest) (
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *AnalyticsService) ClicksByBrowser(request *analytics.GetClicksRequest) (*analytics.ClicksByBrowserResponse, error) {
-	resultChan := make(chan *analytics.ClicksByBrowserResponse)
+	resultChan := make(chan *analytics.ClicksByBrowserResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByBrowser(request)
@@ -81,12 +83,13 @@ func (s *AnalyticsService) ClicksByBrowser(request *analytics.GetClicksRequest) 
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *AnalyticsService) ClicksByOS(request *analytics.GetClicksRequest) (*analytics.ClicksByOSResponse, error) {
-	resultChan := make(chan *analytics.ClicksByOSResponse)
+	resultChan := make(chan *analytics.ClicksByOSResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByOS(request)
@@ -102,12 +105,13 @@ func (s *AnalyticsService) ClicksByOS(request *analytics.GetClicksRequest) (*ana
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *AnalyticsService) ClicksByDeviceType(request *analytics.GetClicksRequest) (*analytics.ClicksByDeviceTypeResponse, error) {
-	resultChan := make(chan *analytics.ClicksByDeviceTypeResponse)
+	resultChan := make(chan *analytics.ClicksByDeviceTypeResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByDeviceType(request)
@@ -123,12 +127,13 @@ func (s *AnalyticsService) ClicksByDeviceType(request *analytics.GetClicksReques
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *AnalyticsService) ClicksByHour(request *analytics.GetClicksRequest) (*analytics.ClicksByHourResponse, error) {
-	resultChan := make(chan *analytics.ClicksByHourResponse)
+	resultChan := make(chan *analytics.ClicksByHourResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByHour(request)
@@ -144,12 +149,13 @@ func (s *AnalyticsService) ClicksByHour(request *analytics.GetClicksRequest) (*a
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *AnalyticsService) ClicksByDate(request *analytics.GetClicksRequest) (*analytics.ClicksByDateResponse, error) {
-	resultChan := make(chan *analytics.ClicksByDateResponse)
+	resultChan := make(chan *analytics.ClicksByDateResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByDate(request)
@@ -165,12 +171,13 @@ func (s *AnalyticsService) ClicksByDate(request *analytics.GetClicksRequest) (*a
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
 
 func (s *AnalyticsService) ClicksByReferrer(request *analytics.GetClicksRequest) (*analytics.ClicksByReferrerResponse, error) {
-	resultChan := make(chan *analytics.ClicksByReferrerResponse)
+	resultChan := make(chan *analytics.ClicksByReferrerResponse, 1)
 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByReferrer(request)
@@ -186,6 +193,7 @@ func (s *AnalyticsService) ClicksByReferrer(request *analytics.GetClicksRequest)
 	}
 
 	response := <-resultChan
+	close(resultChan)
 
 	return response, nil
 }
