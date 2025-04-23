@@ -40,15 +40,24 @@ func (s *Service) GetLink(ctx context.Context, request *shortener.GetLinkRequest
 	var linkId uuid.UUID
 	linkId, err = helper.GetValidatedId(request)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, "couldn't receive a link: invalid linkId",
+			zap.Error(err),
+		)
 		return &shortener.Link{}, fmt.Errorf("error while validating link_id: %w", err)
 	}
 
 	var link models.Link
 	link, err = s.storageRepo.GetLinkById(linkId)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't receive a link from storage",
+			zap.Error(err),
+		)
 		return &shortener.Link{}, fmt.Errorf("error while getting link by id: %w", err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "received a link",
+		zap.String(helper.LinkIdKey, request.LinkId),
+	)
 	return helper.LinkResponseFromLinkModel(link), nil
 }
 
@@ -57,15 +66,24 @@ func (s *Service) CreateNewLink(ctx context.Context, request *shortener.CreateLi
 	var inputData *models.Link
 	inputData, err = helper.LinkModelFromLinkCreateRequest(request, time.Now().Add(s.defaultLinkExpireTime))
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, "couldn't create a link: invalid input data",
+			zap.Error(err),
+		)
 		return &shortener.Link{}, fmt.Errorf("error while validating link: %v", err)
 	}
 
 	var newLink models.Link
 	newLink, err = s.storageRepo.CreateLink(inputData)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't create a link in storage",
+			zap.Error(err),
+		)
 		return &shortener.Link{}, fmt.Errorf("error while creating new link: %w", err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "created a new link",
+		zap.String(helper.LinkIdKey, newLink.Id.String()),
+	)
 	return helper.LinkResponseFromLinkModel(newLink), nil
 }
 
@@ -74,15 +92,24 @@ func (s *Service) UpdateLink(ctx context.Context, request *shortener.UpdateLinkR
 	var inputData *models.Link
 	inputData, err = helper.LinkModelFromLinkUpdateRequest(request)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, "couldn't update a link: invalid input",
+			zap.Error(err),
+		)
 		return &shortener.Link{}, fmt.Errorf("error while validating link: %v", err)
 	}
 
 	var newLink models.Link
 	newLink, err = s.storageRepo.UpdateLink(inputData)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't update a link in storage",
+			zap.Error(err),
+		)
 		return &shortener.Link{}, fmt.Errorf("error while updating link by id: %w", err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "updated a link",
+		zap.String(helper.LinkIdKey, request.LinkId),
+	)
 	return helper.LinkResponseFromLinkModel(newLink), nil
 }
 
@@ -91,26 +118,41 @@ func (s *Service) DeleteLink(ctx context.Context, request *shortener.DeleteLinkR
 	var id uuid.UUID
 	id, err = helper.GetValidatedId(request)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, "couldn't delete a link: invalid linkId",
+			zap.Error(err),
+		)
 		return &shortener.DeleteLinkResponse{Status: false}, fmt.Errorf("error while getting id: %v", err)
 	}
 
 	var link models.Link
 	link, err = s.storageRepo.GetLinkById(id)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't delete a link: error while checking it's existence in storage",
+			zap.Error(err),
+		)
 		return &shortener.DeleteLinkResponse{Status: false}, fmt.Errorf("error while getting link: %v", err)
 	}
 	cacheKeyToDelete := link.ShortLink
 
 	err = s.storageRepo.DeleteLink(id)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't delete a link: error while deleting from storage",
+			zap.Error(err),
+		)
 		return &shortener.DeleteLinkResponse{Status: false}, fmt.Errorf("error while deleting link from storage: %v", err)
 	}
 
 	err = s.cachingRepo.DeleteUrl(*cacheKeyToDelete)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't delete a link: error while invalidating cache",
+			zap.Error(err),
+		)
 		return &shortener.DeleteLinkResponse{Status: false}, fmt.Errorf("error while deleting link from caching: %v", err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "received link",
+		zap.String(helper.LinkIdKey, request.LinkId),
+	)
 	return &shortener.DeleteLinkResponse{Status: true}, nil
 }
 
@@ -125,6 +167,9 @@ func (s *Service) Redirect(ctx context.Context, request *shortener.RedirectReque
 		var link models.Link
 		link, err = s.storageRepo.GetLinkByShortUrl(shortLink)
 		if err != nil {
+			logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't perform a redirect: error while getting target url",
+				zap.Error(err),
+			)
 			return &shortener.RedirectResponse{}, fmt.Errorf("error while getting link: %v", err)
 		}
 
@@ -164,6 +209,11 @@ func (s *Service) Redirect(ctx context.Context, request *shortener.RedirectReque
 		}
 	}()
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "performed a redirect",
+		zap.String(helper.ShortUrlKey, request.ShortLink),
+		zap.String(helper.TargetUrlKey, targetUrl),
+		zap.Error(err),
+	)
 	return &shortener.RedirectResponse{TargetUrl: targetUrl}, nil
 }
 
@@ -172,6 +222,9 @@ func (s *Service) GetLinksCountByUserId(ctx context.Context, request *shortener.
 	var userId uuid.UUID
 	userId, err = helper.GetValidatedUserId(request)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, "couldn't get links count by user id: invalid userId",
+			zap.Error(err),
+		)
 		return &shortener.GetLinksCountByUserIdResponse{Count: 0},
 			fmt.Errorf("error while getting user id: %v", err)
 	}
@@ -179,10 +232,18 @@ func (s *Service) GetLinksCountByUserId(ctx context.Context, request *shortener.
 	var count int32
 	count, err = s.storageRepo.GetLinksCountByUserId(userId)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't delete a link: error while querying the storage",
+			zap.Error(err),
+		)
 		return &shortener.GetLinksCountByUserIdResponse{Count: 0},
 			fmt.Errorf("error while getting links count by id: %v", err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "got links count by user id",
+		zap.String(helper.UserIdKey, request.UserId),
+		zap.Int32(helper.CountKey, count),
+		zap.Error(err),
+	)
 	return &shortener.GetLinksCountByUserIdResponse{Count: count}, nil
 }
 

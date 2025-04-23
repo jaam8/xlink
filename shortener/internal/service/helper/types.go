@@ -2,6 +2,14 @@ package helper
 
 import "google.golang.org/protobuf/types/known/timestamppb"
 
+const (
+	UserIdKey    = "user_id"
+	CountKey     = "count"
+	LinkIdKey    = "link_id"
+	ShortUrlKey  = "short_url"
+	TargetUrlKey = "target_url"
+)
+
 type LinkCreateRequest interface {
 	LinkRequestOnlyUserId
 	LinkRequestOnlyShortLink
