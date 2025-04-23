@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 	"xlink/common/gen/shortener"
+	"xlink/common/logger"
 	"xlink/shortener/internal/models"
 	"xlink/shortener/internal/service"
 	"xlink/shortener/internal/service/utils"
@@ -79,7 +80,10 @@ func TestGetLink(t *testing.T) {
 
 	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
 
-	ctx := context.Background()
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
@@ -141,7 +145,10 @@ func TestCreateNewLink(t *testing.T) {
 
 	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
 
-	ctx := context.Background()
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
@@ -202,7 +209,10 @@ func TestUpdateLink(t *testing.T) {
 
 	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
 
-	ctx := context.Background()
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
@@ -274,7 +284,10 @@ func TestDeleteLink(t *testing.T) {
 
 	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
 
-	ctx := context.Background()
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
@@ -333,7 +346,10 @@ func TestRedirect(t *testing.T) {
 
 	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
 
-	ctx := context.Background()
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	shortLink := "abc123"
 	clickedAt := timestamppb.Now()
@@ -370,7 +386,10 @@ func TestGetLinksCountByUserId(t *testing.T) {
 
 	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
 
-	ctx := context.Background()
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 
@@ -400,7 +419,10 @@ func TestGetLinkOwnerByShortLink(t *testing.T) {
 
 	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
 
-	ctx := context.Background()
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	shortLink := "qwerty"
 
