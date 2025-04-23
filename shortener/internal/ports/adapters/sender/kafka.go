@@ -3,8 +3,9 @@ package sender
 import (
 	"context"
 	"encoding/json"
-	"github.com/segmentio/kafka-go"
 	"xlink/shortener/internal/models"
+
+	"github.com/segmentio/kafka-go"
 )
 
 type ShortenerSenderRepository struct {
@@ -19,6 +20,9 @@ func NewShortenerSenderRepository(kafkaProducer *kafka.Writer) *ShortenerSenderR
 
 func (s *ShortenerSenderRepository) SendClick(ctx context.Context, click *models.Click) error {
 	clickJSON, err := json.Marshal(click)
+	if err != nil {
+		return err
+	}
 	err = s.KafkaProducer.WriteMessages(context.Background(),
 		kafka.Message{
 			Key:   []byte(click.ShortLink),
