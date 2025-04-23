@@ -189,42 +189,42 @@
 
 - /api/v1/analytics/by-region GET
 
-| Input                                                                                                                                                            | Output              | Summary                                            |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|----------------------------------------------------|
-| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' countries  |
+| Input                                                                                                                                                            | Output                                                                                                             | Summary                                         |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) | `{"data": [{"date": string, "stats": [{"region": string, "clicks": uint64, "unique_clicks": uint64}, ...]}, ...]}` | Get link stats, aggregated by clickers' regions |
 
 - /api/v1/analytics/by-browser GET
 
-| Input                                                                                                                                                            | Output              | Summary                                            |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|----------------------------------------------------|
-| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' countries  |
+| Input                                                                                                                                                            | Output                                                                                                              | Summary                                             |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) | `{"data": [{"date": string, "stats": [{"browser": string, "clicks": uint64, "unique_clicks": uint64}, ...]}, ...]}` | Get link stats, aggregated by clickers' countries   |
 
 - /api/v1/analytics/by-os GET
 
-| Input                                                                                                                                                            | Output              | Summary                                    |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|--------------------------------------------|
-| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' OS |
+| Input                                                                                                                                                            | Output                                                                                                         | Summary                                    |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) | `{"data": [{"date": string, "stats": [{"os": string, "clicks": uint64, "unique_clicks": uint64}, ...]}, ...]}` | Get link stats, aggregated by clickers' OS |
 
 - /api/v1/analytics/by-device-type GET
 
-| Input                                                                                                                                                            | Output              | Summary                                             |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|-----------------------------------------------------|
-| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' device type |
+| Input                                                                                                                                                            | Output                                                                                                                  | Summary                                             |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) | `{"data": [{"date": string, "stats": [{"device_type": string, "clicks": uint64, "unique_clicks": uint64}, ...]}, ...]}` | Get link stats, aggregated by clickers' device type |
 
 - /api/v1/analytics/by-hour GET
 
-| Input                                                                                                                                                            | Output              | Summary                                  |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|------------------------------------------|
-| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by click hour |
+| Input                                                                                                                                                            | Output                                                                                                           | Summary                                         |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) | `{"data": [{"date": string, "stats": [{"hour": uint32, "clicks": uint64, "unique_clicks": uint64}, ...]}, ...]}` | Get link stats, aggregated by click hour (0-23) |
 
 - /api/v1/analytics/by-date GET
 
-| Input                                                                                                                                                            | Output              | Summary                                  |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|------------------------------------------|
-| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by click date |
+| Input                                                                                                                                                            | Output                                                                                                           | Summary                                               |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) | `{"data": [{"date": string, "stats": [{"date": string, "clicks": uint64, "unique_clicks": uint64}, ...]}, ...]}` | Get link stats, aggregated by click date (YYYY-MM-DD) |
 
 - /api/v1/analytics/by-referrer GET
 
-| Input                                                                                                                                                            | Output              | Summary                                               |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|-------------------------------------------------------|
-| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) |                     | Get link stats, aggregated by clickers' HTTP_REFERRER |
+| Input                                                                                                                                                            | Output                                                                                                               | Summary                                               |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| **link_owner** - string (**calculated** from token) <br> **short_link** - string (in **query**) <br> **start_date** - YYYY-MM-DD, e.g. 2025-04-23 (in **query**) | `{"data": [{"date": string, "stats": [{"referrer": string, "clicks": uint64, "unique_clicks": uint64}, ...]}, ...]}` | Get link stats, aggregated by clickers' HTTP_REFERRER |
