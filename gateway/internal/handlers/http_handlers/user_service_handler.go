@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
+	"strconv"
 	"xlink/common/gen/user_service"
 	"xlink/common/logger"
 	"xlink/gateway/internal/handlers/helpers"
@@ -94,13 +95,18 @@ func (h *UserServiceHandler) GetUserIDByToken(ctx *fiber.Ctx) error {
 }
 
 func (h *UserServiceHandler) GetUserIdByTgId(ctx *fiber.Ctx) error {
-	var body schemas.UserIdByTgIdSchema
-	if err := ctx.BodyParser(&body); err != nil {
-		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
+	tgIdText := ctx.Params("tg_id")
+	if len(tgIdText) == 0 {
+		return helpers.BadRequest(ctx, "invalid tg_id: cannot be empty")
 	}
+	tgIdInt, err := strconv.Atoi(tgIdText)
+	if err != nil {
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid tg_id: %v", err).Error())
+	}
+	tgId := int64(tgIdInt)
 
 	request := &user_service.GetUserIDByTgIDRequest{
-		TgId: body.TgId,
+		TgId: tgId,
 	}
 
 	response, err := h.userService.GetUserIDByTgID(request)
