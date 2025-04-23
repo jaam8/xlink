@@ -4,7 +4,10 @@ option go_package = "common/gen/analytics";
 
 package api;
 
+import "google/protobuf/timestamp.proto";
+
 service AnalyticsService {
+  rpc ClicksByCountry(GetClicksRequest) returns (ClicksByCountryResponse);
   rpc ClicksByRegion(GetClicksRequest) returns (ClicksByRegionResponse);
   rpc ClicksByBrowser(GetClicksRequest) returns (ClicksByBrowserResponse);
   rpc ClicksByOS(GetClicksRequest) returns (ClicksByOSResponse);
@@ -15,10 +18,26 @@ service AnalyticsService {
 }
 
 message GetClicksRequest {
-  string user_id = 1;
-  string link_id = 2;
-  string start_date = 3; // "2025-04-01"
-  string end_date = 4;   // "2025-04-19"
+  string link_owner = 1;
+  string short_link = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+}
+
+// ========================== Country ==========================
+message ClicksByCountryResponse {
+  repeated CountryDayStats data = 1;
+}
+
+message CountryDayStats {
+  string date = 1;
+  repeated CountryClicks stats = 2;
+}
+
+message CountryClicks {
+  string country = 1;
+  uint64 clicks = 2;
+  uint64 unique_clicks = 3;
 }
 
 // ========================== Region ==========================
@@ -103,7 +122,12 @@ message ReferrerClicks {
 
 // ========================== Hour ==========================
 message ClicksByHourResponse {
-  repeated HourStat stats = 1;
+  repeated HourDayStats stats = 1;
+}
+
+message HourDayStats {
+  string date = 1;
+  repeated HourStat stats = 2;
 }
 
 message HourStat {
