@@ -36,6 +36,9 @@
 
 - /api/v1/s/crud/owner/:id PUT
 - /api/v1/s/crud/owner/:id DELETE
+
+#### For admins
+
 - /api/v1/s/crud/admin/:id PUT
 - /api/v1/s/crud/admin/:id DELETE
 
@@ -137,14 +140,44 @@
 #### Common part
 
 - /api/v1/s/:shortLink GET
+
+| Input                                                                                                                                                       | Output                 | Summary                                                                              |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|--------------------------------------------------------------------------------------|
+| **shortLink** - string (in **query**) <br> _referrer_ - string (in **header**: "HTTP_REFERER") <br> _visitorToken_ - string (in **cookie**: "xlinkVisitor") | Redirect to target url | Send given **short link** and request info, then redirect to target url in response. |
+
 - /api/v1/s/crud/ POST <- create
+
+| Input                                                              | Output                                                                                                                          | Summary                                                                                                                                         |
+|--------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `{"short_link": *string, "target_url": string"}` | `{"link_id": string, "user_id": string, "short_link": string, "target_url": string, "created_at": string, "expire_at": string}` | Simply create link with given data <br> **short_link** is generated if not specified <br> **user_id** is got from auth token (_GetUserIDByToken_) |
 
 #### For link owner
 
 - /api/v1/s/crud/owner/:id PUT
+
+| Input                                                                                                                              | Output                                                                                                                          | Summary                                                                                                                                             |
+|------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **link_id** - string (in **query**) <br> `{"regenerate": bool, "short_link": *string, "target_url": string, "expire_at": *string}` | `{"link_id": string, "user_id": string, "short_link": string, "target_url": string, "created_at": string, "expire_at": string}` | Update link with given data <br> **short_link** is generated if **generated** == true <br>  **user_id** is got from auth token (_GetUserIDByToken_) |
+
 - /api/v1/s/crud/owner/:id DELETE
+
+| Input                               | Output             | Summary                                                                                                        |
+|-------------------------------------|--------------------|----------------------------------------------------------------------------------------------------------------|
+| **link_id** - string (in **query**) | `{"status": bool}` | Delete link with given **link_id** (in **query**) <br> **user_id** is got from auth token (_GetUserIDByToken_) |
+
+#### For admins
+
 - /api/v1/s/crud/admin/:id PUT
+
+| Input                                                                                                                              | Output                                                                                                                          | Summary                                                                                                                                             |
+|------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **link_id** - string (in **query**) <br> `{"regenerate": bool, "short_link": *string, "target_url": string, "expire_at": *string}` | `{"link_id": string, "user_id": string, "short_link": string, "target_url": string, "created_at": string, "expire_at": string}` | Update link with given data <br> **short_link** is generated if **generated** == true <br>  **user_id** is got from auth token (_GetUserIDByToken_) |
+
 - /api/v1/s/crud/admin/:id DELETE
+
+| Input                               | Output             | Summary                                                                                                        |
+|-------------------------------------|--------------------|----------------------------------------------------------------------------------------------------------------|
+| **link_id** - string (in **query**) | `{"status": bool}` | Delete link with given **link_id** (in **query**) <br> **user_id** is got from auth token (_GetUserIDByToken_) |
 
 ### Analytics (auth'd users only)
 
