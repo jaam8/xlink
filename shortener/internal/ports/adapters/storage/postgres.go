@@ -19,7 +19,7 @@ func LinkSelectQuery(filter squirrel.Eq) (string, []interface{}, error) {
 		"id", "user_id", "group_id", "generated",
 		"short_link", "url", "created_at", "expire_at",
 	).
-		From("schema_name.urls").
+		From("shortener.urls").
 		Where(filter).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -74,7 +74,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkByShortUrl(shortUrl string) 
 }
 
 func (s *ShortenerStorageRepositoryPostgres) CreateLink(newLink *models.Link) (models.Link, error) {
-	sql, args, err := squirrel.Insert("schema_name.urls").
+	sql, args, err := squirrel.Insert("shortener.urls").
 		Columns("user_id", "generated",
 			"short_link", "url", "expire_at").
 		Values(newLink.UserId, newLink.Generated, newLink.ShortLink, newLink.TargetUrl, newLink.ExpireAt).
@@ -98,7 +98,7 @@ func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *m
 		return models.Link{}, fmt.Errorf("couldn't update an existing link: %w", err)
 	}
 
-	updateBuilder := squirrel.Update("schema_name.urls").
+	updateBuilder := squirrel.Update("shortener.urls").
 		Where(squirrel.Eq{"id": newLinkWithExistingId.Id}).
 		Set("user_id", newLinkWithExistingId.UserId).
 		Set("url", newLinkWithExistingId.TargetUrl)
@@ -135,7 +135,7 @@ func (s *ShortenerStorageRepositoryPostgres) DeleteLink(linkId uuid.UUID) error 
 		return fmt.Errorf("couldn't delete an existing link: %w", err)
 	}
 
-	sql, args, err := squirrel.Delete("schema_name.urls").
+	sql, args, err := squirrel.Delete("shortener.urls").
 		Where(squirrel.Eq{"id": linkId}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -155,7 +155,7 @@ func (s *ShortenerStorageRepositoryPostgres) DeleteLink(linkId uuid.UUID) error 
 func (s *ShortenerStorageRepositoryPostgres) GetLinksCountByUserId(userId uuid.UUID) (int32, error) {
 	var count int32
 	sql, args, err := squirrel.Select("count(*)").
-		From("schema_name.urls").
+		From("shortener.urls").
 		Where(squirrel.Eq{"user_id": userId}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -173,7 +173,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinksCountByUserId(userId uuid.U
 func (s *ShortenerStorageRepositoryPostgres) GetLinkOwnerByShortLink(shortLink string) (string, error) {
 	var userId string
 	sql, args, err := squirrel.Select("user_id").
-		From("schema_name.urls").
+		From("shortener.urls").
 		Where(squirrel.Eq{"short_link": shortLink}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
