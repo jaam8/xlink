@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS xlink.clicks
     short_link String,
     clicked_at DateTime,
     referrer String,
+    country LowCardinality(String),
     region LowCardinality(String),
     browser LowCardinality(String),
     device_type LowCardinality(String),
