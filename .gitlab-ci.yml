@@ -36,6 +36,7 @@ lint_shortener:
 
 build:
   stage: build
+  image: golang:1.24.1
   script:
     - echo "🔨 Building all services"
     - cd shortener && go build -v ./...
@@ -43,6 +44,7 @@ build:
 
 test-shortener:
   stage: test
+  image: golang:1.24.1
   script:
     - cd shortener
     - go test ./... -coverprofile=coverage.out
@@ -56,6 +58,7 @@ test-shortener:
 
 test-user-service:
   stage: test
+  image: golang:1.24.1
   script:
     - cd user_service
     - go test ./... -coverprofile=coverage.out

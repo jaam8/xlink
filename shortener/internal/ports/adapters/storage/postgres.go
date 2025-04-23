@@ -3,10 +3,11 @@ package storage
 import (
 	"context"
 	"fmt"
+	"xlink/shortener/internal/models"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"xlink/shortener/internal/models"
 )
 
 type ShortenerStorageRepositoryPostgres struct {
@@ -59,7 +60,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkByShortUrl(shortUrl string) 
 		return models.Link{}, fmt.Errorf("couldn't build an SQL query: %w", err)
 	}
 
-	var link models.Link = models.Link{}
+	var link = models.Link{}
 
 	_ = s.PostgresPool.QueryRow(context.Background(), sql, args...).
 		Scan(&link.Id, &link.UserId, &link.Generated,
@@ -138,6 +139,10 @@ func (s *ShortenerStorageRepositoryPostgres) DeleteLink(linkId uuid.UUID) error 
 		Where(squirrel.Eq{"id": linkId}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
+
+	if err != nil {
+		return fmt.Errorf("couldn't build an SQL query: %w", err)
+	}
 
 	_, err = s.PostgresPool.Exec(context.Background(), sql, args...)
 	if err != nil {
