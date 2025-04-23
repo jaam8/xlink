@@ -8,11 +8,11 @@ import (
 )
 
 type UserServiceConfig struct {
-	GRPCPort               int `yaml:"grpc_port" env:"GRPC_PORT" env-default:"50050"`
-	RedisDB                int `yaml:"redis_db" env:"REDIS_DB"`
-	TokenLength            int `yaml:"token_len" env:"TOKEN_LEN" env-default:"32"`
-	CacheExpirationSeconds int `yaml:"cache_expiration_seconds" env:"CACHE_EXPIRATION_SECONDS" env-default:"3600"`
-	MigrationsPath         string
+	GRPCPort               int    `yaml:"grpc_port" env:"GRPC_PORT" env-default:"50050"`
+	RedisDB                int    `yaml:"redis_db" env:"REDIS_DB"`
+	TokenLength            int    `yaml:"token_len" env:"TOKEN_LEN" env-default:"32"`
+	CacheExpirationSeconds int    `yaml:"cache_expiration_seconds" env:"CACHE_EXPIRATION_SECONDS" env-default:"3600"`
+	MigrationsPath         string `yaml:"migrations_path" env:"MIGRATIONS_PATH"`
 }
 
 type ShortenerConfig struct {
