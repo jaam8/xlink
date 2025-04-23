@@ -51,6 +51,25 @@ nginx:
 gateway:
   port: 3000
 
+http_port: 8080
+
+upstream_names:
+  shortener: shortener
+  user_service: user_service
+  analytics: analytics
+  renderer: renderer
+
+upstream_ports:
+  user_service: 50051
+  shortener: 50052
+  analytics: 50053
+  renderer: 50054
+
+timeouts:
+  shortener: 1000
+  user_service: 1000
+  analytics: 1000
+  renderer: 1000
 
 user_service:
   grpc_port: 50051
@@ -66,8 +85,8 @@ shortener:
   kafka_topic: redirect-events
   kafka_num_partitions: 1
   kafka_replication_factor: 1
-  upstream_names: shortener_upstream
-  upstream_ports: 50060
+  upstream_names: shortener
+  upstream_ports: 50052
   timeouts: 10000
   expiration_seconds: 500
   default_link_expiration_minutes: 1440
@@ -79,8 +98,8 @@ analytics:
   kafka_topic: redirect-events
   kafka_group_id: analytics-consumer
   redis_db: 2
-  upstream_names: analytics_upstream
-  upstream_ports: 50061
+  upstream_names: analytics
+  upstream_ports: 50053
   migrations_path: file:///analytics/migrations
   timezone: Europe/Moscow
   batch_size: 1

@@ -14,10 +14,6 @@ type UserIdByTokenSchema struct {
 	Token string `json:"token"`
 }
 
-type UserIdByTgIdSchema struct {
-	TgId int64 `json:"tg_id"`
-}
-
 type UpdateUserSchema struct {
 	TgId int64 `json:"tg_id"`
 }

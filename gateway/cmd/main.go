@@ -15,6 +15,7 @@ import (
 	"xlink/gateway/internal/config"
 	"xlink/gateway/internal/handlers/http_handlers"
 	"xlink/gateway/internal/handlers/middlewares"
+	"xlink/gateway/internal/ports/adapters/analytics_service_adapters"
 	"xlink/gateway/internal/ports/adapters/shortener_service_adapters"
 	"xlink/gateway/internal/ports/adapters/user_service_adapters"
 	"xlink/gateway/internal/services"
@@ -71,9 +72,30 @@ func main() {
 	}
 	//endregion
 
+	//region shortener grpc pool
+	var analyticsGrpcPool *pool.GrpcPool
+
+	analyticsServiceAddress := fmt.Sprintf("%s:%s", mainConfig.UpstreamNames.Analytics, mainConfig.UpstreamPorts.Analytics)
+
+	analyticsGrpcPool, err = pool.NewGrpcPool(ctx, pool.Config{
+		Address:        analyticsServiceAddress,
+		MaxConnections: mainConfig.GrpcPool.MaxConnections,
+		MinConnections: mainConfig.GrpcPool.MinConnections,
+		DialOptions:    []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())},
+	})
+	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Fatal(ctx, "couldn't create grpc pool for analytics service",
+			zap.Int("MaxConnections", mainConfig.GrpcPool.MaxConnections),
+			zap.Int("MinConnections", mainConfig.GrpcPool.MinConnections),
+			zap.String("Address", analyticsServiceAddress),
+			zap.Error(err))
+	}
+	//endregion
+
 	//region repos
 	userServiceRepo := user_service_adapters.NewUserServiceRepositoryGRPC(usersGrpcPool)
 	shortenerServiceRepo := shortener_service_adapters.NewShortenerServiceRepositoryGRPC(shortenerGrpcPool)
+	analyticsServiceRepo := analytics_service_adapters.NewAnalyticsServiceRepositoryGRPC(analyticsGrpcPool)
 
 	userService := services.NewUserService(
 		userServiceRepo,
@@ -85,19 +107,32 @@ func main() {
 		mainConfig.GrpcPool.MaxRetries,
 		time.Millisecond*time.Duration(mainConfig.GrpcPool.BaseRetryDelayMilliseconds),
 	)
+	analyticsService := services.NewAnalyticsService(
+		analyticsServiceRepo,
+		mainConfig.GrpcPool.MaxRetries,
+		time.Millisecond*time.Duration(mainConfig.GrpcPool.BaseRetryDelayMilliseconds),
+	)
 	//endregion repos
 
 	//region handlers
 	userServiceHandler := http_handlers.NewUserServiceHandler(userService)
 	shortenerServiceHandler := http_handlers.NewShortenerServiceHandler(shortenerService, userService)
+	analyticsServiceHandler := http_handlers.NewAnalyticsServiceHandler(analyticsService)
 	//endregion handlers
+
+	//region middlewares
+	loggingMiddleware := middlewares.LoggerMiddleware()
+	authMiddleware := middlewares.AuthMiddleware(userService)
+	isAdminMiddleware := middlewares.RoleMiddleware(false, true, userService)
+	isStaffMiddleware := middlewares.RoleMiddleware(true, false, userService)
+	//endregion middlewares
 
 	//region routing
 	app := fiber.New()
 
 	//region api
 	apiGroup := app.Group("/api")
-	apiGroup.Use(middlewares.LoggerMiddleware())
+	apiGroup.Use(loggingMiddleware)
 
 	//region v1
 	v1Group := apiGroup.Group("/v1")
@@ -107,17 +142,17 @@ func main() {
 	userAdminGroup := userGroup.Group("/admin")
 	userStaffGroup := userGroup.Group("/staff")
 
-	userAdminGroup.Use(middlewares.RoleMiddleware(false, true, userService))
-	userStaffGroup.Use(middlewares.RoleMiddleware(true, false, userService))
+	userAdminGroup.Use(isAdminMiddleware)
+	userStaffGroup.Use(isStaffMiddleware)
 
 	userGroup.Post("/create", userServiceHandler.CreateUser)          //
 	userGroup.Patch("/:id", userServiceHandler.UpdateUser)            //
 	userGroup.Post("/token/refresh", userServiceHandler.RefreshToken) //
 
-	userStaffGroup.Get("/:id", userServiceHandler.GetUser)                   // staff | admin
-	userStaffGroup.Post("/get/by-tg-id", userServiceHandler.GetUserIdByTgId) // staff | admin
-	userStaffGroup.Delete("/:id", userServiceHandler.DeleteUser)             // staff | admin
-	userStaffGroup.Get("/role/:id", userServiceHandler.GetRole)              // staff | admin
+	userStaffGroup.Get("/:id", userServiceHandler.GetUser)                         // staff | admin
+	userStaffGroup.Get("/get/by-tg-id/:tg_id", userServiceHandler.GetUserIdByTgId) // staff | admin
+	userStaffGroup.Delete("/:id", userServiceHandler.DeleteUser)                   // staff | admin
+	userStaffGroup.Get("/role/:id", userServiceHandler.GetRole)                    // staff | admin
 
 	userAdminGroup.Post("/create", userServiceHandler.CreateUserAdmin)        // admin
 	userAdminGroup.Patch("/update/:id", userServiceHandler.UpdateUserAdmin)   // admin
@@ -130,10 +165,10 @@ func main() {
 	shortenerGroup := v1Group.Group("/s")
 
 	shortenerCRUDGroup := shortenerGroup.Group("/crud")
-	shortenerCRUDGroup.Use(middlewares.AuthMiddleware(userService))
+	shortenerCRUDGroup.Use(authMiddleware)
 
 	shortenerAdminGroup := shortenerCRUDGroup.Group("/admin")
-	shortenerAdminGroup.Use(middlewares.RoleMiddleware(false, true, userService))
+	shortenerAdminGroup.Use(isAdminMiddleware)
 
 	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("/owner")
 	shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("id", shortenerService))
@@ -145,6 +180,20 @@ func main() {
 	shortenerAdminGroup.Put("/:id", shortenerServiceHandler.UpdateLink)        // admin
 	shortenerAdminGroup.Delete("/:id", shortenerServiceHandler.DeleteLink)     // admin
 	//endregion shortener v1
+
+	//region analytics v1
+	analyticsGroup := v1Group.Group("/analytics")
+	analyticsGroup.Use(authMiddleware)
+
+	analyticsGroup.Get("/by-country", analyticsServiceHandler.GetClicksByCountry)
+	analyticsGroup.Get("/by-region", analyticsServiceHandler.GetClicksByRegion)
+	analyticsGroup.Get("/by-browser", analyticsServiceHandler.GetClicksByBrowser)
+	analyticsGroup.Get("/by-os", analyticsServiceHandler.GetClicksByOS)
+	analyticsGroup.Get("/by-device-type", analyticsServiceHandler.GetClicksByDeviceType)
+	analyticsGroup.Get("/by-hour", analyticsServiceHandler.GetClicksByHour)
+	analyticsGroup.Get("/by-date", analyticsServiceHandler.GetClicksByDate)
+	analyticsGroup.Get("/by-referrer", analyticsServiceHandler.GetClicksByReferrer)
+	//endregion analytics v1
 
 	//endregion v1
 	//endregion api
