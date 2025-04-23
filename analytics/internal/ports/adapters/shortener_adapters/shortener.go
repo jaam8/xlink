@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
+	"log"
 	"time"
 	"xlink/common/callers"
 	"xlink/common/gen/shortener"
@@ -16,7 +17,7 @@ type ShortenerAdapter struct {
 	Timeout     time.Duration
 }
 
-func NewShortenerRepositoryGRPC(
+func NewShortenerAdapter(
 	address string,
 	options []grpc.DialOption,
 	timeout time.Duration,
@@ -39,15 +40,15 @@ func (s *ShortenerAdapter) GetGRPCClient() (*grpc.ClientConn, *shortener.Shorten
 	return grpcConn, &client, nil
 }
 
-func (s *ShortenerAdapter) CheckLinkOwner(linkOwner uuid.UUID, shortLink string) (bool, error) {
+func (s *ShortenerAdapter) GetLinkOwner(shortLink string) (uuid.UUID, error) {
 	conn, clientPointer, err := s.GetGRPCClient()
 	if err != nil {
-		return false, fmt.Errorf("cannot connect to shortener by gRPC: %v", err)
+		return uuid.UUID{}, fmt.Errorf("cannot connect to shortener by gRPC: %v", err)
 	}
 
 	defer conn.Close() //nolint
 
-	resultChan := make(chan string)
+	resultChan := make(chan string, 1)
 
 	err = callers.Timeout(func() error {
 		request := &shortener.GetLinkOwnerByShortLinkRequest{ShortLink: shortLink}
@@ -55,20 +56,20 @@ func (s *ShortenerAdapter) CheckLinkOwner(linkOwner uuid.UUID, shortLink string)
 		if grpcErr != nil {
 			return fmt.Errorf("error in timeout gRPC caller: %v", grpcErr)
 		}
-		resultChan <- response.LinkOwner
+		resultChan <- response.GetLinkOwner()
 		return nil
 	}, s.Timeout)
 
 	if err != nil {
-		return false, fmt.Errorf("couldn't get shortener.GetLinkOwnerByShortLinkRequest gRPC response: %v", err)
+		log.Printf("error in timeout gRPC caller: %v", err)
+		return uuid.UUID{}, fmt.Errorf("couldn't get shortener.GetLinkOwnerByShortLinkRequest gRPC response: %v", err)
 	}
+
 	responseLinkOwner := <-resultChan
+	close(resultChan)
 	uuidLinkOwner, err := uuid.Parse(responseLinkOwner)
 	if err != nil {
-		return false, fmt.Errorf("couldn't parse link_owner: %v", err)
+		return uuid.UUID{}, fmt.Errorf("couldn't parse link_owner: %v", err)
 	}
-	if linkOwner != uuidLinkOwner {
-		return false, fmt.Errorf("link_owner mismatch: %v != %v", linkOwner, uuidLinkOwner)
-	}
-	return true, nil
+	return uuidLinkOwner, nil
 }
