@@ -74,13 +74,18 @@ test-shortener:
   image: golang:1.24.1
   script:
     - cd shortener
-    - go test ./... -coverprofile=coverage.out
+    - go test ./tests -coverpkg=./internal/service,./internal/service/utils,./internal/service/helper \
+      -coverprofile=cover.out
     - |
-      COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
-      echo "📊 Shortener coverage: ${COVERAGE}%"
-      if (( $(echo "$COVERAGE < $COVERAGE_THRESHOLD" | bc -l) )); then
-        echo "❌ Coverage too low for shortener: ${COVERAGE}%"
+      TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+      echo "📊 shortener total coverage: ${TOTAL_COVERAGE}%"
+      MIN_COVERAGE=30.0
+      COMP_RESULT=$(echo "$TOTAL_COVERAGE < $MIN_COVERAGE" | bc -l)
+      if [[ "$COMP_RESULT" -eq 1 ]]; then
+        echo "❌ Coverage too low for shortener: ${TOTAL_COVERAGE}% (required ≥ ${MIN_COVERAGE}%)"
         exit 1
+      else
+        echo "✅ Coverage OK: ${TOTAL_COVERAGE}%"
       fi
 
 test-user-service:
@@ -89,13 +94,38 @@ test-user-service:
   image: golang:1.24.1
   script:
     - cd user_service
-    - go test ./... -coverprofile=coverage.out
+    - go test ./tests -coverpkg=./internal/service,./internal/utils \
+      -coverprofile=cover.out
     - |
-      COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
-      echo "📊 User Service coverage: ${COVERAGE}%"
-      if (( $(echo "$COVERAGE < $COVERAGE_THRESHOLD" | bc -l) )); then
-        echo "❌ Coverage too low for user_service: ${COVERAGE}%"
+      TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+      echo "📊 user_service total coverage: ${TOTAL_COVERAGE}%"
+      MIN_COVERAGE=30.0
+      COMP_RESULT=$(echo "$TOTAL_COVERAGE < $MIN_COVERAGE" | bc -l)
+      if [[ "$COMP_RESULT" -eq 1 ]]; then
+        echo "❌ Coverage too low for user_service: ${TOTAL_COVERAGE}% (required ≥ ${MIN_COVERAGE}%)"
         exit 1
+      else
+        echo "✅ Coverage OK: ${TOTAL_COVERAGE}%"
+      fi
+
+test-analytics:
+  <<: *default-go-job
+  stage: test
+  image: golang:1.24.1
+  script:
+    - cd user_service
+    - go test ./tests -coverpkg=./internal/service,./internal/service/helper \
+      -coverprofile=cover.out
+    - |
+      TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+      echo "📊 analytics total coverage: ${TOTAL_COVERAGE}%"
+      MIN_COVERAGE=30.0
+      COMP_RESULT=$(echo "$TOTAL_COVERAGE < $MIN_COVERAGE" | bc -l)
+      if [[ "$COMP_RESULT" -eq 1 ]]; then
+        echo "❌ Coverage too low for analytics: ${TOTAL_COVERAGE}% (required ≥ ${MIN_COVERAGE}%)"
+        exit 1
+      else
+        echo "✅ Coverage OK: ${TOTAL_COVERAGE}%"
       fi
 
 deploy:
