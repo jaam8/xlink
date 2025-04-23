@@ -4,7 +4,6 @@ LABEL authors="jaam8"
 
 WORKDIR /build
 
-COPY go.mod ./
 COPY shortener/go.* ./shortener/
 COPY common/go.* ./common/
 

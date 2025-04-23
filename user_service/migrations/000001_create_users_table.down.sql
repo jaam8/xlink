@@ -1,5 +1,8 @@
 drop extension if exists "pgcrypto";
 
-drop table if exists schema_name.users;
+alter table user_service.users drop column token;
 
-drop schema if exists schema_name;
+drop table if exists user_service.users;
+
+drop schema if exists user_service;
+

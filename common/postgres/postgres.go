@@ -8,6 +8,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"log"
 )
 
 type Config struct {
@@ -49,7 +50,7 @@ func Migrate(ctx context.Context, config Config, migrationsPath string) error {
 	if err = m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("failed to migrate database: %v", err)
 	}
-
+	log.Println("migrated successfully")
 	return nil
 }
 

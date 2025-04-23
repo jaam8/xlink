@@ -9,7 +9,6 @@ create table if not exists shortener.urls
         constraint urls_pk
         primary key,
     user_id     uuid        not null,
-    group_id    uuid        not null,
     "generated"   bool      default true    not null,
     short_link  varchar(10) not null,
     url         text not null,
