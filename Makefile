@@ -17,10 +17,15 @@ generate_analytics:
 	./analytics/api/analytics.proto
 
 yaml_to_env:
-	go run scripts/yaml_to_env.go
+	cd scripts && \
+	go run yaml_to_env.go
 
 copy_env:
 	cp configs/.env.example configs/.env
+
+update_env_example:
+	make yaml_to_env
+	cp configs/.env configs/.env.example
 
 .PHONY: build-all
 build-all:
