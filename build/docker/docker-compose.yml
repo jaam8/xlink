@@ -1,5 +1,20 @@
 
 services:
+  gateway:
+    container_name: gateway
+    build:
+      context: ../../
+      dockerfile: build/docker/Dockerfile.gateway
+    env_file:
+      - ../../configs/.env
+    ports:
+      - ${GATEWAY_PORT}:50050
+    depends_on:
+      - postgres
+      - kafka
+      - clickhouse
+      - zookeeper
+
   user_service:
     container_name: user_service
     build:
@@ -10,6 +25,7 @@ services:
     ports:
       - ${USER_SERVICE_GRPC_PORT}:50051
     depends_on:
+      - gateway
       - clickhouse
       - postgres
       - redis
