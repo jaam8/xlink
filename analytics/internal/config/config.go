@@ -19,11 +19,18 @@ type AnalyticsConfig struct {
 	MigrationsPath string `yaml:"migrations_path" env:"MIGRATIONS_PATH"`
 }
 
+type ShortenerConfig struct {
+	UpstreamNames string `yaml:"upstream_names" env:"UPSTREAM_NAMES"`
+	UpstreamPorts string `yaml:"upstream_ports" env:"UPSTREAM_PORTS"`
+	Timeouts      int    `yaml:"timeouts" env:"TIMEOUTS"`
+}
+
 type Config struct {
 	Redis      redis.Config      `yaml:"redis" env-prefix:"REDIS_"`
 	ClickHouse clickhouse.Config `yaml:"clickhouse" env-prefix:"CLICKHOUSE_"`
 	Kafka      kafka.Config      `yaml:"kafka" env-prefix:"KAFKA_"`
 	Analytics  AnalyticsConfig   `yaml:"analytics" env-prefix:"ANALYTICS_"`
+	Shortener  ShortenerConfig   `yaml:"shortener" env-prefix:"SHORTENER_"`
 }
 
 func New() (Config, error) {
