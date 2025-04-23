@@ -10,6 +10,7 @@ services:
     ports:
       - ${USER_SERVICE_GRPC_PORT}:50051
     depends_on:
+      - clickhouse
       - postgres
       - redis
       - kafka
@@ -31,6 +32,25 @@ services:
       - user_service
       - kafka
       - zookeeper
+    volumes:
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+
+  analytics:
+    container_name: analytics
+    build:
+      context: ../../
+      dockerfile: build/docker/Dockerfile.analytics
+    env_file:
+      - ../../configs/.env
+    ports:
+      - ${ANALYTICS_GRPC_PORT}:50053
+    depends_on:
+      - user_service
+      - shortener
+      - postgres
+      - redis
+      - kafka
     volumes:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
@@ -59,6 +79,10 @@ services:
       - ${POSTGRES_PORT}:5432
     env_file:
       - ../../configs/.env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -93,6 +117,9 @@ services:
     hostname: ${ZOOKEEPER_HOST}
     ports:
       - ${ZOOKEEPER_PORT}:2181
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-log:/var/lib/zookeeper/log
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -113,24 +140,29 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+      - kafka-logs:/var/log/kafka
     healthcheck:
       test: [ "CMD", "kafka-topics", "--bootstrap-server", "kafka:9092", "--list" ]
       interval: 10s
       timeout: 5s
       retries: 10
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
     ports:
-      - "8080:8080"
-    depends_on:
-      - kafka
+      - "9000:9000"   # Native protocol port
+      - "8123:8123"   # HTTP protocol port
     environment:
-      KAFKA_CLUSTERS_0_NAME: local-cluster
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: ${KAFKA_HOST}:9092
-      KAFKA_CLUSTERS_0_ZOOKEEPER: ${ZOOKEEPER_HOST}:2181
-      KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: PLAINTEXT
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB}
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - clickhouse-config:/etc/clickhouse-server/config.d
+      - clickhouse-users:/etc/clickhouse-server/users.d
 
 
 volumes:
@@ -138,4 +170,11 @@ volumes:
   go-build-cache:
   postgres_data:
   redis_data:
+  clickhouse-data:
+  clickhouse-config:
+  clickhouse-users:
+  kafka-data:
+  kafka-logs:
+  zookeeper-data:
+  zookeeper-log:
 

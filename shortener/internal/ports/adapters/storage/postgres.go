@@ -3,10 +3,11 @@ package storage
 import (
 	"context"
 	"fmt"
+	"xlink/shortener/internal/models"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"xlink/shortener/internal/models"
 )
 
 type ShortenerStorageRepositoryPostgres struct {
@@ -18,7 +19,7 @@ func LinkSelectQuery(filter squirrel.Eq) (string, []interface{}, error) {
 		"id", "user_id", "group_id", "generated",
 		"short_link", "url", "created_at", "expire_at",
 	).
-		From("schema_name.urls").
+		From("shortener.urls").
 		Where(filter).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -59,7 +60,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkByShortUrl(shortUrl string) 
 		return models.Link{}, fmt.Errorf("couldn't build an SQL query: %w", err)
 	}
 
-	var link models.Link = models.Link{}
+	var link = models.Link{}
 
 	_ = s.PostgresPool.QueryRow(context.Background(), sql, args...).
 		Scan(&link.Id, &link.UserId, &link.Generated,
@@ -73,7 +74,7 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkByShortUrl(shortUrl string) 
 }
 
 func (s *ShortenerStorageRepositoryPostgres) CreateLink(newLink *models.Link) (models.Link, error) {
-	sql, args, err := squirrel.Insert("schema_name.urls").
+	sql, args, err := squirrel.Insert("shortener.urls").
 		Columns("user_id", "generated",
 			"short_link", "url", "expire_at").
 		Values(newLink.UserId, newLink.Generated, newLink.ShortLink, newLink.TargetUrl, newLink.ExpireAt).
@@ -97,7 +98,7 @@ func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *m
 		return models.Link{}, fmt.Errorf("couldn't update an existing link: %w", err)
 	}
 
-	updateBuilder := squirrel.Update("schema_name.urls").
+	updateBuilder := squirrel.Update("shortener.urls").
 		Where(squirrel.Eq{"id": newLinkWithExistingId.Id}).
 		Set("user_id", newLinkWithExistingId.UserId).
 		Set("url", newLinkWithExistingId.TargetUrl)
@@ -134,10 +135,14 @@ func (s *ShortenerStorageRepositoryPostgres) DeleteLink(linkId uuid.UUID) error 
 		return fmt.Errorf("couldn't delete an existing link: %w", err)
 	}
 
-	sql, args, err := squirrel.Delete("schema_name.urls").
+	sql, args, err := squirrel.Delete("shortener.urls").
 		Where(squirrel.Eq{"id": linkId}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
+
+	if err != nil {
+		return fmt.Errorf("couldn't build an SQL query: %w", err)
+	}
 
 	_, err = s.PostgresPool.Exec(context.Background(), sql, args...)
 	if err != nil {
@@ -150,7 +155,7 @@ func (s *ShortenerStorageRepositoryPostgres) DeleteLink(linkId uuid.UUID) error 
 func (s *ShortenerStorageRepositoryPostgres) GetLinksCountByUserId(userId uuid.UUID) (int32, error) {
 	var count int32
 	sql, args, err := squirrel.Select("count(*)").
-		From("schema_name.urls").
+		From("shortener.urls").
 		Where(squirrel.Eq{"user_id": userId}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -163,4 +168,22 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinksCountByUserId(userId uuid.U
 		return 0, fmt.Errorf("couldn't get links count by user id '%s': %w", userId, err)
 	}
 	return count, nil
+}
+
+func (s *ShortenerStorageRepositoryPostgres) GetLinkOwnerByShortLink(shortLink string) (string, error) {
+	var userId string
+	sql, args, err := squirrel.Select("user_id").
+		From("shortener.urls").
+		Where(squirrel.Eq{"short_link": shortLink}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return "", fmt.Errorf("couldn't build an SQL query: %w", err)
+	}
+
+	err = s.PostgresPool.QueryRow(context.Background(), sql, args...).Scan(&userId)
+	if err != nil {
+		return "", fmt.Errorf("couldn't get link owner by short link '%s': %w", shortLink, err)
+	}
+	return userId, nil
 }

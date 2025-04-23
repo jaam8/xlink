@@ -1,8 +1,8 @@
 create extension if not exists "pgcrypto";
 
-create schema if not exists schema_name;
+create schema if not exists user_service;
 
-create table if not exists schema_name.users
+create table if not exists user_service.users
 (
     id          uuid        not null
         default gen_random_uuid()
@@ -13,3 +13,5 @@ create table if not exists schema_name.users
     is_admin bool default false not null,
     created_at  timestamp default now() not null
 );
+
+alter table user_service.users add column token text not null default 'default';

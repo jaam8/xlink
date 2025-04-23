@@ -1,3 +1,12 @@
+clickhouse:
+  host: clickhouse
+  port: 9000
+  user: default
+  password: "1234"
+  db: xlink
+  max_open_conns: 5
+  max_idle_conns: 5
+
 kafka:
   host: kafka
   port: 9092
@@ -68,11 +77,22 @@ shortener:
 
 
 analytics:
-  port_grpc: 50053
+  grpc_port: 50053
   kafka_topic: redirect-events
   kafka_group_id: analytics-consumer
+  redis_db: 2
+  migrations_path: file:///analytics/migrations
+  timezone: Europe/Moscow
+  batch_size: 1
+  flush_timeout: 3
   upstream_names: analytics
   upstream_ports: 50053
   timeouts: 10000
 
 expiration_seconds: 0
+
+grpc_pool:
+  max_connections: 10
+  min_connections: 1
+  max_retries: 3
+  base_retry_delay_milliseconds: 300

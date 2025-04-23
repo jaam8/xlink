@@ -2,12 +2,13 @@ package helper
 
 import (
 	"fmt"
-	"github.com/google/uuid"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 	"xlink/common/gen/shortener"
 	"xlink/shortener/internal/models"
 	"xlink/shortener/internal/service/utils"
+
+	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func LinkResponseFromLinkModel(link models.Link) *shortener.Link {
@@ -74,7 +75,11 @@ func LinkModelFromLinkUpdateRequest(request LinkUpdateRequest) (*models.Link, er
 
 	targetUrl := request.GetTargetUrl()
 
-	expireAt := request.GetExpireAt().AsTime()
+	var expireAt *time.Time
+	expireAt, err = GetValidatedExpireAt(request)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't parse create link request: invalid expire at: %v", err)
+	}
 
 	return &models.Link{
 		Id:        linkId,
@@ -82,7 +87,7 @@ func LinkModelFromLinkUpdateRequest(request LinkUpdateRequest) (*models.Link, er
 		Generated: generated,
 		ShortLink: shortLink,
 		TargetUrl: targetUrl,
-		ExpireAt:  &expireAt,
+		ExpireAt:  expireAt,
 	}, nil
 }
 

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 	"log"
 	"os"
 	"os/signal"
@@ -17,6 +16,8 @@ import (
 	"xlink/shortener/internal/ports/adapters/sender"
 	"xlink/shortener/internal/ports/adapters/storage"
 	"xlink/shortener/internal/runner"
+
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -42,6 +43,7 @@ func main() {
 	}
 
 	postgresClient, err := postgres.New(ctx, postgresCfg)
+	// nolint
 	defer postgresClient.Close()
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to connect to Postgres database: %w", err))
@@ -68,10 +70,10 @@ func main() {
 		redisClient, time.Duration(shortenerCfg.ExpirationSeconds)*time.Second,
 	)
 	repositoryPostgres := storage.NewShortenerStorageRepositoryPostgres(postgresClient)
-	senderRepositoryMock := sender.NewShortenerSenderRepository(kafkaProducer)
+	senderRepository := sender.NewShortenerSenderRepository(kafkaProducer)
 
 	grpcServer, err := runner.CreateGRPC(
-		repositoryRedis, repositoryPostgres, senderRepositoryMock,
+		repositoryRedis, repositoryPostgres, senderRepository,
 		time.Minute*time.Duration(shortenerCfg.DefaultLinkExpirationMinutes),
 	)
 
