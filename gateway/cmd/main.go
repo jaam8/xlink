@@ -149,10 +149,10 @@ func main() {
 	userGroup.Patch("/:id", userServiceHandler.UpdateUser)            //
 	userGroup.Post("/token/refresh", userServiceHandler.RefreshToken) //
 
-	userStaffGroup.Get("/:id", userServiceHandler.GetUser)                   // staff | admin
-	userStaffGroup.Post("/get/by-tg-id", userServiceHandler.GetUserIdByTgId) // staff | admin
-	userStaffGroup.Delete("/:id", userServiceHandler.DeleteUser)             // staff | admin
-	userStaffGroup.Get("/role/:id", userServiceHandler.GetRole)              // staff | admin
+	userStaffGroup.Get("/:id", userServiceHandler.GetUser)                         // staff | admin
+	userStaffGroup.Get("/get/by-tg-id/:tg_id", userServiceHandler.GetUserIdByTgId) // staff | admin
+	userStaffGroup.Delete("/:id", userServiceHandler.DeleteUser)                   // staff | admin
+	userStaffGroup.Get("/role/:id", userServiceHandler.GetRole)                    // staff | admin
 
 	userAdminGroup.Post("/create", userServiceHandler.CreateUserAdmin)        // admin
 	userAdminGroup.Patch("/update/:id", userServiceHandler.UpdateUserAdmin)   // admin
