@@ -30,3 +30,15 @@ func ParseDateTime(dateTime string) (time.Time, error) {
 	}
 	return timeField, nil
 }
+
+func ParseDateField(c *fiber.Ctx, fieldName string) (time.Time, error) {
+	return ParseDate(c.Params(fieldName))
+}
+
+func ParseDate(date string) (time.Time, error) {
+	dateField, err := time.Parse(time.DateOnly, date)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("invalid '%s format' date: %v", time.DateOnly, err)
+	}
+	return dateField, nil
+}

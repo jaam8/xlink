@@ -117,15 +117,22 @@ func main() {
 	//region handlers
 	userServiceHandler := http_handlers.NewUserServiceHandler(userService)
 	shortenerServiceHandler := http_handlers.NewShortenerServiceHandler(shortenerService, userService)
-	_ = http_handlers.NewAnalyticsServiceHandler(analyticsService)
+	analyticsServiceHandler := http_handlers.NewAnalyticsServiceHandler(analyticsService)
 	//endregion handlers
+
+	//region middlewares
+	loggingMiddleware := middlewares.LoggerMiddleware()
+	authMiddleware := middlewares.AuthMiddleware(userService)
+	isAdminMiddleware := middlewares.RoleMiddleware(false, true, userService)
+	isStaffMiddleware := middlewares.RoleMiddleware(true, false, userService)
+	//endregion middlewares
 
 	//region routing
 	app := fiber.New()
 
 	//region api
 	apiGroup := app.Group("/api")
-	apiGroup.Use(middlewares.LoggerMiddleware())
+	apiGroup.Use(loggingMiddleware)
 
 	//region v1
 	v1Group := apiGroup.Group("/v1")
@@ -135,8 +142,8 @@ func main() {
 	userAdminGroup := userGroup.Group("/admin")
 	userStaffGroup := userGroup.Group("/staff")
 
-	userAdminGroup.Use(middlewares.RoleMiddleware(false, true, userService))
-	userStaffGroup.Use(middlewares.RoleMiddleware(true, false, userService))
+	userAdminGroup.Use(isAdminMiddleware)
+	userStaffGroup.Use(isStaffMiddleware)
 
 	userGroup.Post("/create", userServiceHandler.CreateUser)          //
 	userGroup.Patch("/:id", userServiceHandler.UpdateUser)            //
@@ -158,10 +165,10 @@ func main() {
 	shortenerGroup := v1Group.Group("/s")
 
 	shortenerCRUDGroup := shortenerGroup.Group("/crud")
-	shortenerCRUDGroup.Use(middlewares.AuthMiddleware(userService))
+	shortenerCRUDGroup.Use(authMiddleware)
 
 	shortenerAdminGroup := shortenerCRUDGroup.Group("/admin")
-	shortenerAdminGroup.Use(middlewares.RoleMiddleware(false, true, userService))
+	shortenerAdminGroup.Use(isAdminMiddleware)
 
 	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("/owner")
 	shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("id", shortenerService))
@@ -175,7 +182,18 @@ func main() {
 	//endregion shortener v1
 
 	//region analytics v1
-	_ = v1Group.Group("/analytics")
+	analyticsGroup := v1Group.Group("/analytics")
+	analyticsGroup.Use(authMiddleware)
+
+	analyticsGroup.Get("/by-country", analyticsServiceHandler.GetClicksByCountry)
+	analyticsGroup.Get("/by-region", analyticsServiceHandler.GetClicksByRegion)
+	analyticsGroup.Get("/by-browser", analyticsServiceHandler.GetClicksByBrowser)
+	analyticsGroup.Get("/by-os", analyticsServiceHandler.GetClicksByOS)
+	analyticsGroup.Get("/by-device-type", analyticsServiceHandler.GetClicksByDeviceType)
+	analyticsGroup.Get("/by-hour", analyticsServiceHandler.GetClicksByHour)
+	analyticsGroup.Get("/by-date", analyticsServiceHandler.GetClicksByDate)
+	analyticsGroup.Get("/by-referrer", analyticsServiceHandler.GetClicksByReferrer)
+	//endregion analytics v1
 
 	//endregion v1
 	//endregion api

@@ -1,8 +1,14 @@
 package helpers
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"time"
 )
+
+func InvalidDateBadRequest(c *fiber.Ctx, fieldName string) error {
+	return BadRequest(c, fmt.Sprintf("invalid %s: must follow %s pattern", fieldName, time.DateOnly))
+}
 
 func BadRequest(c *fiber.Ctx, message string) error {
 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
