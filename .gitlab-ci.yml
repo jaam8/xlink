@@ -15,10 +15,11 @@ variables:
       files:
         - go.sum
     paths:
-      - /go/pkg/mod
-      - /root/.cache/go-build
-      - /go/bin
+      - $GOPATH/pkg/mod
+      - $GOPATH/bin
+      - $CI_PROJECT_DIR/.cache/go-build
   before_script:
+    - go env -w GOPATH=/go
     - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 lint_common:
@@ -37,7 +38,7 @@ lint_analytics:
   script:
     - cd analytics
     - go build ./...
-    - golangci-lint run ./...
+    - golangci-lint run -timeout 2m ./...
 
 lint_user_service:
   <<: *default-go-job
@@ -46,7 +47,7 @@ lint_user_service:
   script:
     - cd user_service
     - go build ./...
-    - golangci-lint run ./...
+    - golangci-lint run -timeout 2m ./...
 
 lint_shortener:
   <<: *default-go-job
@@ -55,7 +56,7 @@ lint_shortener:
   script:
     - cd shortener
     - go build ./...
-    - golangci-lint run ./...
+    - golangci-lint run -timeout 2m ./...
 
 
 build:
