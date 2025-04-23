@@ -15,6 +15,7 @@ import (
 	"xlink/gateway/internal/config"
 	"xlink/gateway/internal/handlers/http_handlers"
 	"xlink/gateway/internal/handlers/middlewares"
+	"xlink/gateway/internal/ports/adapters/analytics_service_adapters"
 	"xlink/gateway/internal/ports/adapters/shortener_service_adapters"
 	"xlink/gateway/internal/ports/adapters/user_service_adapters"
 	"xlink/gateway/internal/services"
@@ -71,9 +72,30 @@ func main() {
 	}
 	//endregion
 
+	//region shortener grpc pool
+	var analyticsGrpcPool *pool.GrpcPool
+
+	analyticsServiceAddress := fmt.Sprintf("%s:%s", mainConfig.UpstreamNames.Analytics, mainConfig.UpstreamPorts.Analytics)
+
+	analyticsGrpcPool, err = pool.NewGrpcPool(ctx, pool.Config{
+		Address:        analyticsServiceAddress,
+		MaxConnections: mainConfig.GrpcPool.MaxConnections,
+		MinConnections: mainConfig.GrpcPool.MinConnections,
+		DialOptions:    []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())},
+	})
+	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Fatal(ctx, "couldn't create grpc pool for analytics service",
+			zap.Int("MaxConnections", mainConfig.GrpcPool.MaxConnections),
+			zap.Int("MinConnections", mainConfig.GrpcPool.MinConnections),
+			zap.String("Address", analyticsServiceAddress),
+			zap.Error(err))
+	}
+	//endregion
+
 	//region repos
 	userServiceRepo := user_service_adapters.NewUserServiceRepositoryGRPC(usersGrpcPool)
 	shortenerServiceRepo := shortener_service_adapters.NewShortenerServiceRepositoryGRPC(shortenerGrpcPool)
+	analyticsServiceRepo := analytics_service_adapters.NewAnalyticsServiceRepositoryGRPC(analyticsGrpcPool)
 
 	userService := services.NewUserService(
 		userServiceRepo,
@@ -85,11 +107,17 @@ func main() {
 		mainConfig.GrpcPool.MaxRetries,
 		time.Millisecond*time.Duration(mainConfig.GrpcPool.BaseRetryDelayMilliseconds),
 	)
+	analyticsService := services.NewAnalyticsService(
+		analyticsServiceRepo,
+		mainConfig.GrpcPool.MaxRetries,
+		time.Millisecond*time.Duration(mainConfig.GrpcPool.BaseRetryDelayMilliseconds),
+	)
 	//endregion repos
 
 	//region handlers
 	userServiceHandler := http_handlers.NewUserServiceHandler(userService)
 	shortenerServiceHandler := http_handlers.NewShortenerServiceHandler(shortenerService, userService)
+	_ = http_handlers.NewAnalyticsServiceHandler(analyticsService)
 	//endregion handlers
 
 	//region routing
@@ -145,6 +173,9 @@ func main() {
 	shortenerAdminGroup.Put("/:id", shortenerServiceHandler.UpdateLink)        // admin
 	shortenerAdminGroup.Delete("/:id", shortenerServiceHandler.DeleteLink)     // admin
 	//endregion shortener v1
+
+	//region analytics v1
+	_ = v1Group.Group("/analytics")
 
 	//endregion v1
 	//endregion api
