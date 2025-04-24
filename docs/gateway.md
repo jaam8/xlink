@@ -9,6 +9,7 @@
 - /api/v1/user/create POST
 - /api/v1/user/:id PATCH
 - /api/v1/user/token/refresh POST
+- /api/v1/user/token/login POST
 
 #### For staff
 
@@ -102,6 +103,12 @@
 | Input                      | Output                                                 | Summary                                           |
 |----------------------------|--------------------------------------------------------|---------------------------------------------------|
 | **id** - string (in query) | `{"role": string, "is_admin": bool, "is_staff": bool}` | Get user roles data by **id** given **in query**  |
+
+- /api/v1/user/token/login POST
+
+| Input                   | Output                                  | Summary                                                                        |
+|-------------------------|-----------------------------------------|--------------------------------------------------------------------------------|
+| `{"api_token": string}` | `{"id": string, "telegram_id": *int64}` | Get user id & telegram_id by token <br> or return a (totally unrelated!) error |
 
 #### For admins
 
