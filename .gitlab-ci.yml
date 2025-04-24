@@ -74,8 +74,7 @@ test-shortener:
   image: golang:1.24.1
   script:
     - cd shortener
-    - go test ./tests -coverpkg=./internal/service,./internal/service/utils,./internal/service/helper \
-      -coverprofile=cover.out
+    - go test ./tests -coverpkg=./internal/service,./internal/service/utils,./internal/service/helper -coverprofile=cover.out
     - |
       TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
       echo "📊 shortener total coverage: ${TOTAL_COVERAGE}%"
@@ -94,8 +93,7 @@ test-user-service:
   image: golang:1.24.1
   script:
     - cd user_service
-    - go test ./tests -coverpkg=./internal/service,./internal/utils \
-      -coverprofile=cover.out
+    - go test ./tests -coverpkg=./internal/service,./internal/utils -coverprofile=cover.out
     - |
       TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
       echo "📊 user_service total coverage: ${TOTAL_COVERAGE}%"
@@ -114,8 +112,7 @@ test-analytics:
   image: golang:1.24.1
   script:
     - cd user_service
-    - go test ./tests -coverpkg=./internal/service,./internal/service/helper \
-      -coverprofile=cover.out
+    - go test ./tests -coverpkg=./internal/service,./internal/service/helper -coverprofile=cover.out
     - |
       TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
       echo "📊 analytics total coverage: ${TOTAL_COVERAGE}%"
