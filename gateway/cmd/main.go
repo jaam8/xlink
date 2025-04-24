@@ -167,7 +167,7 @@ func main() {
 	//endregion user v1
 
 	//region shortener v1
-	shortenerGroup := v1Group.Group("/s")
+	shortenerGroup := v1Group.Group("/l")
 
 	shortenerCRUDGroup := shortenerGroup.Group("/crud")
 	shortenerCRUDGroup.Use(authMiddleware)
@@ -175,16 +175,16 @@ func main() {
 	shortenerAdminGroup := shortenerCRUDGroup.Group("/admin")
 	shortenerAdminGroup.Use(isAdminMiddleware)
 
-	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("/owner")
+	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("")
 	shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("id", shortenerService))
 
 	//TODO: id -> shortLink
-	app.Get("/l/:shortLink", shortenerServiceHandler.Redirect)                        //
-	shortenerCRUDGroup.Post("/create", shortenerServiceHandler.CreateNewLink)         // authenticated
-	shortenerOwnerOnlyGroup.Put("/update/:id", shortenerServiceHandler.UpdateLink)    // owner
-	shortenerOwnerOnlyGroup.Delete("/delete/:id", shortenerServiceHandler.DeleteLink) // owner
-	shortenerAdminGroup.Put("/update/:id", shortenerServiceHandler.UpdateLink)        // admin
-	shortenerAdminGroup.Delete("/delete/:id", shortenerServiceHandler.DeleteLink)     // admin
+	app.Get("/l/:shortLink", shortenerServiceHandler.Redirect)                               //
+	shortenerCRUDGroup.Post("/create", shortenerServiceHandler.CreateNewLink)                // authenticated
+	shortenerOwnerOnlyGroup.Put("/update/:shortLink", shortenerServiceHandler.UpdateLink)    // owner
+	shortenerOwnerOnlyGroup.Delete("/delete/:shortLink", shortenerServiceHandler.DeleteLink) // owner
+	shortenerAdminGroup.Put("/update/:shortLink", shortenerServiceHandler.UpdateLink)        // admin
+	shortenerAdminGroup.Delete("/delete/:shortLink", shortenerServiceHandler.DeleteLink)     // admin
 	//endregion shortener v1
 
 	//region analytics v1

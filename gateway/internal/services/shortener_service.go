@@ -153,3 +153,25 @@ func (s *ShortenerService) GetLinksCountByUserId(request *shortener.GetLinksCoun
 
 	return response, nil
 }
+
+func (s *ShortenerService) GetLinkIdByShortLink(request *shortener.GetLinkIdByShortLinkRequest) (*shortener.GetLinkIdByShortLinkResponse, error) {
+	resultChan := make(chan *shortener.GetLinkIdByShortLinkResponse, 1)
+
+	err := callers.Retry(func() error {
+		response, err := (*s.ShortenerServiceRepo).GetLinkIdByShortLink(request)
+		if err != nil {
+			return fmt.Errorf("error in timeout GetLinkIdByShortLinkResponse caller: %v", err)
+		}
+		resultChan <- response
+		return nil
+	}, s.MaxRetries, s.BaseDelay)
+
+	if err != nil {
+		return nil, fmt.Errorf("couldn't call GetLinkIdByShortLinkResponse: %v", err)
+	}
+
+	response := <-resultChan
+	close(resultChan)
+
+	return response, nil
+}
