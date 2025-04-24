@@ -78,7 +78,6 @@ user_service:
   cache_expiration_seconds: 3600
   migrations_path: file:///user_service/migrations
 
-
 shortener:
   grpc_port: 50052
   redis_db: 1
@@ -92,7 +91,6 @@ shortener:
   default_link_expiration_minutes: 1440
   migrations_path: file:///shortener/migrations
 
-
 analytics:
   grpc_port: 50053
   kafka_topic: redirect-events
@@ -104,6 +102,15 @@ analytics:
   timezone: Europe/Moscow
   batch_size: 1
   flush_timeout: 3
+  timeouts: 10000
+
+bot:
+  grpc_port: 50055
+  redis_db: 3
+  bot_token:
+  base_url: "gateway:3000/api/v1"
+  upstream_names: tg_bot
+  upstream_ports: 50055
   timeouts: 10000
 
 expiration_seconds: 0
