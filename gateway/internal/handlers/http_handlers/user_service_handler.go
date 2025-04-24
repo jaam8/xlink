@@ -383,7 +383,7 @@ func (h *UserServiceHandler) Login(ctx *fiber.Ctx) error {
 		Info(ctx.Context(), "logged in user", zap.String("id", responseUserId.UserId))
 
 	return ctx.Status(fiber.StatusOK).JSON(&schemas.LoginResponseSchema{
-		Id:         responseUser.UserId,
+		UserId:     responseUser.UserId,
 		TelegramId: responseUser.TgId,
 	})
 }

@@ -163,13 +163,13 @@ func main() {
 	userAdminGroup.Post("/get-by-token", userServiceHandler.GetUserIDByToken) // admin
 	userAdminGroup.Post("/token-check", userServiceHandler.CheckToken)        // admin
 
-	userAuthedGroup.Get("/profile", userServiceHandler.Profile)
+	userAuthedGroup.Get("", userServiceHandler.Profile)
 	//endregion user v1
 
 	//region shortener v1
-	shortenerGroup := v1Group.Group("/l")
+	shortenerGroup := v1Group.Group("/link")
 
-	shortenerCRUDGroup := shortenerGroup.Group("/crud")
+	shortenerCRUDGroup := shortenerGroup.Group("")
 	shortenerCRUDGroup.Use(authMiddleware)
 
 	shortenerAdminGroup := shortenerCRUDGroup.Group("/admin")
@@ -178,7 +178,6 @@ func main() {
 	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("")
 	shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("id", shortenerService))
 
-	//TODO: id -> shortLink
 	app.Get("/l/:shortLink", shortenerServiceHandler.Redirect)                               //
 	shortenerCRUDGroup.Post("/create", shortenerServiceHandler.CreateNewLink)                // authenticated
 	shortenerOwnerOnlyGroup.Put("/update/:shortLink", shortenerServiceHandler.UpdateLink)    // owner
