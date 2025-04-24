@@ -25,6 +25,7 @@ type ShortenerServiceRepository interface {
 	UpdateLink(request *shortener.UpdateLinkRequest) (*shortener.Link, error)
 	DeleteLink(request *shortener.DeleteLinkRequest) (*shortener.DeleteLinkResponse, error)
 	GetLinksCountByUserId(request *shortener.GetLinksCountByUserIdRequest) (*shortener.GetLinksCountByUserIdResponse, error)
+	GetLinkIdByShortLink(request *shortener.GetLinkIdByShortLinkRequest) (*shortener.GetLinkIdByShortLinkResponse, error)
 }
 
 type AnalyticsServiceRepository interface {

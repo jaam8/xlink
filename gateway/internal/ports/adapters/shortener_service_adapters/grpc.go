@@ -118,3 +118,20 @@ func (s ShortenerServiceRepositoryGRPC) GetLinksCountByUserId(request *shortener
 
 	return response, nil
 }
+
+func (s ShortenerServiceRepositoryGRPC) GetLinkIdByShortLink(request *shortener.GetLinkIdByShortLinkRequest) (*shortener.GetLinkIdByShortLinkResponse, error) {
+	conn, err := s.grpcPool.GetConn()
+	if err != nil {
+		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
+	}
+	defer conn.Close() //nolint:all
+
+	client := shortener.NewShortenerServiceClient(conn)
+
+	response, grpcErr := client.GetLinkIdByShortLink(context.Background(), request)
+	if grpcErr != nil {
+		return nil, fmt.Errorf("error in GetLinkIdByShortLink grpc: %v", grpcErr)
+	}
+
+	return response, nil
+}
