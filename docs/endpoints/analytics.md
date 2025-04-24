@@ -9,7 +9,7 @@
 **Request:**
 ```bash
 curl -X GET "http://localhost:8080/api/v1/analytics/by-country?short_link=shortLink&start_date=2023-01-01&end_date=2023-01-31" \
--H "Authorization: Bearer token"
+-H "Authorization: <token>"
 ```
 
 **Headers:**
@@ -47,9 +47,9 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-country?short_link=shortL
 
 **Response Codes:**
 - `200 OK` — Статистика успешно получена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка в микросервисах.
 - `401 Unauthorized` — Неверный токен.
-- `500 Internal Server Error` — Ошибка на сервере.
+- `403 Forbidden` — Недостаточно прав.
 
 ---
 
@@ -60,7 +60,7 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-country?short_link=shortL
 **Request:**
 ```bash
 curl -X GET "http://localhost:8080/api/v1/analytics/by-region?short_link=shortLink&start_date=2023-01-01&end_date=2023-01-31" \
--H "Authorization: Bearer token"
+-H "Authorization: <token>"
 ```
 
 **Headers:**
@@ -98,9 +98,9 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-region?short_link=shortLi
 
 **Response Codes:**
 - `200 OK` — Статистика успешно получена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка в микросервисах.
 - `401 Unauthorized` — Неверный токен.
-- `500 Internal Server Error` — Ошибка на сервере.
+- `403 Forbidden` — Недостаточно прав.
 
 ---
 
@@ -111,7 +111,7 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-region?short_link=shortLi
 **Request:**
 ```bash
 curl -X GET "http://localhost:8080/api/v1/analytics/by-browser?short_link=shortLink&start_date=2023-01-01&end_date=2023-01-31" \
--H "Authorization: Bearer token"
+-H "Authorization: <token>"
 ```
 
 **Headers:**
@@ -149,9 +149,9 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-browser?short_link=shortL
 
 **Response Codes:**
 - `200 OK` — Статистика успешно получена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка в микросервисах.
 - `401 Unauthorized` — Неверный токен.
-- `500 Internal Server Error` — Ошибка на сервере.
+- `403 Forbidden` — Недостаточно прав.
 
 ---
 
@@ -162,7 +162,7 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-browser?short_link=shortL
 **Request:**
 ```bash
 curl -X GET "http://localhost:8080/api/v1/analytics/by-os?short_link=shortLink&start_date=2023-01-01&end_date=2023-01-31" \
--H "Authorization: Bearer token"
+-H "Authorization: <token>"
 ```
 
 **Headers:**
@@ -200,9 +200,9 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-os?short_link=shortLink&s
 
 **Response Codes:**
 - `200 OK` — Статистика успешно получена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка в микросервисах.
 - `401 Unauthorized` — Неверный токен.
-- `500 Internal Server Error` — Ошибка на сервере.
+- `403 Forbidden` — Недостаточно прав.
 
 ---
 
@@ -213,7 +213,7 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-os?short_link=shortLink&s
 **Request:**
 ```bash
 curl -X GET "http://localhost:8080/api/v1/analytics/by-device-type?short_link=shortLink&start_date=2023-01-01&end_date=2023-01-31" \
--H "Authorization: Bearer token"
+-H "Authorization: <token>"
 ```
 
 **Headers:**
@@ -251,9 +251,9 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-device-type?short_link=sh
 
 **Response Codes:**
 - `200 OK` — Статистика успешно получена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка в микросервисах.
 - `401 Unauthorized` — Неверный токен.
-- `500 Internal Server Error` — Ошибка на сервере.
+- `403 Forbidden` — Недостаточно прав.
 
 ---
 
@@ -264,7 +264,7 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-device-type?short_link=sh
 **Request:**
 ```bash
 curl -X GET "http://localhost:8080/api/v1/analytics/by-hour?short_link=shortLink&start_date=2023-01-01&end_date=2023-01-31" \
--H "Authorization: Bearer token"
+-H "Authorization: <token>"
 ```
 
 **Headers:**
@@ -302,9 +302,9 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-hour?short_link=shortLink
 
 **Response Codes:**
 - `200 OK` — Статистика успешно получена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка в микросервисах.
 - `401 Unauthorized` — Неверный токен.
-- `500 Internal Server Error` — Ошибка на сервере.
+- `403 Forbidden` — Недостаточно прав.
 
 ---
 
@@ -315,7 +315,7 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-hour?short_link=shortLink
 **Request:**
 ```bash
 curl -X GET "http://localhost:8080/api/v1/analytics/by-date?short_link=shortLink&start_date=2023-01-01&end_date=2023-01-31" \
--H "Authorization: Bearer token"
+-H "Authorization: <token>"
 ```
 
 **Headers:**
@@ -353,9 +353,9 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-date?short_link=shortLink
 
 **Response Codes:**
 - `200 OK` — Статистика успешно получена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка в микросервисах.
 - `401 Unauthorized` — Неверный токен.
-- `500 Internal Server Error` — Ошибка на сервере.
+- `403 Forbidden` — Недостаточно прав.
 
 ---
 
@@ -366,7 +366,7 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-date?short_link=shortLink
 **Request:**
 ```bash
 curl -X GET "http://localhost:8080/api/v1/analytics/by-referrer?short_link=shortLink&start_date=2023-01-01&end_date=2023-01-31" \
--H "Authorization: Bearer token"
+-H "Authorization: <token>"
 ```
 
 **Headers:**
@@ -404,8 +404,8 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-referrer?short_link=short
 
 **Response Codes:**
 - `200 OK` — Статистика успешно получена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка в микросервисах.
 - `401 Unauthorized` — Неверный токен.
-- `500 Internal Server Error` — Ошибка на сервере.
+- `403 Forbidden` — Недостаточно прав.
 
 `
