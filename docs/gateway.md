@@ -26,6 +26,10 @@
 - /api/v1/user/admin/get/by-token POST <- POST потому что иначе токен передавался бы в url а это уязвимость
 - /api/v1/user/admin/token/check POST <- POST по той же причине
 
+#### For users that provide 'Authorization' header
+
+- /api/v1/user/auth-d/profile
+
 ### Shortener
 
 #### Common part
@@ -141,6 +145,14 @@
 | Input                                 | Output             | Summary                                                                |
 |---------------------------------------|--------------------|------------------------------------------------------------------------|
 | `{"user_id": string, token": string}` | `{"status": bool}` | Check if user with given **user_id** has given **token** (in **body**) |
+
+#### For users that provide 'Authorization' header
+
+- /api/v1/user/auth-d/profile
+
+| Input                          | Output                                                                       | Summary                                                                                   |
+|--------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| provide 'Authorization' header | `{"user_id": string, "role": string, "tg_id": *int64, "link_count": *int32}` | Aggregate user data (GetUser in gRPC) with using a **token** (in header: "Authorization") |
 
 ### Shortener
 
