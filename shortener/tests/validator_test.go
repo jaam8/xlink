@@ -69,12 +69,14 @@ func TestGetValidatedExpireAt(t *testing.T) {
 
 	regenerated := true
 
+	targetUrl := "http://qwertysdijvnisdnc"
+
 	testRequest := shortener.UpdateLinkRequest{
 		LinkId:     idStr,
 		UserId:     userIDStr,
 		Regenerate: regenerated,
 		ShortLink:  &shortLinkStr,
-		TargetUrl:  "http://qwertysdijvnisdnc",
+		TargetUrl:  &targetUrl,
 		ExpireAt:   expireAtTimestamppb1,
 	}
 
