@@ -19,6 +19,7 @@ type UserStorageRepository interface {
 	UpdateUser(userId string, telegramId *int64, isStaff *bool, isAdmin *bool) (bool, error) // status, err
 	DeleteUser(userId string) (bool, error)                                                  // status, err
 	GetRole(userId string) (string, bool, bool, error)                                       // role, isStaff, isAdmin, err
+	GetTokenByTgId(tgId int64) (string, error)                                               // token, err
 }
 
 type ShortenerRepository interface {

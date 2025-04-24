@@ -12,6 +12,7 @@ import (
 
 const (
 	userIdKey = "user_id"
+	tgIdKey   = "telegram_id"
 	tokenKey  = "token"
 	statusKey = "status"
 )
@@ -113,8 +114,11 @@ func (s *Service) RefreshToken(ctx context.Context, req *user_service.RefreshTok
 func (s *Service) CreateUser(ctx context.Context, req *user_service.CreateUserRequest) (*user_service.CreateUserResponse, error) {
 	userId, token, err := s.storageRepo.CreateUser(req.TgId, req.IsStaff, req.IsAdmin)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't create user", zap.Error(err))
 		return &user_service.CreateUserResponse{}, fmt.Errorf("couldn't create user: %v", err)
 	}
+
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "created user", zap.String(userIdKey, userId))
 	return &user_service.CreateUserResponse{
 		UserId: userId,
 		Token:  token,
@@ -143,16 +147,27 @@ func (s *Service) GetUser(ctx context.Context, req *user_service.GetUserRequest)
 	waitGroup.Wait()
 
 	if storageErr != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx,
+			"couldn't get user from storage",
+			zap.String(userIdKey, userId),
+			zap.Error(storageErr),
+		)
 		return &user_service.GetUserResponse{},
 			fmt.Errorf("couldn't get user with id='%s': %v",
 				req.UserId, storageErr)
 	}
 	if shortenerErr != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx,
+			"couldn't get user links count",
+			zap.String(userIdKey, userId),
+			zap.Error(shortenerErr),
+		)
 		return &user_service.GetUserResponse{},
 			fmt.Errorf("couldn't get user links count (id='%s'): %v",
 				userId, shortenerErr)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "received user", zap.String(userIdKey, userId))
 	return &user_service.GetUserResponse{
 		UserId:    userId,
 		Role:      role,
@@ -164,9 +179,17 @@ func (s *Service) GetUser(ctx context.Context, req *user_service.GetUserRequest)
 func (s *Service) GetUserIDByToken(ctx context.Context, req *user_service.GetUserIDByTokenRequest) (*user_service.GetUserIDByTokenResponse, error) {
 	userId, status, err := s.storageRepo.GetUserIDByToken(req.Token)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx,
+			"couldn't get user id by token",
+			zap.Error(err),
+		)
 		return &user_service.GetUserIDByTokenResponse{}, fmt.Errorf("couldn't get user id by token: %v", err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx,
+		"received user id by token",
+		zap.String(userIdKey, userId),
+	)
 	return &user_service.GetUserIDByTokenResponse{
 		UserId: userId,
 		Status: status,
@@ -176,9 +199,19 @@ func (s *Service) GetUserIDByToken(ctx context.Context, req *user_service.GetUse
 func (s *Service) GetUserIDByTgID(ctx context.Context, req *user_service.GetUserIDByTgIDRequest) (*user_service.GetUserIDByTgIDResponse, error) {
 	userId, status, err := s.storageRepo.GetUserIDByTgId(req.TgId)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx,
+			"couldn't get user id by tg id",
+			zap.Int64(tgIdKey, req.TgId),
+			zap.Error(err),
+		)
 		return &user_service.GetUserIDByTgIDResponse{}, fmt.Errorf("couldn't get user id by tgId='%d': %v", req.TgId, err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx,
+		"received user id by tg Id",
+		zap.String(userIdKey, userId),
+		zap.Int64(tgIdKey, req.TgId),
+	)
 	return &user_service.GetUserIDByTgIDResponse{
 		UserId: userId,
 		Status: status,
@@ -188,9 +221,15 @@ func (s *Service) GetUserIDByTgID(ctx context.Context, req *user_service.GetUser
 func (s *Service) UpdateUser(ctx context.Context, req *user_service.UpdateUserRequest) (*user_service.UpdateUserResponse, error) {
 	status, err := s.storageRepo.UpdateUser(req.UserId, req.TgId, req.IsStaff, req.IsAdmin)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx,
+			"couldn't update user",
+			zap.String(userIdKey, req.UserId),
+			zap.Error(err),
+		)
 		return &user_service.UpdateUserResponse{}, fmt.Errorf("couldn't update user: %v", err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "updated user", zap.String(userIdKey, req.UserId))
 	return &user_service.UpdateUserResponse{
 		Status: status,
 	}, nil
@@ -199,9 +238,15 @@ func (s *Service) UpdateUser(ctx context.Context, req *user_service.UpdateUserRe
 func (s *Service) DeleteUser(ctx context.Context, req *user_service.DeleteUserRequest) (*user_service.DeleteUserResponse, error) {
 	status, err := s.storageRepo.DeleteUser(req.UserId)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx,
+			"couldn't delete user",
+			zap.String(userIdKey, req.UserId),
+			zap.Error(err),
+		)
 		return &user_service.DeleteUserResponse{}, fmt.Errorf("couldn't delete user: %v", err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "deleted user", zap.String(userIdKey, req.UserId))
 	return &user_service.DeleteUserResponse{Status: status}, nil
 }
 
@@ -215,6 +260,11 @@ func (s *Service) GetRole(ctx context.Context, req *user_service.GetRoleRequest)
 
 		// couldn't get from postgres
 		if err != nil {
+			logger.GetLoggerFromCtx(ctx).Error(ctx,
+				"couldn't get roles for user",
+				zap.String(userIdKey, req.UserId),
+				zap.Error(err),
+			)
 			return &user_service.GetRoleResponse{}, fmt.Errorf("couldn't get role for userId='%s': %v", req.UserId, err)
 		}
 
@@ -223,9 +273,27 @@ func (s *Service) GetRole(ctx context.Context, req *user_service.GetRoleRequest)
 		}()
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "got roles for user", zap.String(userIdKey, req.UserId))
 	return &user_service.GetRoleResponse{
 		Role:    role,
 		IsStaff: isStaff,
 		IsAdmin: isAdmin,
 	}, nil
+}
+
+func (s *Service) GetTokenByTgId(ctx context.Context, req *user_service.GetTokenByTgIdRequest) (*user_service.GetTokenByTgIdResponse, error) {
+	// try to get the token from storage
+	token, err := s.storageRepo.GetTokenByTgId(req.TgId)
+	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx,
+			"couldn't get token by tg id",
+			zap.Int64(tgIdKey, req.TgId),
+			zap.Error(err),
+		)
+		return &user_service.GetTokenByTgIdResponse{},
+			fmt.Errorf("couldn't get token for tgId='%d': %v", req.TgId, err)
+	}
+
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "got token for tg id", zap.Int64(tgIdKey, req.TgId))
+	return &user_service.GetTokenByTgIdResponse{Token: token}, nil
 }
