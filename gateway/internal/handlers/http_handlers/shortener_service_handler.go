@@ -28,6 +28,25 @@ func NewShortenerServiceHandler(
 	return &ShortenerServiceHandler{shortenerService: shortenerService, userService: userService}
 }
 
+func (h *ShortenerServiceHandler) getLinkIdByShortLinkParameter(ctx *fiber.Ctx) (string, error) {
+	shortLink := ctx.Params("shortLink")
+	if len(shortLink) == 0 {
+		return "", helpers.BadRequest(ctx, "invalid shortLink: must be a non-empty string")
+	}
+
+	responseLinkId, err := h.shortenerService.GetLinkIdByShortLink(
+		&shortener.GetLinkIdByShortLinkRequest{ShortLink: shortLink})
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+			Error(ctx.Context(), "couldn't get shortener response", zap.Error(err))
+		return "", helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't get shortener response"))
+	}
+
+	linkId := responseLinkId.LinkId
+	return linkId, nil
+}
+
 func (h *ShortenerServiceHandler) Redirect(ctx *fiber.Ctx) error {
 	shortLink := ctx.Params("shortLink")
 	clickedAt := timestamppb.New(time.Now())
@@ -106,9 +125,9 @@ func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {
 
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.Context(), "couldn't get shortener response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
-			fmt.Errorf("couldn't get user_service response"))
+			fmt.Errorf("couldn't get shortener response"))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
@@ -117,9 +136,9 @@ func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {
 }
 
 func (h *ShortenerServiceHandler) UpdateLink(ctx *fiber.Ctx) error {
-	linkId, err := helpers.ParseUUIDField(ctx, "id")
+	linkId, err := h.getLinkIdByShortLinkParameter(ctx)
 	if err != nil {
-		return helpers.BadRequest(ctx, "invalid link id: must be a valid uuid")
+		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get link id by short link: %v", err))
 	}
 
 	var body schemas.UpdateLinkSchema
@@ -134,7 +153,7 @@ func (h *ShortenerServiceHandler) UpdateLink(ctx *fiber.Ctx) error {
 	}
 
 	request := &shortener.UpdateLinkRequest{
-		LinkId:     linkId.String(),
+		LinkId:     linkId,
 		UserId:     ctx.Get(handlers.UserIdKey),
 		Regenerate: body.Regenerate,
 		ShortLink:  body.ShortLink,
@@ -158,14 +177,12 @@ func (h *ShortenerServiceHandler) UpdateLink(ctx *fiber.Ctx) error {
 }
 
 func (h *ShortenerServiceHandler) DeleteLink(ctx *fiber.Ctx) error {
-	linkId, err := helpers.ParseUUIDField(ctx, "id")
+	linkId, err := h.getLinkIdByShortLinkParameter(ctx)
 	if err != nil {
-		return helpers.BadRequest(ctx, "invalid link id: must be a valid uuid")
+		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get link id by short link: %v", err))
 	}
 
-	linkIdText := linkId.String()
-
-	request := &shortener.DeleteLinkRequest{LinkId: linkIdText}
+	request := &shortener.DeleteLinkRequest{LinkId: linkId}
 
 	var response *shortener.DeleteLinkResponse
 	response, err = h.shortenerService.DeleteLink(request)
@@ -179,13 +196,13 @@ func (h *ShortenerServiceHandler) DeleteLink(ctx *fiber.Ctx) error {
 
 	if !response.Status {
 		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
-			Error(ctx.Context(), "link deletion was unsuccessful", zap.String("id", linkIdText))
+			Error(ctx.Context(), "link deletion was unsuccessful", zap.String("id", linkId))
 		return helpers.BadRequest(ctx, "link deletion was unsuccessful")
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
 		Info(ctx.Context(), "deleted link",
-			zap.String("id", linkIdText),
+			zap.String("id", linkId),
 			zap.Bool("status", response.Status))
 	return ctx.SendStatus(fiber.StatusNoContent)
 }
