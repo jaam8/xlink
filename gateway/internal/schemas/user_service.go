@@ -39,6 +39,6 @@ type LoginSchema struct {
 }
 
 type LoginResponseSchema struct {
-	Id         string `json:"id"`
+	UserId     string `json:"user_id"`
 	TelegramId *int64 `json:"telegram_id"`
 }
