@@ -178,7 +178,7 @@ func main() {
 	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("/owner")
 	shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("id", shortenerService))
 
-	shortenerGroup.Get("/:shortLink", shortenerServiceHandler.Redirect)        //
+	app.Get("/l/:shortLink", shortenerServiceHandler.Redirect)                 //
 	shortenerCRUDGroup.Post("/", shortenerServiceHandler.CreateNewLink)        // authenticated
 	shortenerOwnerOnlyGroup.Put("/:id", shortenerServiceHandler.UpdateLink)    // owner
 	shortenerOwnerOnlyGroup.Delete("/:id", shortenerServiceHandler.DeleteLink) // owner
