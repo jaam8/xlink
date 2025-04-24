@@ -6,29 +6,29 @@
 
 #### Common part
 
-- /api/v1/user/create POST
-- /api/v1/user/:id PATCH
-- /api/v1/user/token/refresh POST
-- /api/v1/user/token/login POST
+- /api/v1/user/crud POST
+- /api/v1/user/crud/:id PATCH
+- /api/v1/user/refresh POST
+- /api/v1/user/login POST
 
 #### For staff
 
-- /api/v1/user/staff/:id GET
+- /api/v1/user/staff/crud/:id GET
 - /api/v1/user/staff/get/by-tg-id/:tgId GET
-- /api/v1/user/staff/:id DELETE
+- /api/v1/user/staff/crud/:id DELETE
 - /api/v1/user/staff/role/:id GET
 
 #### For admins
 
-- /api/v1/user/admin/create POST
-- /api/v1/user/admin/update/:id PATCH
-- /api/v1/user/admin/delete/:id DELETE
-- /api/v1/user/admin/get/by-token POST <- POST потому что иначе токен передавался бы в url а это уязвимость
-- /api/v1/user/admin/token/check POST <- POST по той же причине
+- /api/v1/user/admin/crud POST
+- /api/v1/user/admin/crud/:id PATCH
+- /api/v1/user/admin/crud/:id DELETE
+- /api/v1/user/admin/get-by-token POST <- POST потому что иначе токен передавался бы в url а это уязвимость
+- /api/v1/user/admin/token-check POST <- POST по той же причине
 
 #### For users that provide 'Authorization' header
 
-- /api/v1/user/auth-d/profile
+- /api/v1/user/profile
 
 ### Shortener
 
@@ -64,19 +64,19 @@
 
 #### Common part
 
-- /api/v1/user/create POST
+- /api/v1/user/crud POST
 
 | Input               | Output                                 | Summary                                            |
 |---------------------|----------------------------------------|----------------------------------------------------|
 | `{"tg_id": *int64}` | `{"user_id": string, "token": string}` | Create user with `is_staff` & `is_admin` set to **false** |
 
-- /api/v1/user/:id PATCH
+- /api/v1/user/crud/:id PATCH
 
 | Input              | Output             | Summary                                                   |
 |--------------------|--------------------|-----------------------------------------------------------|
 | `{"tg_id": int64}` | `{"status": bool}` | Update user with `is_staff` & `is_admin` set to **false** |
 
-- /api/v1/user/token/refresh POST
+- /api/v1/user/refresh POST
 
 | Input                                  | Output                                 | Summary                                                                            |
 |----------------------------------------|----------------------------------------|------------------------------------------------------------------------------------|
@@ -84,7 +84,7 @@
 
 #### For staff
 
-- /api/v1/user/staff/:id GET
+- /api/v1/user/staff/crud/:id GET
 
 | Input                                                             | Output                                                                       | Summary                                    |
 |-------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------|
@@ -96,7 +96,7 @@
 |---------------------------------------------------------------------|------------------------------------------------------------------------------|-----------------------------------------|
 | Requires _'Authorization'_ header <br> **tg_id** - int64 (in query) | `{"user_id": string, "status": bool}` | Get user by **tg_id** given **in query** |
 
-- /api/v1/user/staff/:id DELETE
+- /api/v1/user/staff/crud/:id DELETE
 
 | Input                                                             | Output                                                                      | Summary                                  |
 |-------------------------------------------------------------------|-----------------------------------------------------------------------------|------------------------------------------|
@@ -108,7 +108,7 @@
 |-------------------------------------------------------------------|--------------------------------------------------------|---------------------------------------------------|
 | Requires _'Authorization'_ header <br> **id** - string (in query) | `{"role": string, "is_admin": bool, "is_staff": bool}` | Get user roles data by **id** given **in query**  |
 
-- /api/v1/user/token/login POST
+- /api/v1/user/login POST
 
 | Input                   | Output                                  | Summary                                                                        |
 |-------------------------|-----------------------------------------|--------------------------------------------------------------------------------|
@@ -116,31 +116,31 @@
 
 #### For admins
 
-- /api/v1/user/admin/create POST
+- /api/v1/user/admin/crud POST
 
 | Input                                                                                          | Output                                 | Summary         |
 |------------------------------------------------------------------------------------------------|----------------------------------------|-----------------|
 | Requires _'Authorization'_ header <br> `{"tg_id": *int64, "is_admin": bool, "is_staff": bool}` | `{"user_id": string, "token": string}` | Create new user |
 
-- /api/v1/user/admin/update/:id PATCH
+- /api/v1/user/admin/crud/:id PATCH
 
 | Input                                                                                          | Output                                 | Summary         |
 |------------------------------------------------------------------------------------------------|----------------------------------------|-----------------|
 | Requires _'Authorization'_ header <br> `{"tg_id": *int64, "is_admin": bool, "is_staff": bool}` | `{"user_id": string, "token": string}` | Create new user |
 
-- /api/v1/user/admin/delete/:id DELETE
+- /api/v1/user/admin/crud/:id DELETE
 
 | Input                                                             | Output             | Summary                                  |
 |-------------------------------------------------------------------|--------------------|------------------------------------------|
 | Requires _'Authorization'_ header <br> **id** - string (in query) | `{"status": bool}` | Delete user by **id** given **in query** |
 
-- /api/v1/user/admin/get/by-token POST <- POST потому что иначе токен передавался бы в url а это уязвимость
+- /api/v1/user/admin/get-by-token POST <- POST потому что иначе токен передавался бы в url а это уязвимость
 
 | Input                                                      | Output                                | Summary                                                                                                    |
 |------------------------------------------------------------|---------------------------------------|------------------------------------------------------------------------------------------------------------|
 | Requires _'Authorization'_ header <br> `{"token": string}` | `{"user_id": string, "status": bool}` | Get user by **token** given in **body**. Use of **body** and not **query** is for "at least better" safety |
 
-- /api/v1/user/admin/token/check POST <- POST по той же причине
+- /api/v1/user/admin/token-check POST <- POST по той же причине
 
 | Input                                                                        | Output             | Summary                                                                |
 |------------------------------------------------------------------------------|--------------------|------------------------------------------------------------------------|
@@ -148,7 +148,7 @@
 
 #### For users that provide 'Authorization' header
 
-- /api/v1/user/auth-d/profile
+- /api/v1/user/profile
 
 | Input                             | Output                                                                           | Summary                                                                                            |
 |-----------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
