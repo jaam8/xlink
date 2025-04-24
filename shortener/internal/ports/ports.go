@@ -20,6 +20,7 @@ type ShortenerStorageRepository interface {
 	DeleteLink(linkId uuid.UUID) error
 	GetLinksCountByUserId(userId uuid.UUID) (int32, error)
 	GetLinkOwnerByShortLink(shortLink string) (string, error)
+	GetLinkIdByShortLink(shortLink string) (string, error)
 }
 
 type ShortenerSenderRepository interface {

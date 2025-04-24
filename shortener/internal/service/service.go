@@ -259,5 +259,30 @@ func (s *Service) GetLinkOwnerByShortLink(ctx context.Context, request *shortene
 		return &shortener.GetLinkOwnerByShortLinkResponse{}, fmt.Errorf("error while getting user id: %v", err)
 	}
 
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "got link owner by short link",
+		zap.String(helper.ShortUrlKey, request.ShortLink),
+		zap.String(helper.UserIdKey, userId),
+		zap.Error(err),
+	)
 	return &shortener.GetLinkOwnerByShortLinkResponse{LinkOwner: userId}, nil
+}
+
+func (s *Service) GetLinkIdByShortLink(ctx context.Context, request *shortener.GetLinkIdByShortLinkRequest) (*shortener.GetLinkIdByShortLinkResponse, error) {
+	shortLink, err := helper.ValidateNotEmptyStr(request.ShortLink)
+	if err != nil {
+		return &shortener.GetLinkIdByShortLinkResponse{}, fmt.Errorf("error while validating link: %v", err)
+	}
+
+	var linkId string
+	linkId, err = s.storageRepo.GetLinkIdByShortLink(shortLink)
+	if err != nil {
+		return &shortener.GetLinkIdByShortLinkResponse{}, fmt.Errorf("error while getting link id: %v", err)
+	}
+
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "got link id by short link",
+		zap.String(helper.ShortUrlKey, request.ShortLink),
+		zap.String(helper.LinkIdKey, linkId),
+		zap.Error(err),
+	)
+	return &shortener.GetLinkIdByShortLinkResponse{LinkId: linkId}, nil
 }
