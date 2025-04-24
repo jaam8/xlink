@@ -148,6 +148,7 @@ func main() {
 	userGroup.Post("/create", userServiceHandler.CreateUser)          //
 	userGroup.Patch("/:id", userServiceHandler.UpdateUser)            //
 	userGroup.Post("/token/refresh", userServiceHandler.RefreshToken) //
+	userGroup.Post("/token/login", userServiceHandler.Login)
 
 	userStaffGroup.Get("/:id", userServiceHandler.GetUser)                         // staff | admin
 	userStaffGroup.Get("/get/by-tg-id/:tg_id", userServiceHandler.GetUserIdByTgId) // staff | admin

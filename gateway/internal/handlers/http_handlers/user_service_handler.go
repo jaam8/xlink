@@ -351,3 +351,38 @@ func (h *UserServiceHandler) DeleteUserAdmin(ctx *fiber.Ctx) error {
 		)
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
+
+func (h *UserServiceHandler) Login(ctx *fiber.Ctx) error {
+	var body schemas.LoginSchema
+	if err := ctx.BodyParser(&body); err != nil {
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
+	}
+
+	responseUserId, err := h.userService.GetUserIDByToken(
+		&user_service.GetUserIDByTokenRequest{Token: body.ApiToken},
+	)
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+		return helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't get user_service response: %v", err))
+	}
+
+	responseUser, err := h.userService.GetUser(
+		&user_service.GetUserRequest{UserId: responseUserId.UserId},
+	)
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+		return helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't get user_service response: %v", err))
+	}
+
+	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		Info(ctx.Context(), "logged in user", zap.String("id", responseUserId.UserId))
+
+	return ctx.Status(fiber.StatusOK).JSON(&schemas.LoginResponseSchema{
+		Id:         responseUser.UserId,
+		TelegramId: responseUser.TgId,
+	})
+}
