@@ -45,7 +45,7 @@ message UpdateLinkRequest {
   string user_id = 2;
   bool regenerate = 3;
   optional string short_link = 4;
-  string target_url = 5;
+  optional string target_url = 5;
   optional google.protobuf.Timestamp expire_at = 6;
 }
 

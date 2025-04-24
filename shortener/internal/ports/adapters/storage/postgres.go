@@ -100,8 +100,7 @@ func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *m
 
 	updateBuilder := squirrel.Update("shortener.urls").
 		Where(squirrel.Eq{"id": newLinkWithExistingId.Id}).
-		Set("user_id", newLinkWithExistingId.UserId).
-		Set("url", newLinkWithExistingId.TargetUrl)
+		Set("user_id", newLinkWithExistingId.UserId)
 
 	if newLinkWithExistingId.Generated != nil {
 		updateBuilder = updateBuilder.Set("generated", newLinkWithExistingId.Generated)
@@ -113,6 +112,10 @@ func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *m
 
 	if newLinkWithExistingId.ExpireAt != nil {
 		updateBuilder = updateBuilder.Set("expire_at", newLinkWithExistingId.ExpireAt)
+	}
+
+	if newLinkWithExistingId.TargetUrl != nil {
+		updateBuilder = updateBuilder.Set("url", newLinkWithExistingId.TargetUrl)
 	}
 
 	sql, args, err := updateBuilder.PlaceholderFormat(squirrel.Dollar).ToSql()

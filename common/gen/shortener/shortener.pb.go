@@ -220,7 +220,7 @@ type UpdateLinkRequest struct {
 	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Regenerate    bool                   `protobuf:"varint,3,opt,name=regenerate,proto3" json:"regenerate,omitempty"`
 	ShortLink     *string                `protobuf:"bytes,4,opt,name=short_link,json=shortLink,proto3,oneof" json:"short_link,omitempty"`
-	TargetUrl     string                 `protobuf:"bytes,5,opt,name=target_url,json=targetUrl,proto3" json:"target_url,omitempty"`
+	TargetUrl     *string                `protobuf:"bytes,5,opt,name=target_url,json=targetUrl,proto3,oneof" json:"target_url,omitempty"`
 	ExpireAt      *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expire_at,json=expireAt,proto3,oneof" json:"expire_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -285,8 +285,8 @@ func (x *UpdateLinkRequest) GetShortLink() string {
 }
 
 func (x *UpdateLinkRequest) GetTargetUrl() string {
-	if x != nil {
-		return x.TargetUrl
+	if x != nil && x.TargetUrl != nil {
+		return *x.TargetUrl
 	}
 	return ""
 }
@@ -866,7 +866,7 @@ const file_api_shortener_proto_rawDesc = "" +
 	"short_link\x18\x02 \x01(\tH\x00R\tshortLink\x88\x01\x01\x12\x1d\n" +
 	"\n" +
 	"target_url\x18\x03 \x01(\tR\ttargetUrlB\r\n" +
-	"\v_short_link\"\x83\x02\n" +
+	"\v_short_link\"\x97\x02\n" +
 	"\x11UpdateLinkRequest\x12\x17\n" +
 	"\alink_id\x18\x01 \x01(\tR\x06linkId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1e\n" +
@@ -874,11 +874,12 @@ const file_api_shortener_proto_rawDesc = "" +
 	"regenerate\x18\x03 \x01(\bR\n" +
 	"regenerate\x12\"\n" +
 	"\n" +
-	"short_link\x18\x04 \x01(\tH\x00R\tshortLink\x88\x01\x01\x12\x1d\n" +
+	"short_link\x18\x04 \x01(\tH\x00R\tshortLink\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"target_url\x18\x05 \x01(\tR\ttargetUrl\x12<\n" +
-	"\texpire_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\bexpireAt\x88\x01\x01B\r\n" +
-	"\v_short_linkB\f\n" +
+	"target_url\x18\x05 \x01(\tH\x01R\ttargetUrl\x88\x01\x01\x12<\n" +
+	"\texpire_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampH\x02R\bexpireAt\x88\x01\x01B\r\n" +
+	"\v_short_linkB\r\n" +
+	"\v_target_urlB\f\n" +
 	"\n" +
 	"_expire_at\"V\n" +
 	"\tUserAgent\x12\x18\n" +
