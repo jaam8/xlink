@@ -141,24 +141,29 @@ func main() {
 	userGroup := v1Group.Group("/user")
 	userAdminGroup := userGroup.Group("/admin")
 	userStaffGroup := userGroup.Group("/staff")
+	userAuthedGroup := userGroup.Group("")
 
 	userAdminGroup.Use(isAdminMiddleware)
 	userStaffGroup.Use(isStaffMiddleware)
+	userAuthedGroup.Use(authMiddleware)
 
-	userGroup.Post("/create", userServiceHandler.CreateUser)          //
-	userGroup.Patch("/:id", userServiceHandler.UpdateUser)            //
-	userGroup.Post("/token/refresh", userServiceHandler.RefreshToken) //
+	userGroup.Post("/create", userServiceHandler.CreateUser)
+	userGroup.Patch("/update/:id", userServiceHandler.UpdateUser)
+	userGroup.Post("/refresh", userServiceHandler.RefreshToken)
+	userGroup.Post("/login", userServiceHandler.Login)
 
-	userStaffGroup.Get("/:id", userServiceHandler.GetUser)                         // staff | admin
-	userStaffGroup.Get("/get/by-tg-id/:tg_id", userServiceHandler.GetUserIdByTgId) // staff | admin
-	userStaffGroup.Delete("/:id", userServiceHandler.DeleteUser)                   // staff | admin
+	userStaffGroup.Get("/get/:id", userServiceHandler.GetUser)                     // staff | admin
+	userStaffGroup.Get("/get-by-tg-id/:tg_id", userServiceHandler.GetUserIdByTgId) // staff | admin
+	userStaffGroup.Delete("/delete/:id", userServiceHandler.DeleteUser)            // staff | admin
 	userStaffGroup.Get("/role/:id", userServiceHandler.GetRole)                    // staff | admin
 
 	userAdminGroup.Post("/create", userServiceHandler.CreateUserAdmin)        // admin
 	userAdminGroup.Patch("/update/:id", userServiceHandler.UpdateUserAdmin)   // admin
 	userAdminGroup.Delete("/delete/:id", userServiceHandler.DeleteUserAdmin)  // admin
-	userAdminGroup.Post("/get/by-token", userServiceHandler.GetUserIDByToken) // admin
-	userAdminGroup.Post("/token/check", userServiceHandler.CheckToken)        // admin
+	userAdminGroup.Post("/get-by-token", userServiceHandler.GetUserIDByToken) // admin
+	userAdminGroup.Post("/token-check", userServiceHandler.CheckToken)        // admin
+
+	userAuthedGroup.Get("/profile", userServiceHandler.Profile)
 	//endregion user v1
 
 	//region shortener v1
@@ -173,12 +178,13 @@ func main() {
 	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("/owner")
 	shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("id", shortenerService))
 
-	shortenerGroup.Get("/:shortLink", shortenerServiceHandler.Redirect)        //
-	shortenerCRUDGroup.Post("/", shortenerServiceHandler.CreateNewLink)        // authenticated
-	shortenerOwnerOnlyGroup.Put("/:id", shortenerServiceHandler.UpdateLink)    // owner
-	shortenerOwnerOnlyGroup.Delete("/:id", shortenerServiceHandler.DeleteLink) // owner
-	shortenerAdminGroup.Put("/:id", shortenerServiceHandler.UpdateLink)        // admin
-	shortenerAdminGroup.Delete("/:id", shortenerServiceHandler.DeleteLink)     // admin
+	//TODO: id -> shortLink
+	app.Get("/l/:shortLink", shortenerServiceHandler.Redirect)                        //
+	shortenerCRUDGroup.Post("/create", shortenerServiceHandler.CreateNewLink)         // authenticated
+	shortenerOwnerOnlyGroup.Put("/update/:id", shortenerServiceHandler.UpdateLink)    // owner
+	shortenerOwnerOnlyGroup.Delete("/delete/:id", shortenerServiceHandler.DeleteLink) // owner
+	shortenerAdminGroup.Put("/update/:id", shortenerServiceHandler.UpdateLink)        // admin
+	shortenerAdminGroup.Delete("/delete/:id", shortenerServiceHandler.DeleteLink)     // admin
 	//endregion shortener v1
 
 	//region analytics v1

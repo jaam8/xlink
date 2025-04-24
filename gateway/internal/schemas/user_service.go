@@ -33,3 +33,12 @@ type RefreshTokenSchema struct {
 	UserId string `json:"user_id"`
 	Token  string `json:"token"`
 }
+
+type LoginSchema struct {
+	ApiToken string `json:"api_token"`
+}
+
+type LoginResponseSchema struct {
+	Id         string `json:"id"`
+	TelegramId *int64 `json:"telegram_id"`
+}
