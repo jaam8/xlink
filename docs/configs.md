@@ -137,5 +137,20 @@ Documentation for environment variables to run all microservices.
 
 ---
 
+### ![Bot](https://img.shields.io/badge/Bot-2CA5E0.svg?style=for-the-badge&logo=telegram&logoColor=white)
+
+| variable               | description                     | example                        |
+|------------------------|---------------------------------|--------------------------------|
+| `BOT_GRPC_PORT`        | gRPC port                       | `50055`                        |
+| `BOT_REDIS_DB`         | redis table                     | `3`                            |
+| `BOT_TOKEN`            | bot token                       | `your_bot_token_here`          |
+| `BOT_BASE_URL`         | base URL for API calls          | `gateway:3000/api/v1`          |
+| `BOT_UPSTREAM_NAMES`   | upstream service name           | `tg_bot`                       |
+| `BOT_UPSTREAM_PORTS`   | upstream port                   | `50055`                        |
+| `BOT_TIMEOUTS`         | timeout for internal calls (ms) | `10000`                        |
+
+---
+
 > 🧠 All variables can be set local via `make copy_env` command
+
 
