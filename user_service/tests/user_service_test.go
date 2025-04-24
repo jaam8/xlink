@@ -131,6 +131,11 @@ func (m *mockUserStorageRepository) GetRole(userId string) (string, bool, bool, 
 	return args.String(0), args.Bool(1), args.Bool(2), args.Error(3)
 }
 
+func (m *mockUserStorageRepository) GetTokenByTgId(tgId int64) (string, error) {
+	args := m.Called(tgId)
+	return args.String(0), args.Error(1)
+}
+
 type mockShortenerRepository struct {
 	mock.Mock
 }
@@ -147,6 +152,11 @@ func TestCreateUser(t *testing.T) {
 
 	svc := service.New(cacheRepo, storageRepo, shortenerRepo)
 
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
+
 	tgId := int64(123456)
 	isStaff := true
 	isAdmin := false
@@ -161,7 +171,7 @@ func TestCreateUser(t *testing.T) {
 		IsAdmin: &isAdmin,
 	}
 
-	resp, err := svc.CreateUser(context.Background(), req)
+	resp, err := svc.CreateUser(ctx, req)
 
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -178,6 +188,11 @@ func TestGetUser(t *testing.T) {
 
 	svc := service.New(cacheRepo, storageRepo, shortenerRepo)
 
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
+
 	userId := "user123"
 
 	req := &user_service.GetUserRequest{
@@ -193,7 +208,7 @@ func TestGetUser(t *testing.T) {
 	storageRepo.On("GetUser", userId).Return(expectedUserId, expectedRole, expectedTgId, nil)
 	shortenerRepo.On("GetLinksCountByUserId", userId).Return(expectedLinkCount, nil)
 
-	resp, err := svc.GetUser(context.Background(), req)
+	resp, err := svc.GetUser(ctx, req)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -210,6 +225,11 @@ func TestGetUserIDByToken(t *testing.T) {
 
 	svc := service.New(cacheRepo, storageRepo, shortenerRepo)
 
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
+
 	token := "token321"
 
 	expectedUserID := "user99"
@@ -219,19 +239,24 @@ func TestGetUserIDByToken(t *testing.T) {
 
 	req := &user_service.GetUserIDByTokenRequest{Token: token}
 
-	resp, err := svc.GetUserIDByToken(context.Background(), req)
+	resp, err := svc.GetUserIDByToken(ctx, req)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	assert.Equal(t, resp.UserId, expectedUserID)
 	assert.Equal(t, resp.Status, expectedStatus)
 }
-func TestGetUserIDByTg(t *testing.T) {
+func TestGetUserIDByTgID(t *testing.T) {
 	cacheRepo := NewMockUsersCacheRepository()
 	storageRepo := new(mockUserStorageRepository)
 	shortenerRepo := new(mockShortenerRepository)
 
 	svc := service.New(cacheRepo, storageRepo, shortenerRepo)
+
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	tgId := int64(123456)
 
@@ -242,7 +267,7 @@ func TestGetUserIDByTg(t *testing.T) {
 
 	req := &user_service.GetUserIDByTgIDRequest{TgId: tgId}
 
-	resp, err := svc.GetUserIDByTgID(context.Background(), req)
+	resp, err := svc.GetUserIDByTgID(ctx, req)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -256,6 +281,11 @@ func TestUpdateUser(t *testing.T) {
 	shortenerRepo := new(mockShortenerRepository)
 
 	svc := service.New(cacheRepo, storageRepo, shortenerRepo)
+
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	userId := "user123"
 	tgId := int64(987654321)
@@ -273,7 +303,7 @@ func TestUpdateUser(t *testing.T) {
 
 	storageRepo.On("UpdateUser", userId, &tgId, &isStaff, &isAdmin).Return(expectedStatus, nil)
 
-	resp, err := svc.UpdateUser(context.Background(), req)
+	resp, err := svc.UpdateUser(ctx, req)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedStatus, resp.Status)
 
@@ -287,6 +317,11 @@ func TestDeleteUser(t *testing.T) {
 
 	svc := service.New(cacheRepo, storageRepo, shortenerRepo)
 
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
+
 	userId := "user123"
 	expectedStatus := true
 
@@ -294,7 +329,7 @@ func TestDeleteUser(t *testing.T) {
 
 	storageRepo.On("DeleteUser", userId).Return(expectedStatus, nil)
 
-	resp, err := svc.DeleteUser(context.Background(), req)
+	resp, err := svc.DeleteUser(ctx, req)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedStatus, resp.Status)
 
@@ -308,15 +343,20 @@ func TestGetRole(t *testing.T) {
 
 	svc := service.New(cacheRepo, storageRepo, shortenerRepo)
 
-	userId := "user123"
-	err := cacheRepo.SetRole(userId, true, false)
+	ctx, err := logger.New(context.Background())
 	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
+
+	userId := "user123"
+	setrolo_error := cacheRepo.SetRole(userId, true, false)
+	if setrolo_error != nil {
 		t.Errorf("failed to set role:%v", err)
 	}
 
 	req := &user_service.GetRoleRequest{UserId: userId}
 
-	resp, err := svc.GetRole(context.Background(), req)
+	resp, err := svc.GetRole(ctx, req)
 
 	assert.NoError(t, err)
 	assert.Equal(t, "staff", resp.Role)
@@ -324,14 +364,47 @@ func TestGetRole(t *testing.T) {
 	assert.False(t, resp.IsAdmin)
 }
 
+func TestGetTokenByTgId(t *testing.T) {
+	cacheRepo := NewMockUsersCacheRepository()
+	storageRepo := new(mockUserStorageRepository)
+	shortenerRepo := new(mockShortenerRepository)
+
+	s := service.New(cacheRepo, storageRepo, shortenerRepo)
+
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
+
+	tgId := int64(123456)
+
+	req := user_service.GetTokenByTgIdRequest{TgId: tgId}
+
+	token := "h384ntv873hc8wh8c7th3"
+
+	storageRepo.On("GetTokenByTgId", tgId).Return(token, nil)
+
+	resp, err := s.GetTokenByTgId(ctx, &req)
+	if err != nil {
+		t.Errorf("failed to get response from GetTokenByTgId:%v", err)
+	}
+
+	assert.Equal(t, token, resp.Token)
+}
+
 func TestCheckToken_EmptyUserId(t *testing.T) {
 	svc := service.New(NewMockUsersCacheRepository(), new(mockUserStorageRepository), new(mockShortenerRepository))
+
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
 
 	req := &user_service.TokenCheckRequest{
 		UserId: "",
 		Token:  "token123",
 	}
-	resp, err := svc.CheckToken(context.Background(), req)
+	resp, err := svc.CheckToken(ctx, req)
 
 	assert.Error(t, err)
 	assert.False(t, resp.Status)
@@ -341,11 +414,16 @@ func TestCheckToken_EmptyUserId(t *testing.T) {
 func TestCheckToken_EmptyToken(t *testing.T) {
 	svc := service.New(NewMockUsersCacheRepository(), new(mockUserStorageRepository), new(mockShortenerRepository))
 
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
+
 	req := &user_service.TokenCheckRequest{
 		UserId: "user123",
 		Token:  "",
 	}
-	resp, err := svc.CheckToken(context.Background(), req)
+	resp, err := svc.CheckToken(ctx, req)
 
 	assert.Error(t, err)
 	assert.False(t, resp.Status)
