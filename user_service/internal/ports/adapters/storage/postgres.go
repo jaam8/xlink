@@ -194,3 +194,20 @@ func (u *UserStorageRepositoryPostgres) GetRole(userId string) (string, bool, bo
 
 	return role, isStaff, isAdmin, nil
 }
+
+func (u *UserStorageRepositoryPostgres) GetTokenByTgId(tgId int64) (string, error) {
+	query := `SELECT token FROM user_service.users WHERE telegram_id = $1`
+
+	var token string
+
+	err := u.pool.QueryRow(context.Background(), query, tgId).Scan(&token)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return "", errors.New("(postgres) token doesn't exist")
+		} else {
+			return "", fmt.Errorf("(postgres) couldn't get token by tgId=%d: %v", tgId, err)
+		}
+	}
+
+	return token, nil
+}

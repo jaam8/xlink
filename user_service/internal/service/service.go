@@ -229,3 +229,14 @@ func (s *Service) GetRole(ctx context.Context, req *user_service.GetRoleRequest)
 		IsAdmin: isAdmin,
 	}, nil
 }
+
+func (s *Service) GetTokenByTgId(ctx context.Context, req *user_service.GetTokenByTgIdRequest) (*user_service.GetTokenByTgIdResponse, error) {
+	// try to get the token from storage
+	token, err := s.storageRepo.GetTokenByTgId(req.TgId)
+	if err != nil {
+		return &user_service.GetTokenByTgIdResponse{},
+			fmt.Errorf("couldn't get token for tgId='%d': %v", req.TgId, err)
+	}
+
+	return &user_service.GetTokenByTgIdResponse{Token: token}, nil
+}
