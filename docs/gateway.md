@@ -6,23 +6,23 @@
 
 #### Common part
 
-- /api/v1/user/crud POST
-- /api/v1/user/crud/:id PATCH
+- /api/v1/user/create POST
+- /api/v1/user/update/:id PATCH
 - /api/v1/user/refresh POST
 - /api/v1/user/login POST
 
 #### For staff
 
-- /api/v1/user/staff/crud/:id GET
+- /api/v1/user/staff/get/:id GET
 - /api/v1/user/staff/get/by-tg-id/:tgId GET
-- /api/v1/user/staff/crud/:id DELETE
+- /api/v1/user/staff/delete/:id DELETE
 - /api/v1/user/staff/role/:id GET
 
 #### For admins
 
-- /api/v1/user/admin/crud POST
-- /api/v1/user/admin/crud/:id PATCH
-- /api/v1/user/admin/crud/:id DELETE
+- /api/v1/user/admin/create POST
+- /api/v1/user/admin/update/:id PATCH
+- /api/v1/user/admin/delete/:id DELETE
 - /api/v1/user/admin/get-by-token POST <- POST потому что иначе токен передавался бы в url а это уязвимость
 - /api/v1/user/admin/token-check POST <- POST по той же причине
 
@@ -35,17 +35,17 @@
 #### Common part
 
 - /l/:shortLink GET
-- /api/v1/s/crud/ POST <- create
+- /api/v1/s/create/ POST <- create
 
 #### For link owner
 
-- /api/v1/s/crud/owner/:id PUT
-- /api/v1/s/crud/owner/:id DELETE
+- /api/v1/s/crud/owner/update/:id PUT
+- /api/v1/s/crud/owner/delete/:id DELETE
 
 #### For admins
 
-- /api/v1/s/crud/admin/:id PUT
-- /api/v1/s/crud/admin/:id DELETE
+- /api/v1/s/crud/admin/delete/:id PUT
+- /api/v1/s/crud/admin/delete/:id DELETE
 
 ### Analytics (auth'd users only)
 
@@ -64,13 +64,13 @@
 
 #### Common part
 
-- /api/v1/user/crud POST
+- /api/v1/user/create POST
 
 | Input               | Output                                 | Summary                                            |
 |---------------------|----------------------------------------|----------------------------------------------------|
 | `{"tg_id": *int64}` | `{"user_id": string, "token": string}` | Create user with `is_staff` & `is_admin` set to **false** |
 
-- /api/v1/user/crud/:id PATCH
+- /api/v1/user/update/:id PATCH
 
 | Input              | Output             | Summary                                                   |
 |--------------------|--------------------|-----------------------------------------------------------|
@@ -84,7 +84,7 @@
 
 #### For staff
 
-- /api/v1/user/staff/crud/:id GET
+- /api/v1/user/staff/get/:id GET
 
 | Input                                                             | Output                                                                       | Summary                                    |
 |-------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------|
@@ -96,7 +96,7 @@
 |---------------------------------------------------------------------|------------------------------------------------------------------------------|-----------------------------------------|
 | Requires _'Authorization'_ header <br> **tg_id** - int64 (in query) | `{"user_id": string, "status": bool}` | Get user by **tg_id** given **in query** |
 
-- /api/v1/user/staff/crud/:id DELETE
+- /api/v1/user/staff/delete/:id DELETE
 
 | Input                                                             | Output                                                                      | Summary                                  |
 |-------------------------------------------------------------------|-----------------------------------------------------------------------------|------------------------------------------|
@@ -116,19 +116,19 @@
 
 #### For admins
 
-- /api/v1/user/admin/crud POST
+- /api/v1/user/admin/create POST
 
 | Input                                                                                          | Output                                 | Summary         |
 |------------------------------------------------------------------------------------------------|----------------------------------------|-----------------|
 | Requires _'Authorization'_ header <br> `{"tg_id": *int64, "is_admin": bool, "is_staff": bool}` | `{"user_id": string, "token": string}` | Create new user |
 
-- /api/v1/user/admin/crud/:id PATCH
+- /api/v1/user/admin/update/:id PATCH
 
 | Input                                                                                          | Output                                 | Summary         |
 |------------------------------------------------------------------------------------------------|----------------------------------------|-----------------|
 | Requires _'Authorization'_ header <br> `{"tg_id": *int64, "is_admin": bool, "is_staff": bool}` | `{"user_id": string, "token": string}` | Create new user |
 
-- /api/v1/user/admin/crud/:id DELETE
+- /api/v1/user/admin/delete/:id DELETE
 
 | Input                                                             | Output             | Summary                                  |
 |-------------------------------------------------------------------|--------------------|------------------------------------------|
@@ -164,7 +164,7 @@
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|--------------------------------------------------------------------------------------|
 | **shortLink** - string (in **path**) <br> _referrer_ - string (in **header**: "HTTP_REFERER") <br> _visitorToken_ - string (in **cookie**: "xlinkVisitor")    | Redirect to target url | Send given **short link** and request info, then redirect to target url in response. |
 
-- /api/v1/s/crud/ POST <- create
+- /api/v1/s/crud/create POST <- create
 
 | Input                                            | Output                                                                                                                           | Summary                                                                                                                                           |
 |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -172,13 +172,13 @@
 
 #### For link owner
 
-- /api/v1/s/crud/owner/:id PUT
+- /api/v1/s/crud/owner/update/:id PUT
 
 | Input                                                                                                                                                                    | Output                                                                                                                          | Summary                                                                                                                                             |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | Requires _'Authorization'_ header <br> **link_id** - string (in **path**) <br> `{"regenerate": bool, "short_link": *string, "target_url": string, "expire_at": *string}` | `{"link_id": string, "user_id": string, "short_link": string, "target_url": string, "created_at": string, "expire_at": string}` | Update link with given data <br> **short_link** is generated if **generated** == true <br>  **user_id** is got from auth token (_GetUserIDByToken_) |
 
-- /api/v1/s/crud/owner/:id DELETE
+- /api/v1/s/crud/owner/delete/:id DELETE
 
 | Input                                                                     | Output             | Summary                                                                                                        |
 |---------------------------------------------------------------------------|--------------------|----------------------------------------------------------------------------------------------------------------|
@@ -186,13 +186,13 @@
 
 #### For admins
 
-- /api/v1/s/crud/admin/:id PUT
+- /api/v1/s/crud/admin/delete/:id PUT
 
 | Input                                                                                                                                                                    | Output                                                                                                                          | Summary                                                                                                                                             |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | Requires _'Authorization'_ header <br> **link_id** - string (in **path**) <br> `{"regenerate": bool, "short_link": *string, "target_url": string, "expire_at": *string}` | `{"link_id": string, "user_id": string, "short_link": string, "target_url": string, "created_at": string, "expire_at": string}` | Update link with given data <br> **short_link** is generated if **generated** == true <br>  **user_id** is got from auth token (_GetUserIDByToken_) |
 
-- /api/v1/s/crud/admin/:id DELETE
+- /api/v1/s/crud/admin/delete/:id DELETE
 
 | Input                                                                     | Output             | Summary                                                                                                        |
 |---------------------------------------------------------------------------|--------------------|----------------------------------------------------------------------------------------------------------------|
