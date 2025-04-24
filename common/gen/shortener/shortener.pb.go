@@ -220,7 +220,7 @@ type UpdateLinkRequest struct {
 	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Regenerate    bool                   `protobuf:"varint,3,opt,name=regenerate,proto3" json:"regenerate,omitempty"`
 	ShortLink     *string                `protobuf:"bytes,4,opt,name=short_link,json=shortLink,proto3,oneof" json:"short_link,omitempty"`
-	TargetUrl     string                 `protobuf:"bytes,5,opt,name=target_url,json=targetUrl,proto3" json:"target_url,omitempty"`
+	TargetUrl     *string                `protobuf:"bytes,5,opt,name=target_url,json=targetUrl,proto3,oneof" json:"target_url,omitempty"`
 	ExpireAt      *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expire_at,json=expireAt,proto3,oneof" json:"expire_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -285,8 +285,8 @@ func (x *UpdateLinkRequest) GetShortLink() string {
 }
 
 func (x *UpdateLinkRequest) GetTargetUrl() string {
-	if x != nil {
-		return x.TargetUrl
+	if x != nil && x.TargetUrl != nil {
+		return *x.TargetUrl
 	}
 	return ""
 }
@@ -754,6 +754,95 @@ func (x *GetLinkOwnerByShortLinkResponse) GetLinkOwner() string {
 	return ""
 }
 
+// =================== Get Link Id By ShortLink =========================
+type GetLinkIdByShortLinkRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ShortLink     string                 `protobuf:"bytes,1,opt,name=short_link,json=shortLink,proto3" json:"short_link,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLinkIdByShortLinkRequest) Reset() {
+	*x = GetLinkIdByShortLinkRequest{}
+	mi := &file_api_shortener_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLinkIdByShortLinkRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLinkIdByShortLinkRequest) ProtoMessage() {}
+
+func (x *GetLinkIdByShortLinkRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_shortener_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLinkIdByShortLinkRequest.ProtoReflect.Descriptor instead.
+func (*GetLinkIdByShortLinkRequest) Descriptor() ([]byte, []int) {
+	return file_api_shortener_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetLinkIdByShortLinkRequest) GetShortLink() string {
+	if x != nil {
+		return x.ShortLink
+	}
+	return ""
+}
+
+type GetLinkIdByShortLinkResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	LinkId        string                 `protobuf:"bytes,1,opt,name=link_id,json=linkId,proto3" json:"link_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLinkIdByShortLinkResponse) Reset() {
+	*x = GetLinkIdByShortLinkResponse{}
+	mi := &file_api_shortener_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLinkIdByShortLinkResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLinkIdByShortLinkResponse) ProtoMessage() {}
+
+func (x *GetLinkIdByShortLinkResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_shortener_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLinkIdByShortLinkResponse.ProtoReflect.Descriptor instead.
+func (*GetLinkIdByShortLinkResponse) Descriptor() ([]byte, []int) {
+	return file_api_shortener_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetLinkIdByShortLinkResponse) GetLinkId() string {
+	if x != nil {
+		return x.LinkId
+	}
+	return ""
+}
+
 var File_api_shortener_proto protoreflect.FileDescriptor
 
 const file_api_shortener_proto_rawDesc = "" +
@@ -777,7 +866,7 @@ const file_api_shortener_proto_rawDesc = "" +
 	"short_link\x18\x02 \x01(\tH\x00R\tshortLink\x88\x01\x01\x12\x1d\n" +
 	"\n" +
 	"target_url\x18\x03 \x01(\tR\ttargetUrlB\r\n" +
-	"\v_short_link\"\x83\x02\n" +
+	"\v_short_link\"\x97\x02\n" +
 	"\x11UpdateLinkRequest\x12\x17\n" +
 	"\alink_id\x18\x01 \x01(\tR\x06linkId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1e\n" +
@@ -785,11 +874,12 @@ const file_api_shortener_proto_rawDesc = "" +
 	"regenerate\x18\x03 \x01(\bR\n" +
 	"regenerate\x12\"\n" +
 	"\n" +
-	"short_link\x18\x04 \x01(\tH\x00R\tshortLink\x88\x01\x01\x12\x1d\n" +
+	"short_link\x18\x04 \x01(\tH\x00R\tshortLink\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"target_url\x18\x05 \x01(\tR\ttargetUrl\x12<\n" +
-	"\texpire_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\bexpireAt\x88\x01\x01B\r\n" +
-	"\v_short_linkB\f\n" +
+	"target_url\x18\x05 \x01(\tH\x01R\ttargetUrl\x88\x01\x01\x12<\n" +
+	"\texpire_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampH\x02R\bexpireAt\x88\x01\x01B\r\n" +
+	"\v_short_linkB\r\n" +
+	"\v_target_urlB\f\n" +
 	"\n" +
 	"_expire_at\"V\n" +
 	"\tUserAgent\x12\x18\n" +
@@ -824,7 +914,12 @@ const file_api_shortener_proto_rawDesc = "" +
 	"short_link\x18\x01 \x01(\tR\tshortLink\"@\n" +
 	"\x1fGetLinkOwnerByShortLinkResponse\x12\x1d\n" +
 	"\n" +
-	"link_owner\x18\x01 \x01(\tR\tlinkOwner2\xe0\x03\n" +
+	"link_owner\x18\x01 \x01(\tR\tlinkOwner\"<\n" +
+	"\x1bGetLinkIdByShortLinkRequest\x12\x1d\n" +
+	"\n" +
+	"short_link\x18\x01 \x01(\tR\tshortLink\"7\n" +
+	"\x1cGetLinkIdByShortLinkResponse\x12\x17\n" +
+	"\alink_id\x18\x01 \x01(\tR\x06linkId2\xbd\x04\n" +
 	"\x10ShortenerService\x127\n" +
 	"\bRedirect\x12\x14.api.RedirectRequest\x1a\x15.api.RedirectResponse\x12)\n" +
 	"\aGetLink\x12\x13.api.GetLinkRequest\x1a\t.api.Link\x122\n" +
@@ -834,7 +929,8 @@ const file_api_shortener_proto_rawDesc = "" +
 	"\n" +
 	"DeleteLink\x12\x16.api.DeleteLinkRequest\x1a\x17.api.DeleteLinkResponse\x12^\n" +
 	"\x15GetLinksCountByUserId\x12!.api.GetLinksCountByUserIdRequest\x1a\".api.GetLinksCountByUserIdResponse\x12d\n" +
-	"\x17GetLinkOwnerByShortLink\x12#.api.GetLinkOwnerByShortLinkRequest\x1a$.api.GetLinkOwnerByShortLinkResponseB\x16Z\x14common/gen/shortenerb\x06proto3"
+	"\x17GetLinkOwnerByShortLink\x12#.api.GetLinkOwnerByShortLinkRequest\x1a$.api.GetLinkOwnerByShortLinkResponse\x12[\n" +
+	"\x14GetLinkIdByShortLink\x12 .api.GetLinkIdByShortLinkRequest\x1a!.api.GetLinkIdByShortLinkResponseB\x16Z\x14common/gen/shortenerb\x06proto3"
 
 var (
 	file_api_shortener_proto_rawDescOnce sync.Once
@@ -848,7 +944,7 @@ func file_api_shortener_proto_rawDescGZIP() []byte {
 	return file_api_shortener_proto_rawDescData
 }
 
-var file_api_shortener_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_api_shortener_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_api_shortener_proto_goTypes = []any{
 	(*Link)(nil),                            // 0: api.Link
 	(*GetLinkRequest)(nil),                  // 1: api.GetLinkRequest
@@ -863,13 +959,15 @@ var file_api_shortener_proto_goTypes = []any{
 	(*GetLinksCountByUserIdResponse)(nil),   // 10: api.GetLinksCountByUserIdResponse
 	(*GetLinkOwnerByShortLinkRequest)(nil),  // 11: api.GetLinkOwnerByShortLinkRequest
 	(*GetLinkOwnerByShortLinkResponse)(nil), // 12: api.GetLinkOwnerByShortLinkResponse
-	(*timestamppb.Timestamp)(nil),           // 13: google.protobuf.Timestamp
+	(*GetLinkIdByShortLinkRequest)(nil),     // 13: api.GetLinkIdByShortLinkRequest
+	(*GetLinkIdByShortLinkResponse)(nil),    // 14: api.GetLinkIdByShortLinkResponse
+	(*timestamppb.Timestamp)(nil),           // 15: google.protobuf.Timestamp
 }
 var file_api_shortener_proto_depIdxs = []int32{
-	13, // 0: api.Link.created_at:type_name -> google.protobuf.Timestamp
-	13, // 1: api.Link.expire_at:type_name -> google.protobuf.Timestamp
-	13, // 2: api.UpdateLinkRequest.expire_at:type_name -> google.protobuf.Timestamp
-	13, // 3: api.RedirectRequest.clicked_at:type_name -> google.protobuf.Timestamp
+	15, // 0: api.Link.created_at:type_name -> google.protobuf.Timestamp
+	15, // 1: api.Link.expire_at:type_name -> google.protobuf.Timestamp
+	15, // 2: api.UpdateLinkRequest.expire_at:type_name -> google.protobuf.Timestamp
+	15, // 3: api.RedirectRequest.clicked_at:type_name -> google.protobuf.Timestamp
 	4,  // 4: api.RedirectRequest.user_agent:type_name -> api.UserAgent
 	5,  // 5: api.ShortenerService.Redirect:input_type -> api.RedirectRequest
 	1,  // 6: api.ShortenerService.GetLink:input_type -> api.GetLinkRequest
@@ -878,15 +976,17 @@ var file_api_shortener_proto_depIdxs = []int32{
 	7,  // 9: api.ShortenerService.DeleteLink:input_type -> api.DeleteLinkRequest
 	9,  // 10: api.ShortenerService.GetLinksCountByUserId:input_type -> api.GetLinksCountByUserIdRequest
 	11, // 11: api.ShortenerService.GetLinkOwnerByShortLink:input_type -> api.GetLinkOwnerByShortLinkRequest
-	6,  // 12: api.ShortenerService.Redirect:output_type -> api.RedirectResponse
-	0,  // 13: api.ShortenerService.GetLink:output_type -> api.Link
-	0,  // 14: api.ShortenerService.CreateNewLink:output_type -> api.Link
-	0,  // 15: api.ShortenerService.UpdateLink:output_type -> api.Link
-	8,  // 16: api.ShortenerService.DeleteLink:output_type -> api.DeleteLinkResponse
-	10, // 17: api.ShortenerService.GetLinksCountByUserId:output_type -> api.GetLinksCountByUserIdResponse
-	12, // 18: api.ShortenerService.GetLinkOwnerByShortLink:output_type -> api.GetLinkOwnerByShortLinkResponse
-	12, // [12:19] is the sub-list for method output_type
-	5,  // [5:12] is the sub-list for method input_type
+	13, // 12: api.ShortenerService.GetLinkIdByShortLink:input_type -> api.GetLinkIdByShortLinkRequest
+	6,  // 13: api.ShortenerService.Redirect:output_type -> api.RedirectResponse
+	0,  // 14: api.ShortenerService.GetLink:output_type -> api.Link
+	0,  // 15: api.ShortenerService.CreateNewLink:output_type -> api.Link
+	0,  // 16: api.ShortenerService.UpdateLink:output_type -> api.Link
+	8,  // 17: api.ShortenerService.DeleteLink:output_type -> api.DeleteLinkResponse
+	10, // 18: api.ShortenerService.GetLinksCountByUserId:output_type -> api.GetLinksCountByUserIdResponse
+	12, // 19: api.ShortenerService.GetLinkOwnerByShortLink:output_type -> api.GetLinkOwnerByShortLinkResponse
+	14, // 20: api.ShortenerService.GetLinkIdByShortLink:output_type -> api.GetLinkIdByShortLinkResponse
+	13, // [13:21] is the sub-list for method output_type
+	5,  // [5:13] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -905,7 +1005,7 @@ func file_api_shortener_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_shortener_proto_rawDesc), len(file_api_shortener_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

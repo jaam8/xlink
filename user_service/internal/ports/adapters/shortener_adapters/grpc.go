@@ -46,7 +46,7 @@ func (s *ShortenerRepositoryGRPC) GetLinksCountByUserId(userId string) (int32, e
 
 	defer conn.Close() //nolint:all
 
-	resultChan := make(chan int32)
+	resultChan := make(chan int32, 1)
 
 	err = callers.Timeout(func() error {
 		request := &shortener.GetLinksCountByUserIdRequest{UserId: userId}
@@ -62,5 +62,6 @@ func (s *ShortenerRepositoryGRPC) GetLinksCountByUserId(userId string) (int32, e
 		return 0, fmt.Errorf("couldn't get shortener.GetLinksCountByUserIdRequest gRPC response: %v", err)
 	}
 	linkCount := <-resultChan
+	close(resultChan)
 	return linkCount, nil
 }

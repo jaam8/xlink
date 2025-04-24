@@ -100,8 +100,7 @@ func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *m
 
 	updateBuilder := squirrel.Update("shortener.urls").
 		Where(squirrel.Eq{"id": newLinkWithExistingId.Id}).
-		Set("user_id", newLinkWithExistingId.UserId).
-		Set("url", newLinkWithExistingId.TargetUrl)
+		Set("user_id", newLinkWithExistingId.UserId)
 
 	if newLinkWithExistingId.Generated != nil {
 		updateBuilder = updateBuilder.Set("generated", newLinkWithExistingId.Generated)
@@ -113,6 +112,10 @@ func (s *ShortenerStorageRepositoryPostgres) UpdateLink(newLinkWithExistingId *m
 
 	if newLinkWithExistingId.ExpireAt != nil {
 		updateBuilder = updateBuilder.Set("expire_at", newLinkWithExistingId.ExpireAt)
+	}
+
+	if newLinkWithExistingId.TargetUrl != nil {
+		updateBuilder = updateBuilder.Set("url", newLinkWithExistingId.TargetUrl)
 	}
 
 	sql, args, err := updateBuilder.PlaceholderFormat(squirrel.Dollar).ToSql()
@@ -186,4 +189,22 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinkOwnerByShortLink(shortLink s
 		return "", fmt.Errorf("couldn't get link owner by short link '%s': %w", shortLink, err)
 	}
 	return userId, nil
+}
+
+func (s *ShortenerStorageRepositoryPostgres) GetLinkIdByShortLink(shortLink string) (string, error) {
+	var linkId string
+	sql, args, err := squirrel.Select("id").
+		From("shortener.urls").
+		Where(squirrel.Eq{"short_link": shortLink}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return "", fmt.Errorf("couldn't build an SQL query: %w", err)
+	}
+
+	err = s.PostgresPool.QueryRow(context.Background(), sql, args...).Scan(&linkId)
+	if err != nil {
+		return "", fmt.Errorf("couldn't get link id by shortLink='%s': %w", shortLink, err)
+	}
+	return linkId, nil
 }

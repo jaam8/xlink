@@ -9,6 +9,6 @@ type CreateLinkSchema struct {
 type UpdateLinkSchema struct {
 	Regenerate bool    `json:"regenerate"`
 	ShortLink  *string `json:"short_link,omitempty"`
-	TargetUrl  string  `json:"target_url"`
+	TargetUrl  *string `json:"target_url,omitempty"`
 	ExpireAt   string  `json:"expire_at"`
 }

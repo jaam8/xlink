@@ -14,6 +14,7 @@ service ShortenerService {
   rpc DeleteLink(DeleteLinkRequest) returns (DeleteLinkResponse);
   rpc GetLinksCountByUserId(GetLinksCountByUserIdRequest) returns (GetLinksCountByUserIdResponse);
   rpc GetLinkOwnerByShortLink(GetLinkOwnerByShortLinkRequest) returns (GetLinkOwnerByShortLinkResponse);
+  rpc GetLinkIdByShortLink(GetLinkIdByShortLinkRequest) returns (GetLinkIdByShortLinkResponse);
 }
 
 // ======================== Link ========================
@@ -44,7 +45,7 @@ message UpdateLinkRequest {
   string user_id = 2;
   bool regenerate = 3;
   optional string short_link = 4;
-  string target_url = 5;
+  optional string target_url = 5;
   optional google.protobuf.Timestamp expire_at = 6;
 }
 
@@ -93,4 +94,13 @@ message GetLinkOwnerByShortLinkRequest {
 
 message GetLinkOwnerByShortLinkResponse {
   string link_owner = 1;
+}
+
+// =================== Get Link Id By ShortLink =========================
+message GetLinkIdByShortLinkRequest {
+  string short_link = 1;
+}
+
+message GetLinkIdByShortLinkResponse {
+  string link_id = 1;
 }
