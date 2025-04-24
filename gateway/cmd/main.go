@@ -141,9 +141,11 @@ func main() {
 	userGroup := v1Group.Group("/user")
 	userAdminGroup := userGroup.Group("/admin")
 	userStaffGroup := userGroup.Group("/staff")
+	userAuthedGroup := userGroup.Group("/auth-d")
 
 	userAdminGroup.Use(isAdminMiddleware)
 	userStaffGroup.Use(isStaffMiddleware)
+	userAuthedGroup.Use(authMiddleware)
 
 	userGroup.Post("/create", userServiceHandler.CreateUser)          //
 	userGroup.Patch("/:id", userServiceHandler.UpdateUser)            //
@@ -160,6 +162,8 @@ func main() {
 	userAdminGroup.Delete("/delete/:id", userServiceHandler.DeleteUserAdmin)  // admin
 	userAdminGroup.Post("/get/by-token", userServiceHandler.GetUserIDByToken) // admin
 	userAdminGroup.Post("/token/check", userServiceHandler.CheckToken)        // admin
+
+	userAuthedGroup.Get("/profile", userServiceHandler.Profile)
 	//endregion user v1
 
 	//region shortener v1
