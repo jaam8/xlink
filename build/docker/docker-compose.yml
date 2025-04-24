@@ -180,6 +180,13 @@ services:
       - clickhouse-config:/etc/clickhouse-server/config.d
       - clickhouse-users:/etc/clickhouse-server/users.d
 
+  entry_nginx:
+    image: nginx:latest
+    ports:
+      - ${NGINX_ENTRY_PORT}:${NGINX_ENTRY_PORT}
+    volumes:
+      - ./build/entry_nginx/conf.d:/etc/nginx/conf.d
+
 
 volumes:
   go-mod-cache:
