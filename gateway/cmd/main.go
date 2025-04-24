@@ -167,7 +167,7 @@ func main() {
 	//endregion user v1
 
 	//region shortener v1
-	shortenerGroup := v1Group.Group("/s")
+	shortenerGroup := v1Group.Group("/l")
 
 	shortenerCRUDGroup := shortenerGroup.Group("/crud")
 	shortenerCRUDGroup.Use(authMiddleware)
@@ -175,7 +175,7 @@ func main() {
 	shortenerAdminGroup := shortenerCRUDGroup.Group("/admin")
 	shortenerAdminGroup.Use(isAdminMiddleware)
 
-	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("/owner")
+	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("")
 	shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("id", shortenerService))
 
 	//TODO: id -> shortLink
