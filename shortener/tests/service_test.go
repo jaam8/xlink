@@ -62,6 +62,11 @@ func (m *mokShortenerStorageRepository) GetLinkOwnerByShortLink(shortLink string
 	return args.Get(0).(string), args.Error(1)
 }
 
+func (m *mokShortenerStorageRepository) GetLinkIdByShortLink(shortLink string) (string, error) {
+	args := m.Called(shortLink)
+	return args.Get(0).(string), args.Error(1)
+}
+
 type mokShortenerSenderRepository struct{ mock.Mock }
 
 func (m *mokShortenerSenderRepository) SendClick(ctx context.Context, click *models.Click) error {
@@ -88,6 +93,7 @@ func TestGetLink(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
+	targetUrl := "http://qwertysdijvnisdnc"
 	createdAtStr := "2025-04-16T11:28:06+03:00"
 	expireAtStr := "2025-04-16T11:28:07+03:00"
 
@@ -114,7 +120,7 @@ func TestGetLink(t *testing.T) {
 		UserId:    userUUID,
 		Generated: &generated,
 		ShortLink: &shortLinkStr,
-		TargetUrl: "http://qwertysdijvnisdnc",
+		TargetUrl: &targetUrl,
 		CreatedAt: createdAtTime,
 		ExpireAt:  &expireAtTime,
 	}
@@ -130,7 +136,7 @@ func TestGetLink(t *testing.T) {
 	assert.Equal(t, expectedModel.Id.String(), testGetLinkResponse.LinkId)
 	assert.Equal(t, expectedModel.UserId.String(), testGetLinkResponse.UserId)
 	assert.Equal(t, *expectedModel.ShortLink, testGetLinkResponse.ShortLink)
-	assert.Equal(t, expectedModel.TargetUrl, testGetLinkResponse.TargetUrl)
+	assert.Equal(t, *expectedModel.TargetUrl, testGetLinkResponse.TargetUrl)
 	assert.Equal(t, timestamppb.New(expectedModel.CreatedAt), testGetLinkResponse.CreatedAt)
 	assert.Equal(t, timestamppb.New(*expectedModel.ExpireAt), testGetLinkResponse.ExpireAt)
 
@@ -152,6 +158,7 @@ func TestCreateNewLink(t *testing.T) {
 
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
+	targetUrl := "http://qwertysdijvnisdnc"
 
 	testCreateLinkRequest := shortener.CreateLinkRequest{
 		UserId:    userIDStr,
@@ -177,7 +184,7 @@ func TestCreateNewLink(t *testing.T) {
 		UserId:    userUUID,
 		Generated: &generated,
 		ShortLink: &shortLinkStr,
-		TargetUrl: "http://qwertysdijvnisdnc",
+		TargetUrl: &targetUrl,
 		CreatedAt: time.Now(),
 		ExpireAt:  &expireAtTime,
 	}
@@ -193,7 +200,7 @@ func TestCreateNewLink(t *testing.T) {
 	assert.Equal(t, expectedModel.Id.String(), testCreateNewLinkResponse.LinkId)
 	assert.Equal(t, expectedModel.UserId.String(), testCreateNewLinkResponse.UserId)
 	assert.Equal(t, *expectedModel.ShortLink, testCreateNewLinkResponse.ShortLink)
-	assert.Equal(t, expectedModel.TargetUrl, testCreateNewLinkResponse.TargetUrl)
+	assert.Equal(t, *expectedModel.TargetUrl, testCreateNewLinkResponse.TargetUrl)
 	assert.Equal(t, timestamppb.New(expectedModel.CreatedAt), testCreateNewLinkResponse.CreatedAt)
 	assert.Equal(t, timestamppb.New(*expectedModel.ExpireAt), testCreateNewLinkResponse.ExpireAt)
 
@@ -217,6 +224,7 @@ func TestUpdateLink(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
+	targetUrl := "http://qwertysdijvnisdnc"
 	expireAtStr := "2025-05-16T11:28:07+03:00"
 
 	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
@@ -232,7 +240,7 @@ func TestUpdateLink(t *testing.T) {
 		UserId:     userIDStr,
 		Regenerate: regenerated,
 		ShortLink:  &shortLinkStr,
-		TargetUrl:  "http://qwertysdijvnisdnc",
+		TargetUrl:  &targetUrl,
 		ExpireAt:   expireAtTimestamppb,
 	}
 
@@ -253,7 +261,7 @@ func TestUpdateLink(t *testing.T) {
 		UserId:    userUUID,
 		Generated: &regenerated,
 		ShortLink: &newShortLink,
-		TargetUrl: "http://qwertysdijvnisdnc",
+		TargetUrl: &targetUrl,
 		CreatedAt: createdAtTime,
 		ExpireAt:  &expireAtTime,
 	}
@@ -269,7 +277,7 @@ func TestUpdateLink(t *testing.T) {
 	assert.Equal(t, expectedModel.Id.String(), testUpdateLinkResponse.LinkId)
 	assert.Equal(t, expectedModel.UserId.String(), testUpdateLinkResponse.UserId)
 	assert.Equal(t, *expectedModel.ShortLink, testUpdateLinkResponse.ShortLink)
-	assert.Equal(t, expectedModel.TargetUrl, testUpdateLinkResponse.TargetUrl)
+	assert.Equal(t, *expectedModel.TargetUrl, testUpdateLinkResponse.TargetUrl)
 	assert.Equal(t, timestamppb.New(expectedModel.CreatedAt), testUpdateLinkResponse.CreatedAt)
 	assert.Equal(t, timestamppb.New(*expectedModel.ExpireAt), testUpdateLinkResponse.ExpireAt)
 
@@ -292,6 +300,7 @@ func TestDeleteLink(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
+	targetUrl := "http://qwertysdijvnisdnc"
 	createdAtStr := "2025-04-16T11:28:06+03:00"
 	expireAtStr := "2025-04-16T11:28:07+03:00"
 
@@ -318,7 +327,7 @@ func TestDeleteLink(t *testing.T) {
 		UserId:    userUUID,
 		Generated: &generated,
 		ShortLink: &shortLinkStr,
-		TargetUrl: "http://qwertysdijvnisdnc",
+		TargetUrl: &targetUrl,
 		CreatedAt: createdAtTime,
 		ExpireAt:  &expireAtTime,
 	}
@@ -438,5 +447,34 @@ func TestGetLinkOwnerByShortLink(t *testing.T) {
 	}
 
 	assert.Equal(t, userIDStr, resp.LinkOwner)
+
+}
+
+func TestGetLinkIdByShortLink(t *testing.T) {
+	testShortenerCacheRepository := new(mokShortenerCacheRepository)
+	testShortenerStorageRepository := new(mokShortenerStorageRepository)
+	testShortenerSenderRepository := new(mokShortenerSenderRepository)
+
+	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
+
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
+
+	shortLink := "qwerty"
+
+	req := shortener.GetLinkIdByShortLinkRequest{ShortLink: shortLink}
+
+	linkId := "f9e71cb4-e1e1-4721-8eef-887338db7247"
+
+	testShortenerStorageRepository.On("GetLinkIdByShortLink", mock.AnythingOfType("string")).Return(linkId, nil)
+
+	resp, err := s.GetLinkIdByShortLink(ctx, &req)
+	if err != nil {
+		t.Errorf("cant get link owner by short link:%v", err)
+	}
+
+	assert.Equal(t, linkId, resp.LinkId)
 
 }

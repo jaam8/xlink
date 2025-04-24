@@ -18,6 +18,7 @@ func TestLinkResponseFromLinkModel(t *testing.T) {
 
 	gen := true
 	shortLink := "qwerty"
+	targetUrl := "https://syubfugsebfuyegfbyu"
 	expireAt := time.Now()
 
 	model := models.Link{
@@ -25,7 +26,7 @@ func TestLinkResponseFromLinkModel(t *testing.T) {
 		UserId:    uuid.New(),
 		Generated: &gen,
 		ShortLink: &shortLink,
-		TargetUrl: "https://syubfugsebfuyegfbyu",
+		TargetUrl: &targetUrl,
 		CreatedAt: time.Now(),
 		ExpireAt:  &expireAt,
 	}
@@ -35,7 +36,7 @@ func TestLinkResponseFromLinkModel(t *testing.T) {
 	assert.Equal(t, model.Id.String(), resp.LinkId)
 	assert.Equal(t, model.UserId.String(), resp.UserId)
 	assert.Equal(t, *model.ShortLink, resp.ShortLink)
-	assert.Equal(t, model.TargetUrl, resp.TargetUrl)
+	assert.Equal(t, *model.TargetUrl, resp.TargetUrl)
 	assert.Equal(t, timestamppb.New(model.CreatedAt), resp.CreatedAt)
 	assert.Equal(t, timestamppb.New(expireAt), resp.ExpireAt)
 }
@@ -58,12 +59,14 @@ func TestLinkModelFromLinkCreateRequest_with_ready_shortlink(t *testing.T) {
 	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
 	require.NoError(t, err)
 
+	targetUrl := "http://qwertysdijvnisdnc"
+
 	generated := false
 
 	expectedModel := models.Link{
 		UserId:    userUUID,
 		ShortLink: &shortLinkStr,
-		TargetUrl: "http://qwertysdijvnisdnc",
+		TargetUrl: &targetUrl,
 		ExpireAt:  &expireAtTime,
 		Generated: &generated,
 	}
@@ -101,12 +104,14 @@ func TestLinkModelFromLinkCreateRequest_without_ready_shortlink(t *testing.T) {
 
 	generated := true
 
+	targetUrl := "http://qwertysdijvnisdnc"
+
 	shortLinkForModel := "nsuidfhuyefbuye"
 
 	expectedModel := models.Link{
 		UserId:    userUUID,
 		ShortLink: &shortLinkForModel,
-		TargetUrl: "http://qwertysdijvnisdnc",
+		TargetUrl: &targetUrl,
 		ExpireAt:  &expireAtTime,
 		Generated: &generated,
 	}
@@ -129,6 +134,7 @@ func TestLinkModelFromLinkUpdateRequest_with_regenarating(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
+	targerUrl := "http://qwertysdijvnisdnc"
 	expireAtStr := "2025-05-16T11:28:07+03:00"
 
 	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
@@ -144,7 +150,7 @@ func TestLinkModelFromLinkUpdateRequest_with_regenarating(t *testing.T) {
 		UserId:     userIDStr,
 		Regenerate: regenerated,
 		ShortLink:  &shortLinkStr,
-		TargetUrl:  "http://qwertysdijvnisdnc",
+		TargetUrl:  &targerUrl,
 		ExpireAt:   expireAtTimestamppb,
 	}
 
@@ -165,7 +171,7 @@ func TestLinkModelFromLinkUpdateRequest_with_regenarating(t *testing.T) {
 		UserId:    userUUID,
 		Generated: &regenerated,
 		ShortLink: &newShortLink,
-		TargetUrl: "http://qwertysdijvnisdnc",
+		TargetUrl: &targerUrl,
 		CreatedAt: createdAtTime,
 		ExpireAt:  &expireAtTime,
 	}
@@ -188,6 +194,7 @@ func TestLinkModelFromLinkUpdateRequest_without_regenarating(t *testing.T) {
 	idStr := "f9e71cb4-e1e1-4721-8eef-806338db2222"
 	userIDStr := "f9e71cb4-e1e1-4721-8eef-806338db7282"
 	shortLinkStr := "http://qwerty"
+	targetUrl := "http://qwertysdijvnisdnc"
 	expireAtStr := "2025-05-16T11:28:07+03:00"
 
 	expireAtTime, err := time.Parse(time.RFC3339, expireAtStr)
@@ -203,7 +210,7 @@ func TestLinkModelFromLinkUpdateRequest_without_regenarating(t *testing.T) {
 		UserId:     userIDStr,
 		Regenerate: regenerated,
 		ShortLink:  &shortLinkStr,
-		TargetUrl:  "http://qwertysdijvnisdnc",
+		TargetUrl:  &targetUrl,
 		ExpireAt:   expireAtTimestamppb,
 	}
 
@@ -222,7 +229,7 @@ func TestLinkModelFromLinkUpdateRequest_without_regenarating(t *testing.T) {
 		UserId:    userUUID,
 		Generated: &regenerated,
 		ShortLink: &shortLinkStr,
-		TargetUrl: "http://qwertysdijvnisdnc",
+		TargetUrl: &targetUrl,
 		CreatedAt: createdAtTime,
 		ExpireAt:  &expireAtTime,
 	}
