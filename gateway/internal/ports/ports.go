@@ -20,6 +20,7 @@ type UserServiceRepository interface {
 
 type ShortenerServiceRepository interface {
 	Redirect(request *shortener.RedirectRequest) (*shortener.RedirectResponse, error)
+	GetLinks(request *shortener.GetLinksRequest) (*shortener.GetLinksResponse, error)
 	GetLink(request *shortener.GetLinkRequest) (*shortener.Link, error)
 	CreateNewLink(request *shortener.CreateLinkRequest) (*shortener.Link, error)
 	UpdateLink(request *shortener.UpdateLinkRequest) (*shortener.Link, error)
