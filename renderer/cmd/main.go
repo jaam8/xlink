@@ -13,8 +13,10 @@ import (
 	"xlink/common/grpc/pool"
 	"xlink/common/logger"
 	"xlink/renderer/internal/config"
+	"xlink/renderer/internal/handlers/http_handlers"
 	"xlink/renderer/internal/handlers/middlewares"
 	"xlink/renderer/internal/ports/adapters/analytics_service_adapters"
+	"xlink/renderer/internal/ports/adapters/drawer_adapters"
 	"xlink/renderer/internal/services"
 )
 
@@ -56,10 +58,13 @@ func main() {
 		mainConfig.GrpcPool.MaxRetries,
 		time.Millisecond*time.Duration(mainConfig.GrpcPool.BaseRetryDelayMilliseconds),
 	)
+
+	drawerRepo := drawer_adapters.NewDrawerRepositoryEcharts()
+	drawerService := services.NewDrawerService(drawerRepo)
 	//endregion repos
 
 	//region handlers
-	analyticsServiceHandler := http_handlers.NewAnalyticsServiceHandler(analyticsService)
+	analyticsServiceHandler := http_handlers.NewRendererHandler(analyticsService, drawerService)
 	//endregion handlers
 
 	//region middlewares
@@ -69,8 +74,7 @@ func main() {
 	//region routing
 	app := fiber.New()
 	app.Use(loggingMiddleware)
-	app.Get("/image")
-	//endregion api
+	app.Get("/image", analyticsServiceHandler.Image)
 	//endregion routing
 
 	go func() {

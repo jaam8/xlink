@@ -2,6 +2,7 @@ package ports
 
 import (
 	"xlink/common/gen/analytics"
+	"xlink/renderer/internal/statistics_data"
 )
 
 type AnalyticsServiceRepository interface {
@@ -13,4 +14,8 @@ type AnalyticsServiceRepository interface {
 	ClicksByHour(request *analytics.GetClicksRequest) (*analytics.ClicksByHourResponse, error)
 	ClicksByDate(request *analytics.GetClicksRequest) (*analytics.ClicksByDateResponse, error)
 	ClicksByReferrer(request *analytics.GetClicksRequest) (*analytics.ClicksByReferrerResponse, error)
+}
+
+type DrawerRepository interface {
+	Generate(input statistics_data.StatisticsData, paramName string) ([]byte, error)
 }
