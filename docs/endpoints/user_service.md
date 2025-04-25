@@ -31,6 +31,7 @@ curl -X POST http://localhost:8080/api/v1/user/create \
 **Response Codes:**
 - `201 Created` — Пользователь успешно создан.
 - `400 Bad Request` — Неверный формат данных.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -64,6 +65,7 @@ curl -X PATCH http://localhost:8080/api/v1/user/update/uuid \
 - `200 OK` — Пользователь успешно обновлен.
 - `400 Bad Request` — Неверный формат данных.
 - `404 Not Found` — Пользователь не найден.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -98,6 +100,7 @@ curl -X POST http://localhost:8080/api/v1/user/refresh \
 - `200 OK` — Токен успешно обновлен.
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -132,6 +135,7 @@ curl -X POST http://localhost:8080/api/v1/user/login \
 - `200 OK` — Успешная авторизация.
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -170,6 +174,7 @@ curl -X GET http://localhost:8080/api/v1/user/staff/get/uuid \
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
 - `404 Not Found` — Пользователь не найден.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -195,6 +200,7 @@ curl -X DELETE http://localhost:8080/api/v1/user/staff/delete/uuid \
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
 - `404 Not Found` — Пользователь не найден.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -240,6 +246,7 @@ curl -X POST http://localhost:8080/api/v1/user/admin/create \
 - `201 Created` — Пользователь успешно создан.
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -264,11 +271,11 @@ curl -X PATCH http://localhost:8080/api/v1/user/admin/update/uuid \
 
 **Request Body:**
 
-| Field      | Type   | Required | Description               |
-|------------|--------|----------|---------------------------|
-| `tg_id`    | int64  | No       | Новый Telegram ID.        |
-| `is_staff` | bool   | No       | Новый флаг сотрудника.    |
-| `is_admin` | bool   | No       | Новый флаг администратора.|
+| Field        | Type    | Required  | Description                |
+|--------------|---------|-----------|----------------------------|
+| `tg_id`      | int64   | No        | Новый Telegram ID.         |
+| `is_staff`   | bool    | No        | Новый флаг сотрудника.     |
+| `is_admin`   | bool    | No        | Новый флаг администратора. |
 
 **Response:**
 - **200 OK**
@@ -283,6 +290,7 @@ curl -X PATCH http://localhost:8080/api/v1/user/admin/update/uuid \
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
 - `404 Not Found` — Пользователь не найден.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---

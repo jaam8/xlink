@@ -96,8 +96,9 @@ func (h *ShortenerServiceHandler) Redirect(ctx *fiber.Ctx) error {
 			zap.String("shortLink", shortLink),
 			zap.String("targetLink", targetLink))
 
-	//TODO: return HTML that redirects itself
-	return ctx.Redirect(targetLink, 200)
+	return ctx.Render("redirect", fiber.Map{
+		"TargetLink": targetLink,
+	})
 }
 
 func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {

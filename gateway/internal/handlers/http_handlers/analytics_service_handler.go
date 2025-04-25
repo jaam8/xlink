@@ -60,7 +60,7 @@ func (h *AnalyticsServiceHandler) GetClicksByCountry(ctx *fiber.Ctx) error {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.UserContext(), "couldn't get country stats",
 				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get country stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get country stats: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
@@ -80,7 +80,7 @@ func (h *AnalyticsServiceHandler) GetClicksByRegion(ctx *fiber.Ctx) error {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.UserContext(), "couldn't get region stats",
 				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get region stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get region stats: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
@@ -100,7 +100,7 @@ func (h *AnalyticsServiceHandler) GetClicksByBrowser(ctx *fiber.Ctx) error {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.UserContext(), "couldn't get browser stats",
 				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get browser stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get browser stats: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
@@ -120,7 +120,7 @@ func (h *AnalyticsServiceHandler) GetClicksByOS(ctx *fiber.Ctx) error {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.UserContext(), "couldn't get OS stats",
 				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get OS stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get OS stats: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
@@ -140,7 +140,7 @@ func (h *AnalyticsServiceHandler) GetClicksByDeviceType(ctx *fiber.Ctx) error {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.UserContext(), "couldn't get device type stats",
 				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get device type stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get device type stats: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
@@ -160,7 +160,7 @@ func (h *AnalyticsServiceHandler) GetClicksByHour(ctx *fiber.Ctx) error {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.UserContext(), "couldn't get per-hour stats",
 				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get per-hour stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get per-hour stats: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
@@ -180,7 +180,7 @@ func (h *AnalyticsServiceHandler) GetClicksByDate(ctx *fiber.Ctx) error {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.UserContext(), "couldn't get per-date stats",
 				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get per-date stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get per-date stats: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
@@ -200,7 +200,7 @@ func (h *AnalyticsServiceHandler) GetClicksByReferrer(ctx *fiber.Ctx) error {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.UserContext(), "couldn't get referrer stats",
 				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get referrer stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get referrer stats: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
