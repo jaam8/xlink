@@ -35,6 +35,38 @@ func New(
 	}
 }
 
+func (s *Service) GetLinks(ctx context.Context, request *shortener.GetLinksRequest) (*shortener.GetLinksResponse, error) {
+	var err error
+	var userId uuid.UUID
+	userId, err = helper.GetValidatedUserId(request)
+	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, "couldn't receive links list by user id: invalid userId",
+			zap.Error(err),
+		)
+		return &shortener.GetLinksResponse{}, fmt.Errorf("error while validating user_id: %w", err)
+	}
+
+	var links []*models.Link
+	links, err = s.storageRepo.GetLinks(userId)
+	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't receive links list by user id from storage",
+			zap.Error(err),
+		)
+		return &shortener.GetLinksResponse{}, fmt.Errorf("error while getting links by user id: %w", err)
+	}
+
+	logger.GetLoggerFromCtx(ctx).Info(ctx, "received links list by user id",
+		zap.String(helper.UserIdKey, request.UserId),
+	)
+
+	linkResponseList := make([]*shortener.Link, len(links))
+	for i, link := range links {
+		linkResponseList[i] = helper.LinkResponseFromLinkModel(*link)
+	}
+
+	return &shortener.GetLinksResponse{Links: linkResponseList}, nil
+}
+
 func (s *Service) GetLink(ctx context.Context, request *shortener.GetLinkRequest) (*shortener.Link, error) {
 	var err error
 	var linkId uuid.UUID
