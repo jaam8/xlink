@@ -507,7 +507,7 @@ func TestGetLinks(t *testing.T) {
 
 	expectedModel := []string{"qwerty", "shortlink", "xlinktets"}
 
-	testShortenerStorageRepository.On("GetLinks", userIduuid).Return(expectedModel)
+	testShortenerStorageRepository.On("GetLinks", userIduuid).Return(expectedModel, nil)
 
 	resp, err := s.GetLinks(ctx, &req)
 	if err != nil {
