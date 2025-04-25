@@ -132,7 +132,14 @@ func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 		Info(ctx.UserContext(), "created link (administrator)", zap.String("id", response.UserId))
-	return ctx.Status(fiber.StatusCreated).JSON(response)
+	return ctx.Status(fiber.StatusCreated).JSON(schemas.Link{
+		LinkId:    response.LinkId,
+		UserId:    response.UserId,
+		ShortLink: response.ShortLink,
+		TargetUrl: response.TargetUrl,
+		CreatedAt: response.CreatedAt.AsTime().Format(time.RFC3339),
+		ExpireAt:  response.ExpireAt.AsTime().Format(time.RFC3339),
+	})
 }
 
 func (h *ShortenerServiceHandler) CreateNewLinkAdmin(ctx *fiber.Ctx) error {
@@ -167,7 +174,14 @@ func (h *ShortenerServiceHandler) CreateNewLinkAdmin(ctx *fiber.Ctx) error {
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 		Info(ctx.UserContext(), "created link (administrator)", zap.String("id", response.UserId))
-	return ctx.Status(fiber.StatusCreated).JSON(response)
+	return ctx.Status(fiber.StatusCreated).JSON(schemas.Link{
+		LinkId:    response.LinkId,
+		UserId:    response.UserId,
+		ShortLink: response.ShortLink,
+		TargetUrl: response.TargetUrl,
+		CreatedAt: response.CreatedAt.AsTime().Format(time.RFC3339),
+		ExpireAt:  response.ExpireAt.AsTime().Format(time.RFC3339),
+	})
 }
 
 func (h *ShortenerServiceHandler) UpdateLink(ctx *fiber.Ctx) error {
@@ -208,7 +222,14 @@ func (h *ShortenerServiceHandler) UpdateLink(ctx *fiber.Ctx) error {
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 		Info(ctx.UserContext(), "updated link", zap.String("id", response.LinkId))
-	return ctx.Status(fiber.StatusCreated).JSON(response)
+	return ctx.Status(fiber.StatusCreated).JSON(schemas.Link{
+		LinkId:    response.LinkId,
+		UserId:    response.UserId,
+		ShortLink: response.ShortLink,
+		TargetUrl: response.TargetUrl,
+		CreatedAt: response.CreatedAt.AsTime().Format(time.RFC3339),
+		ExpireAt:  response.ExpireAt.AsTime().Format(time.RFC3339),
+	})
 }
 
 func (h *ShortenerServiceHandler) DeleteLink(ctx *fiber.Ctx) error {
