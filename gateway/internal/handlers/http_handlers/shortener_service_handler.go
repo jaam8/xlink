@@ -37,7 +37,7 @@ func (h *ShortenerServiceHandler) getLinkIdByShortLinkParameter(ctx *fiber.Ctx) 
 	responseLinkId, err := h.shortenerService.GetLinkIdByShortLink(
 		&shortener.GetLinkIdByShortLinkRequest{ShortLink: shortLink})
 	if err != nil {
-		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.Context(), "couldn't get shortener response", zap.Error(err))
 		return "", helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get shortener response"))
@@ -84,14 +84,14 @@ func (h *ShortenerServiceHandler) Redirect(ctx *fiber.Ctx) error {
 	response, err := h.shortenerService.Redirect(request)
 
 	if err != nil {
-		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.Context(), "couldn't get shortener_service response", zap.Error(err))
 		return helpers.NotFoundError(ctx, "couldn't get shortener_service response")
 	}
 
 	targetLink := response.TargetUrl
 
-	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 		Info(ctx.Context(), "redirected link",
 			zap.String("shortLink", shortLink),
 			zap.String("targetLink", targetLink))
@@ -124,13 +124,13 @@ func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {
 	response, err := h.shortenerService.CreateNewLink(request)
 
 	if err != nil {
-		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.Context(), "couldn't get shortener response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get shortener response"))
 	}
 
-	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 		Info(ctx.Context(), "created user", zap.String("id", response.UserId))
 	return ctx.Status(fiber.StatusCreated).JSON(response)
 }
@@ -165,13 +165,13 @@ func (h *ShortenerServiceHandler) UpdateLink(ctx *fiber.Ctx) error {
 	response, err = h.shortenerService.UpdateLink(request)
 
 	if err != nil {
-		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.Context(), "couldn't get shortener response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get shortener response"))
 	}
 
-	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 		Info(ctx.Context(), "updated link", zap.String("id", response.LinkId))
 	return ctx.Status(fiber.StatusCreated).JSON(response)
 }
@@ -188,19 +188,19 @@ func (h *ShortenerServiceHandler) DeleteLink(ctx *fiber.Ctx) error {
 	response, err = h.shortenerService.DeleteLink(request)
 
 	if err != nil {
-		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.Context(), "couldn't get shortener response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get shortener response"))
 	}
 
 	if !response.Status {
-		logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.Context(), "link deletion was unsuccessful", zap.String("id", linkId))
 		return helpers.BadRequest(ctx, "link deletion was unsuccessful")
 	}
 
-	logger.GetOrCreateLoggerFromCtx(ctx.Context()).
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 		Info(ctx.Context(), "deleted link",
 			zap.String("id", linkId),
 			zap.Bool("status", response.Status))
