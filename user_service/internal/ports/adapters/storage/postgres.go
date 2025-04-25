@@ -67,7 +67,7 @@ func (u *UserStorageRepositoryPostgres) CreateUser(telegramId *int64, isStaff *b
 }
 
 func (u *UserStorageRepositoryPostgres) GetUser(userId string) (string, string, *int64, error) {
-	query := `SELECT telegramId, isStaff, isAdmin FROM user_service.users WHERE id = $1`
+	query := `SELECT telegram_id, is_staff, is_admin FROM user_service.users WHERE id = $1`
 
 	var telegramId sql.NullInt64
 	var isStaff, isAdmin bool
@@ -84,7 +84,7 @@ func (u *UserStorageRepositoryPostgres) GetUser(userId string) (string, string, 
 }
 
 func (u *UserStorageRepositoryPostgres) GetUserIDByToken(token string) (string, bool, error) {
-	query := `SELECT id, count(*) FROM user_service.users WHERE token = $1`
+	query := `SELECT id FROM user_service.users WHERE token = $1`
 
 	var userId string
 
@@ -104,7 +104,7 @@ func (u *UserStorageRepositoryPostgres) GetUserIDByToken(token string) (string, 
 }
 
 func (u *UserStorageRepositoryPostgres) GetUserIDByTgId(tgId int64) (string, bool, error) {
-	query := `SELECT id, count(*) FROM user_service.users WHERE telegram_id = $1`
+	query := `SELECT id FROM user_service.users WHERE telegram_id = $1`
 
 	var userId string
 

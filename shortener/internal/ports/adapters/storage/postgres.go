@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"fmt"
+	"sync"
 	"xlink/shortener/internal/models"
 
 	"github.com/Masterminds/squirrel"
@@ -27,10 +28,88 @@ func LinkSelectQuery(filter squirrel.Eq) (string, []interface{}, error) {
 	return sql, args, err
 }
 
+func ShortLinkSelectQuery(filter squirrel.Eq) (string, []interface{}, error) {
+	sql, args, err := squirrel.Select("short_link").
+		From("shortener.urls").
+		Where(filter).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	return sql, args, err
+}
+
+func LinkCountQuery(filter squirrel.Eq) (string, []interface{}, error) {
+	sql, args, err := squirrel.Select("count(*)").
+		From("shortener.urls").
+		Where(filter).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	return sql, args, err
+}
+
 func NewShortenerStorageRepositoryPostgres(pool *pgxpool.Pool) *ShortenerStorageRepositoryPostgres {
 	return &ShortenerStorageRepositoryPostgres{
 		PostgresPool: pool,
 	}
+}
+
+func (s *ShortenerStorageRepositoryPostgres) GetLinks(userId uuid.UUID) ([]string, error) {
+	//region getCount
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
+
+	countChannel := make(chan uint64, 1)
+	countErrorChannel := make(chan error, 1)
+	go func() {
+		defer wg.Done()
+
+		countSql, countArgs, err := LinkCountQuery(squirrel.Eq{"user_id": userId})
+		if err != nil {
+			countErrorChannel <- fmt.Errorf("couldn't build SQL rows count query: %w", err)
+		}
+
+		var totalRows uint64
+		err = s.PostgresPool.QueryRow(context.Background(), countSql, countArgs...).Scan(&totalRows)
+		if err != nil {
+			countErrorChannel <- fmt.Errorf("couldn't execute get rows count query: %w", err)
+		}
+
+		countChannel <- totalRows
+	}()
+	//endregion getCount
+
+	sql, args, err := ShortLinkSelectQuery(squirrel.Eq{"user_id": userId})
+	if err != nil {
+		return []string{}, fmt.Errorf("couldn't build an SQL query: %w", err)
+	}
+
+	rows, err := s.PostgresPool.Query(context.Background(), sql, args...)
+	if err != nil {
+		return []string{}, fmt.Errorf("couldn't execute select link list query: %w", err)
+	}
+
+	wg.Wait()
+	countRowsError := <-countErrorChannel
+	if countRowsError != nil {
+		return []string{}, countRowsError
+	}
+	totalRows := <-countChannel
+
+	defer rows.Close()
+
+	links := make([]string, 0, totalRows)
+
+	for rows.Next() {
+		var link string
+		err = rows.Scan(&link)
+		if err != nil {
+			return []string{}, fmt.Errorf("couldn't scan row: %w", err)
+		}
+		links = append(links, link)
+	}
+
+	return links, nil
 }
 
 func (s *ShortenerStorageRepositoryPostgres) GetLinkById(linkId uuid.UUID) (models.Link, error) {

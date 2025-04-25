@@ -34,6 +34,23 @@ func (s ShortenerServiceRepositoryGRPC) Redirect(request *shortener.RedirectRequ
 	return response, nil
 }
 
+func (s ShortenerServiceRepositoryGRPC) GetLinks(request *shortener.GetLinksRequest) (*shortener.GetLinksResponse, error) {
+	conn, err := s.grpcPool.GetConn()
+	if err != nil {
+		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
+	}
+	defer conn.Close() //nolint:all
+
+	client := shortener.NewShortenerServiceClient(conn)
+
+	response, grpcErr := client.GetLinks(context.Background(), request)
+	if grpcErr != nil {
+		return nil, fmt.Errorf("error in GetLinks grpc: %v", grpcErr)
+	}
+
+	return response, nil
+}
+
 func (s ShortenerServiceRepositoryGRPC) GetLink(request *shortener.GetLinkRequest) (*shortener.Link, error) {
 	conn, err := s.grpcPool.GetConn()
 	if err != nil {
