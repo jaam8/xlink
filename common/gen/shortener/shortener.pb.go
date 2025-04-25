@@ -154,7 +154,7 @@ func (x *GetLinksRequest) GetUserId() string {
 
 type GetLinksResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Links         []*Link                `protobuf:"bytes,1,rep,name=links,proto3" json:"links,omitempty"`
+	ShortLinks    []string               `protobuf:"bytes,1,rep,name=shortLinks,proto3" json:"shortLinks,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -189,9 +189,9 @@ func (*GetLinksResponse) Descriptor() ([]byte, []int) {
 	return file_api_shortener_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *GetLinksResponse) GetLinks() []*Link {
+func (x *GetLinksResponse) GetShortLinks() []string {
 	if x != nil {
-		return x.Links
+		return x.ShortLinks
 	}
 	return nil
 }
@@ -948,9 +948,11 @@ const file_api_shortener_proto_rawDesc = "" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x127\n" +
 	"\texpire_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\bexpireAt\"*\n" +
 	"\x0fGetLinksRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"3\n" +
-	"\x10GetLinksResponse\x12\x1f\n" +
-	"\x05links\x18\x01 \x03(\v2\t.api.LinkR\x05links\")\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"2\n" +
+	"\x10GetLinksResponse\x12\x1e\n" +
+	"\n" +
+	"shortLinks\x18\x01 \x03(\tR\n" +
+	"shortLinks\")\n" +
 	"\x0eGetLinkRequest\x12\x17\n" +
 	"\alink_id\x18\x01 \x01(\tR\x06linkId\"~\n" +
 	"\x11CreateLinkRequest\x12\x17\n" +
@@ -1062,33 +1064,32 @@ var file_api_shortener_proto_goTypes = []any{
 var file_api_shortener_proto_depIdxs = []int32{
 	17, // 0: api.Link.created_at:type_name -> google.protobuf.Timestamp
 	17, // 1: api.Link.expire_at:type_name -> google.protobuf.Timestamp
-	0,  // 2: api.GetLinksResponse.links:type_name -> api.Link
-	17, // 3: api.UpdateLinkRequest.expire_at:type_name -> google.protobuf.Timestamp
-	17, // 4: api.RedirectRequest.clicked_at:type_name -> google.protobuf.Timestamp
-	6,  // 5: api.RedirectRequest.user_agent:type_name -> api.UserAgent
-	7,  // 6: api.ShortenerService.Redirect:input_type -> api.RedirectRequest
-	1,  // 7: api.ShortenerService.GetLinks:input_type -> api.GetLinksRequest
-	3,  // 8: api.ShortenerService.GetLink:input_type -> api.GetLinkRequest
-	4,  // 9: api.ShortenerService.CreateNewLink:input_type -> api.CreateLinkRequest
-	5,  // 10: api.ShortenerService.UpdateLink:input_type -> api.UpdateLinkRequest
-	9,  // 11: api.ShortenerService.DeleteLink:input_type -> api.DeleteLinkRequest
-	11, // 12: api.ShortenerService.GetLinksCountByUserId:input_type -> api.GetLinksCountByUserIdRequest
-	13, // 13: api.ShortenerService.GetLinkOwnerByShortLink:input_type -> api.GetLinkOwnerByShortLinkRequest
-	15, // 14: api.ShortenerService.GetLinkIdByShortLink:input_type -> api.GetLinkIdByShortLinkRequest
-	8,  // 15: api.ShortenerService.Redirect:output_type -> api.RedirectResponse
-	2,  // 16: api.ShortenerService.GetLinks:output_type -> api.GetLinksResponse
-	0,  // 17: api.ShortenerService.GetLink:output_type -> api.Link
-	0,  // 18: api.ShortenerService.CreateNewLink:output_type -> api.Link
-	0,  // 19: api.ShortenerService.UpdateLink:output_type -> api.Link
-	10, // 20: api.ShortenerService.DeleteLink:output_type -> api.DeleteLinkResponse
-	12, // 21: api.ShortenerService.GetLinksCountByUserId:output_type -> api.GetLinksCountByUserIdResponse
-	14, // 22: api.ShortenerService.GetLinkOwnerByShortLink:output_type -> api.GetLinkOwnerByShortLinkResponse
-	16, // 23: api.ShortenerService.GetLinkIdByShortLink:output_type -> api.GetLinkIdByShortLinkResponse
-	15, // [15:24] is the sub-list for method output_type
-	6,  // [6:15] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	17, // 2: api.UpdateLinkRequest.expire_at:type_name -> google.protobuf.Timestamp
+	17, // 3: api.RedirectRequest.clicked_at:type_name -> google.protobuf.Timestamp
+	6,  // 4: api.RedirectRequest.user_agent:type_name -> api.UserAgent
+	7,  // 5: api.ShortenerService.Redirect:input_type -> api.RedirectRequest
+	1,  // 6: api.ShortenerService.GetLinks:input_type -> api.GetLinksRequest
+	3,  // 7: api.ShortenerService.GetLink:input_type -> api.GetLinkRequest
+	4,  // 8: api.ShortenerService.CreateNewLink:input_type -> api.CreateLinkRequest
+	5,  // 9: api.ShortenerService.UpdateLink:input_type -> api.UpdateLinkRequest
+	9,  // 10: api.ShortenerService.DeleteLink:input_type -> api.DeleteLinkRequest
+	11, // 11: api.ShortenerService.GetLinksCountByUserId:input_type -> api.GetLinksCountByUserIdRequest
+	13, // 12: api.ShortenerService.GetLinkOwnerByShortLink:input_type -> api.GetLinkOwnerByShortLinkRequest
+	15, // 13: api.ShortenerService.GetLinkIdByShortLink:input_type -> api.GetLinkIdByShortLinkRequest
+	8,  // 14: api.ShortenerService.Redirect:output_type -> api.RedirectResponse
+	2,  // 15: api.ShortenerService.GetLinks:output_type -> api.GetLinksResponse
+	0,  // 16: api.ShortenerService.GetLink:output_type -> api.Link
+	0,  // 17: api.ShortenerService.CreateNewLink:output_type -> api.Link
+	0,  // 18: api.ShortenerService.UpdateLink:output_type -> api.Link
+	10, // 19: api.ShortenerService.DeleteLink:output_type -> api.DeleteLinkResponse
+	12, // 20: api.ShortenerService.GetLinksCountByUserId:output_type -> api.GetLinksCountByUserIdResponse
+	14, // 21: api.ShortenerService.GetLinkOwnerByShortLink:output_type -> api.GetLinkOwnerByShortLinkResponse
+	16, // 22: api.ShortenerService.GetLinkIdByShortLink:output_type -> api.GetLinkIdByShortLinkResponse
+	14, // [14:23] is the sub-list for method output_type
+	5,  // [5:14] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_api_shortener_proto_init() }
