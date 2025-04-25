@@ -39,13 +39,13 @@ func (h *UserServiceHandler) CreateUser(ctx *fiber.Ctx) error {
 
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response"))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(), "created user", zap.String("id", response.UserId))
+		Info(ctx.UserContext(), "created user", zap.String("id", response.UserId))
 	return ctx.Status(fiber.StatusCreated).JSON(response)
 }
 
@@ -62,13 +62,13 @@ func (h *UserServiceHandler) GetUser(ctx *fiber.Ctx) error {
 	response, err := h.userService.GetUser(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(), "received user", zap.String("id", response.UserId))
+		Info(ctx.UserContext(), "received user", zap.String("id", response.UserId))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -85,13 +85,13 @@ func (h *UserServiceHandler) GetUserIDByToken(ctx *fiber.Ctx) error {
 	response, err := h.userService.GetUserIDByToken(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(), "received user ID by token", zap.String("id", response.UserId))
+		Info(ctx.UserContext(), "received user ID by token", zap.String("id", response.UserId))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -113,13 +113,13 @@ func (h *UserServiceHandler) GetUserIdByTgId(ctx *fiber.Ctx) error {
 	response, err := h.userService.GetUserIDByTgID(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(), "received user ID by tg_ID", zap.String("id", response.UserId))
+		Info(ctx.UserContext(), "received user ID by tg_ID", zap.String("id", response.UserId))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -144,13 +144,13 @@ func (h *UserServiceHandler) UpdateUser(ctx *fiber.Ctx) error {
 	response, err := h.userService.UpdateUser(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(),
+		Info(ctx.UserContext(),
 			"updated user",
 			zap.String("id", userId.String()),
 			zap.Bool("status", response.Status),
@@ -172,13 +172,13 @@ func (h *UserServiceHandler) CheckToken(ctx *fiber.Ctx) error {
 	response, err := h.userService.CheckToken(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(),
+		Info(ctx.UserContext(),
 			"checked token for user",
 			zap.String("id", body.UserId),
 			zap.Bool("status", response.Status),
@@ -200,13 +200,13 @@ func (h *UserServiceHandler) RefreshToken(ctx *fiber.Ctx) error {
 	response, err := h.userService.RefreshToken(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(),
+		Info(ctx.UserContext(),
 			"refreshed token for user",
 			zap.String("id", body.UserId),
 		)
@@ -224,20 +224,20 @@ func (h *UserServiceHandler) DeleteUser(ctx *fiber.Ctx) error {
 	response, err := h.userService.DeleteUser(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	if !response.Status {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "unsuccessful delete operation in user_service")
+			Error(ctx.UserContext(), "unsuccessful delete operation in user_service")
 		return helpers.BadRequest(ctx,
 			"unsuccessful delete operation in user_service")
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(),
+		Info(ctx.UserContext(),
 			"deleted user",
 			zap.String("id", userId.String()),
 		)
@@ -255,13 +255,13 @@ func (h *UserServiceHandler) GetRole(ctx *fiber.Ctx) error {
 	response, err := h.userService.GetRole(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(), "got roles for user", zap.String("id", userId.String()))
+		Info(ctx.UserContext(), "got roles for user", zap.String("id", userId.String()))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -281,13 +281,13 @@ func (h *UserServiceHandler) CreateUserAdmin(ctx *fiber.Ctx) error {
 
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response"))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(), "created user (by admin)", zap.String("id", response.UserId))
+		Info(ctx.UserContext(), "created user (by admin)", zap.String("id", response.UserId))
 	return ctx.Status(fiber.StatusCreated).JSON(response)
 }
 
@@ -312,13 +312,13 @@ func (h *UserServiceHandler) UpdateUserAdmin(ctx *fiber.Ctx) error {
 	response, err := h.userService.UpdateUser(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(),
+		Info(ctx.UserContext(),
 			"updated user (by admin)",
 			zap.String("id", userId.String()),
 			zap.Bool("status", response.Status),
@@ -339,13 +339,13 @@ func (h *UserServiceHandler) DeleteUserAdmin(ctx *fiber.Ctx) error {
 	response, err := h.userService.DeleteUser(request)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(),
+		Info(ctx.UserContext(),
 			"deleted user (by admin)",
 			zap.String("id", userId.String()),
 			zap.Bool("status", response.Status),
@@ -364,7 +364,7 @@ func (h *UserServiceHandler) Login(ctx *fiber.Ctx) error {
 	)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
@@ -374,13 +374,13 @@ func (h *UserServiceHandler) Login(ctx *fiber.Ctx) error {
 	)
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(), "logged in user", zap.String("id", responseUserId.UserId))
+		Info(ctx.UserContext(), "logged in user", zap.String("id", responseUserId.UserId))
 
 	return ctx.Status(fiber.StatusOK).JSON(&schemas.LoginResponseSchema{
 		UserId:     responseUser.UserId,
@@ -399,13 +399,13 @@ func (h *UserServiceHandler) Profile(ctx *fiber.Ctx) error {
 	response, err := h.userService.GetUser(&user_service.GetUserRequest{UserId: userId})
 	if err != nil {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-			Error(ctx.Context(), "couldn't get user_service response", zap.Error(err))
+			Error(ctx.UserContext(), "couldn't get user_service response", zap.Error(err))
 		return helpers.InternalServerError(ctx,
 			fmt.Errorf("couldn't get user_service response: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.Context(), "got user profile", zap.String("id", userId))
+		Info(ctx.UserContext(), "got user profile", zap.String("id", userId))
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
