@@ -1,6 +1,7 @@
 package http_handlers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/mileusna/useragent"
@@ -31,7 +32,7 @@ func NewShortenerServiceHandler(
 func (h *ShortenerServiceHandler) getLinkIdByShortLinkParameter(ctx *fiber.Ctx) (string, error) {
 	shortLink := ctx.Params("shortLink")
 	if len(shortLink) == 0 {
-		return "", helpers.BadRequest(ctx, "invalid shortLink: must be a non-empty string")
+		return "", helpers.BadRequest(ctx, errors.New("invalid shortLink: must be a non-empty string"))
 	}
 
 	responseLinkId, err := h.shortenerService.GetLinkIdByShortLink(
@@ -104,16 +105,16 @@ func (h *ShortenerServiceHandler) Redirect(ctx *fiber.Ctx) error {
 func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {
 	var body schemas.CreateLinkSchema
 	if err := ctx.BodyParser(&body); err != nil {
-		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err))
 	}
 
 	if _, err := helpers.ParseUUID(body.UserId); err != nil {
-		return helpers.BadRequest(ctx, fmt.Errorf("invalid user id: %v", err).Error())
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid user id: %v", err))
 	}
 
 	if _, err := h.userService.GetUser(&user_service.GetUserRequest{UserId: body.UserId}); err != nil {
 		return helpers.BadRequest(ctx, fmt.Errorf("couldn't find user with given id='%s': %v",
-			body.UserId, err).Error())
+			body.UserId, err))
 	}
 
 	request := &shortener.CreateLinkRequest{
@@ -139,18 +140,18 @@ func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {
 func (h *ShortenerServiceHandler) UpdateLink(ctx *fiber.Ctx) error {
 	linkId, err := h.getLinkIdByShortLinkParameter(ctx)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get link id by short link: %v", err))
+		return helpers.BadRequest(ctx, fmt.Errorf("couldn't get link id by short link: %v", err))
 	}
 
 	var body schemas.UpdateLinkSchema
 	if err = ctx.BodyParser(&body); err != nil {
-		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err).Error())
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err))
 	}
 
 	var expireAt time.Time
 	expireAt, err = helpers.ParseDateTime(body.ExpireAt)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Errorf("invalid expire_at: %v", err).Error())
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid expire_at: %v", err))
 	}
 
 	request := &shortener.UpdateLinkRequest{
@@ -180,7 +181,7 @@ func (h *ShortenerServiceHandler) UpdateLink(ctx *fiber.Ctx) error {
 func (h *ShortenerServiceHandler) DeleteLink(ctx *fiber.Ctx) error {
 	linkId, err := h.getLinkIdByShortLinkParameter(ctx)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get link id by short link: %v", err))
+		return helpers.BadRequest(ctx, fmt.Errorf("couldn't get link id by short link: %v", err))
 	}
 
 	request := &shortener.DeleteLinkRequest{LinkId: linkId}
@@ -198,7 +199,7 @@ func (h *ShortenerServiceHandler) DeleteLink(ctx *fiber.Ctx) error {
 	if !response.Status {
 		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 			Error(ctx.UserContext(), "link deletion was unsuccessful", zap.String("id", linkId))
-		return helpers.BadRequest(ctx, "link deletion was unsuccessful")
+		return helpers.BadRequest(ctx, fmt.Errorf("link deletion was unsuccessful: %v", err))
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
