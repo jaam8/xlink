@@ -52,7 +52,7 @@
     const countdownEl = document.getElementById('countdown');
     const interval = setInterval(() => {
       seconds--;
-      countdownEl.textContent = `Автоматический переход по ссылке через ${seconds}...`;
+      countdownEl.textContent = `Переход по ссылке через ${seconds}...`;
       if (seconds === 0) {
         clearInterval(interval);
         window.location.href = redirectUrl;
