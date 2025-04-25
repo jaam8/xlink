@@ -208,3 +208,45 @@ func (h *ShortenerServiceHandler) DeleteLink(ctx *fiber.Ctx) error {
 			zap.Bool("status", response.Status))
 	return ctx.SendStatus(fiber.StatusNoContent)
 }
+
+func (h *ShortenerServiceHandler) MyLinks(ctx *fiber.Ctx) error {
+	userIdValue := ctx.Context().Value(handlers.UserIdKey)
+	if userIdValue == nil {
+		return ctx.Status(fiber.StatusUnauthorized).
+			JSON(fiber.Map{"error": "unauthorized (Use auth middleware before Owner only middleware!!!)"})
+	}
+	userId := userIdValue.(string)
+
+	response, err := h.shortenerService.GetLinks(&shortener.GetLinksRequest{UserId: userId})
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get shortener response", zap.Error(err))
+		return helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't get shortener response: %v", err))
+	}
+
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got user's links", zap.String("id", userId))
+
+	return ctx.Status(fiber.StatusOK).JSON(response)
+}
+
+func (h *ShortenerServiceHandler) GetLinksByUserId(ctx *fiber.Ctx) error {
+	userId, err := helpers.ParseUUIDField(ctx, "userId")
+	if err != nil {
+		return helpers.BadRequest(ctx, fmt.Errorf("couldn't parse user id: %v", err))
+	}
+
+	response, err := h.shortenerService.GetLinks(&shortener.GetLinksRequest{UserId: userId.String()})
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get shortener response", zap.Error(err))
+		return helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't get shortener response: %v", err))
+	}
+
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got user's links", zap.String("id", userId.String()))
+
+	return ctx.Status(fiber.StatusOK).JSON(response)
+}

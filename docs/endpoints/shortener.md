@@ -67,7 +67,7 @@ curl -X POST http://localhost:8080/api/v1/link/create \
 
 #### For Authenticated Users
 
-##### GET /api/v1/link/list/
+##### GET /api/v1/link/my-links/
 
 **Description:** Получения списка своих ссылок.
 
@@ -78,26 +78,14 @@ curl -X POST http://localhost:8080/api/v1/link/create \
 | `Authorization` | Yes      | Токен авторизации.        |
 
 **Response:**
-- **201 Created**
+- **200 Ok**
 ```json
-[
-  {
-    "link_id": "uuid",
-    "user_id": "uuid",
-    "short_link": "customLink",
-    "target_url": "https://example.com",
-    "created_at": "2023-01-01T00:00:00Z",
-    "expire_at": "2023-12-31T23:59:59Z"
-  },
-  {
-    "link_id": "uuid",
-    "user_id": "uuid",
-    "short_link": "customLink",
-    "target_url": "https://example.com",
-    "created_at": "2023-01-01T00:00:00Z",
-    "expire_at": "2023-12-31T23:59:59Z"
-  }
-]
+{
+  "links":  [
+    "some-short-link-part1",
+    "some-short-link-part2"
+  ]
+}
 ```
 
 **Response Codes:**
@@ -186,7 +174,7 @@ curl -X DELETE http://localhost:8080/api/v1/link/delete/shortLink \
 
 #### For Admins
 
-##### GET /api/v1/link/admin/list/:userId
+##### GET /api/v1/link/admin/links/:userId
 
 **Description:** Получения списка ссылок нужного пользователя администратором.
 
@@ -197,26 +185,14 @@ curl -X DELETE http://localhost:8080/api/v1/link/delete/shortLink \
 | `Authorization` | Yes      | Токен авторизации.        |
 
 **Response:**
-- **201 Created**
+- **200 Ok**
 ```json
-[
-  {
-    "link_id": "uuid",
-    "user_id": "uuid",
-    "short_link": "customLink",
-    "target_url": "https://example.com",
-    "created_at": "2023-01-01T00:00:00Z",
-    "expire_at": "2023-12-31T23:59:59Z"
-  },
-  {
-    "link_id": "uuid",
-    "user_id": "uuid",
-    "short_link": "customLink",
-    "target_url": "https://example.com",
-    "created_at": "2023-01-01T00:00:00Z",
-    "expire_at": "2023-12-31T23:59:59Z"
-  }
-]
+{
+  "links":  [
+    "some-short-link-part1",
+    "some-short-link-part2"
+  ]
+}
 ```
 
 **Response Codes:**
