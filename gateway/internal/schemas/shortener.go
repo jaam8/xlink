@@ -17,3 +17,12 @@ type UpdateLinkSchema struct {
 	TargetUrl  *string `json:"target_url,omitempty"`
 	ExpireAt   string  `json:"expire_at"`
 }
+
+type Link struct {
+	LinkId    string `json:"link_id,omitempty"`
+	UserId    string `json:"user_id,omitempty"`
+	ShortLink string `json:"short_link,omitempty"`
+	TargetUrl string `json:"target_url,omitempty"`
+	CreatedAt string `json:"created_at,omitempty"`
+	ExpireAt  string `json:"expire_at,omitempty"`
+}
