@@ -134,10 +134,10 @@ func main() {
 
 	//region routing
 	app := fiber.New(fiber.Config{Views: htmlEngine})
+	app.Use(loggingMiddleware)
 
 	//region api
 	apiGroup := app.Group("/api")
-	apiGroup.Use(loggingMiddleware)
 
 	//region v1
 	v1Group := apiGroup.Group("/v1")
