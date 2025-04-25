@@ -34,8 +34,8 @@ type GrpcPoolConfig struct {
 }
 
 type Config struct {
-	UpstreamNames UpstreamNamesConfig `yaml:"upstream_names" env-prefix:"UPSTREAM_NAME_"`
-	UpstreamPorts UpstreamPortsConfig `yaml:"upstream_ports" env-prefix:"UPSTREAM_PORT_"`
+	UpstreamNames UpstreamNamesConfig `yaml:"upstream_names" env-prefix:"UPSTREAM_NAMES_"`
+	UpstreamPorts UpstreamPortsConfig `yaml:"upstream_ports" env-prefix:"UPSTREAM_PORTS_"`
 	GrpcPool      GrpcPoolConfig      `yaml:"grpc_pool" env-prefix:"GRPC_POOL_"`
 	Timeouts      TimeoutsConfig      `yaml:"timeouts" env-prefix:"TIMEOUT_"`
 	HTTPPort      int                 `yaml:"http_port" env:"HTTP_PORT" env-default:"8080"`
