@@ -31,6 +31,11 @@ func (m *mokShortenerCacheRepository) DeleteUrl(shortUrl string) error {
 
 type mokShortenerStorageRepository struct{ mock.Mock }
 
+func (m *mokShortenerStorageRepository) GetLinks(userId uuid.UUID) ([]string, error) {
+	args := m.Called(userId)
+	return args.Get(0).([]string), args.Error(1)
+}
+
 func (m *mokShortenerStorageRepository) GetLinkById(linkId uuid.UUID) (models.Link, error) {
 	args := m.Called(linkId)
 	return args.Get(0).(models.Link), args.Error(1)
@@ -476,5 +481,39 @@ func TestGetLinkIdByShortLink(t *testing.T) {
 	}
 
 	assert.Equal(t, linkId, resp.LinkId)
+
+}
+
+func TestGetLinks(t *testing.T) {
+	testShortenerCacheRepository := new(mokShortenerCacheRepository)
+	testShortenerStorageRepository := new(mokShortenerStorageRepository)
+	testShortenerSenderRepository := new(mokShortenerSenderRepository)
+
+	s := service.New(testShortenerCacheRepository, testShortenerStorageRepository, testShortenerSenderRepository, testdefaultLinkExpireTime)
+
+	ctx, err := logger.New(context.Background())
+	if err != nil {
+		t.Errorf("cannot implement logger:%v", err)
+	}
+
+	userId := "f9e71cb4-e1e1-4721-8eef-806338db7282"
+
+	userIduuid, err := uuid.Parse(userId)
+	if err != nil {
+		t.Errorf("cant parse userId:%v", err)
+	}
+
+	req := shortener.GetLinksRequest{UserId: userId}
+
+	expectedModel := []string{"qwerty", "shortlink", "xlinktets"}
+
+	testShortenerStorageRepository.On("GetLinks", userIduuid).Return(expectedModel, nil)
+
+	resp, err := s.GetLinks(ctx, &req)
+	if err != nil {
+		t.Errorf("cant get list of links by userId:%v", err)
+	}
+
+	assert.Equal(t, expectedModel, resp.ShortLinks)
 
 }
