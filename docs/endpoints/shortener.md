@@ -65,6 +65,48 @@ curl -X POST http://localhost:8080/api/v1/link/create \
 
 ---
 
+#### For Authenticated Users
+
+##### GET /api/v1/link/list/
+
+**Description:** Получения списка своих ссылок.
+
+**Headers:**
+
+| Header          | Required | Description               |
+|-----------------|----------|---------------------------|
+| `Authorization` | Yes      | Токен авторизации.        |
+
+**Response:**
+- **201 Created**
+```json
+[
+  {
+    "link_id": "uuid",
+    "user_id": "uuid",
+    "short_link": "customLink",
+    "target_url": "https://example.com",
+    "created_at": "2023-01-01T00:00:00Z",
+    "expire_at": "2023-12-31T23:59:59Z"
+  },
+  {
+    "link_id": "uuid",
+    "user_id": "uuid",
+    "short_link": "customLink",
+    "target_url": "https://example.com",
+    "created_at": "2023-01-01T00:00:00Z",
+    "expire_at": "2023-12-31T23:59:59Z"
+  }
+]
+```
+
+**Response Codes:**
+- `200 Ok` — Получен список ссылок.
+- `400 Bad Request` — Неверный формат данных или ошибка на сервере.
+- `401 Unauthorized` — Неверный токен.
+
+---
+
 #### For Link Owner
 
 ##### PUT /api/v1/link/update/:id
@@ -144,6 +186,45 @@ curl -X DELETE http://localhost:8080/api/v1/link/delete/shortLink \
 
 #### For Admins
 
+##### GET /api/v1/link/admin/list/:userId
+
+**Description:** Получения списка ссылок нужного пользователя администратором.
+
+**Headers:**
+
+| Header          | Required | Description               |
+|-----------------|----------|---------------------------|
+| `Authorization` | Yes      | Токен авторизации.        |
+
+**Response:**
+- **201 Created**
+```json
+[
+  {
+    "link_id": "uuid",
+    "user_id": "uuid",
+    "short_link": "customLink",
+    "target_url": "https://example.com",
+    "created_at": "2023-01-01T00:00:00Z",
+    "expire_at": "2023-12-31T23:59:59Z"
+  },
+  {
+    "link_id": "uuid",
+    "user_id": "uuid",
+    "short_link": "customLink",
+    "target_url": "https://example.com",
+    "created_at": "2023-01-01T00:00:00Z",
+    "expire_at": "2023-12-31T23:59:59Z"
+  }
+]
+```
+
+**Response Codes:**
+- `200 Ok` — Получен список ссылок.
+- `400 Bad Request` — Неверный формат данных или ошибка на сервере.
+- `401 Unauthorized` — Неверный токен.
+- `404 Not Found` — Пользователь не найден.
+
 ##### DELETE /api/v1/link/admin/delete/:id
 
 **Description:** Удаление короткой ссылки администратором.
@@ -164,6 +245,6 @@ curl -X DELETE http://localhost:8080/api/v1/link/admin/delete/uuid \
 - `204 No Content` — Ссылка успешно удалена.
 - `400 Bad Request` — Неверный формат данных или ошибка на сервере.
 - `401 Unauthorized` — Неверный токен.
-- `404 Not Found` — Ссылка не найдена.=
+- `404 Not Found` — Ссылка не найдена.
 
 ---
