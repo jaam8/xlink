@@ -14,6 +14,7 @@ curl -X GET http://localhost:8080/l/shortLink
 **Response:**
 - **302 Found** — Редирект на целевой URL.
 - **404 Not Found** — Ссылка не найдена.
+- **400 Bad Request** — Пустая ссылка.
 
 ---
 
@@ -59,6 +60,7 @@ curl -X POST http://localhost:8080/api/v1/s/create \
 - `201 Created` — Ссылка успешно создана.
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -85,12 +87,12 @@ curl -X PUT http://localhost:8080/api/v1/s/crud/owner/update/uuid \
 
 **Request Body:**
 
-| Field        | Type   | Required | Description               |
-|--------------|--------|----------|---------------------------|
-| `regenerate` | bool   | Yes      | Генерировать новую ссылку.|
-| `short_link` | string | No       | Новая короткая ссылка.    |
-| `target_url` | string | No       | Новый целевой URL.        |
-| `expire_at`  | string | Yes      | Дата истечения (ISO 8601).|
+| Field        | Type   | Required | Description                |
+|--------------|--------|----------|----------------------------|
+| `regenerate` | bool   | Yes      | Генерировать новую ссылку. |
+| `short_link` | string | No       | Новая короткая ссылка.     |
+| `target_url` | string | No       | Новый целевой URL.         |
+| `expire_at`  | string | Yes      | Дата истечения (ISO 8601). |
 
 **Response:**
 - **200 OK**
@@ -110,6 +112,7 @@ curl -X PUT http://localhost:8080/api/v1/s/crud/owner/update/uuid \
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
 - `404 Not Found` — Ссылка не найдена.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -159,9 +162,8 @@ curl -X DELETE http://localhost:8080/api/v1/s/crud/admin/delete/uuid \
 
 **Response Codes:**
 - `204 No Content` — Ссылка успешно удалена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка на сервере.
 - `401 Unauthorized` — Неверный токен.
-- `404 Not Found` — Ссылка не найдена.
-- `500 Internal Server Error` — Ошибка на сервере.
+- `404 Not Found` — Ссылка не найдена.=
 
 ---
