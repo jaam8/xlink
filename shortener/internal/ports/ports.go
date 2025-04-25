@@ -13,6 +13,7 @@ type ShortenerCacheRepository interface {
 }
 
 type ShortenerStorageRepository interface {
+	GetLinks(userId uuid.UUID) ([]*models.Link, error)
 	GetLinkById(linkId uuid.UUID) (models.Link, error)
 	GetLinkByShortUrl(shortUrl string) (models.Link, error)
 	CreateLink(newLink *models.Link) (models.Link, error)
