@@ -55,7 +55,7 @@ func (h *AnalyticsServiceHandler) GetClicksByCountry(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByCountry(request)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get country stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get country stats: %v", err))
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
@@ -69,7 +69,7 @@ func (h *AnalyticsServiceHandler) GetClicksByRegion(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByRegion(request)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get region stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get region stats: %v", err))
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
@@ -83,7 +83,7 @@ func (h *AnalyticsServiceHandler) GetClicksByBrowser(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByBrowser(request)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get browser stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get browser stats: %v", err))
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
@@ -97,7 +97,7 @@ func (h *AnalyticsServiceHandler) GetClicksByOS(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByOS(request)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get OS stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get OS stats: %v", err))
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
@@ -111,7 +111,7 @@ func (h *AnalyticsServiceHandler) GetClicksByDeviceType(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByDeviceType(request)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get device type stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get device type stats: %v", err))
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
@@ -125,7 +125,7 @@ func (h *AnalyticsServiceHandler) GetClicksByHour(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByHour(request)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get per-hour stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get per-hour stats: %v", err))
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
@@ -139,7 +139,7 @@ func (h *AnalyticsServiceHandler) GetClicksByDate(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByDate(request)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get per-date stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get per-date stats: %v", err))
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
@@ -153,7 +153,7 @@ func (h *AnalyticsServiceHandler) GetClicksByReferrer(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByReferrer(request)
 	if err != nil {
-		return helpers.BadRequest(ctx, fmt.Sprintf("couldn't get referrer stats: %v", err))
+		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get referrer stats: %v", err))
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
