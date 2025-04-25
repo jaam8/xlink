@@ -5,7 +5,7 @@ import (
 	"time"
 	"xlink/common/callers"
 	"xlink/common/gen/analytics"
-	"xlink/gateway/internal/ports"
+	"xlink/renderer/internal/ports"
 )
 
 type AnalyticsService struct {

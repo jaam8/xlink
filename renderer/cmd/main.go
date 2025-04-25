@@ -68,83 +68,8 @@ func main() {
 
 	//region routing
 	app := fiber.New()
-
-	//region api
-	apiGroup := app.Group("/api")
-	apiGroup.Use(loggingMiddleware)
-
-	//region v1
-	v1Group := apiGroup.Group("/v1")
-
-	//region user v1
-	userGroup := v1Group.Group("/user")
-	userAdminGroup := userGroup.Group("/admin")
-	userStaffGroup := userGroup.Group("/staff")
-	//userAuthedGroup := userGroup.Group("")
-
-	userAdminGroup.Use(isAdminMiddleware)
-	userStaffGroup.Use(isStaffMiddleware)
-	//userAuthedGroup.Use(authMiddleware)
-
-	userGroup.Post("/create", userServiceHandler.CreateUser)
-	userGroup.Patch("/update/:id", userServiceHandler.UpdateUser)
-	userGroup.Post("/refresh", userServiceHandler.RefreshToken)
-	userGroup.Post("/login", userServiceHandler.Login)
-
-	userStaffGroup.Get("/get/:id", userServiceHandler.GetUser)                     // staff | admin
-	userStaffGroup.Get("/get-by-tg-id/:tg_id", userServiceHandler.GetUserIdByTgId) // staff | admin
-	userStaffGroup.Delete("/delete/:id", userServiceHandler.DeleteUser)            // staff | admin
-	userStaffGroup.Get("/role/:id", userServiceHandler.GetRole)                    // staff | admin
-
-	userAdminGroup.Post("/create", userServiceHandler.CreateUserAdmin)        // admin
-	userAdminGroup.Patch("/update/:id", userServiceHandler.UpdateUserAdmin)   // admin
-	userAdminGroup.Delete("/delete/:id", userServiceHandler.DeleteUserAdmin)  // admin
-	userAdminGroup.Post("/get-by-token", userServiceHandler.GetUserIDByToken) // admin
-	userAdminGroup.Post("/token-check", userServiceHandler.CheckToken)        // admin
-
-	//userAuthedGroup.Get("/profile", userServiceHandler.Profile)
-	//endregion user v1
-
-	//region shortener v1
-	shortenerGroup := v1Group.Group("/link")
-
-	shortenerAuthenticatedGroup := shortenerGroup.Group("/my-")
-	shortenerAuthenticatedGroup.Use(authMiddleware)
-
-	shortenerCRUDGroup := shortenerGroup.Group("")
-	shortenerCRUDGroup.Use(authMiddleware)
-
-	shortenerAdminGroup := shortenerCRUDGroup.Group("/admin")
-	shortenerAdminGroup.Use(isAdminMiddleware)
-
-	shortenerOwnerOnlyGroup := shortenerCRUDGroup.Group("")
-	shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("id", shortenerService))
-
-	app.Get("/l/:shortLink", shortenerServiceHandler.Redirect)                               //
-	shortenerAuthenticatedGroup.Get("links", shortenerServiceHandler.MyLinks)                // authenticated
-	shortenerCRUDGroup.Post("/create", shortenerServiceHandler.CreateNewLink)                // authenticated
-	shortenerOwnerOnlyGroup.Put("/update/:shortLink", shortenerServiceHandler.UpdateLink)    // owner
-	shortenerOwnerOnlyGroup.Delete("/delete/:shortLink", shortenerServiceHandler.DeleteLink) // owner
-	shortenerAdminGroup.Get("/links/:userId", shortenerServiceHandler.GetLinksByUserId)      // admin
-	shortenerAdminGroup.Put("/update/:shortLink", shortenerServiceHandler.UpdateLink)        // admin
-	shortenerAdminGroup.Delete("/delete/:shortLink", shortenerServiceHandler.DeleteLink)     // admin
-	//endregion shortener v1
-
-	//region analytics v1
-	analyticsGroup := v1Group.Group("/analytics")
-	analyticsGroup.Use(authMiddleware)
-
-	analyticsGroup.Get("/by-country", analyticsServiceHandler.GetClicksByCountry)
-	analyticsGroup.Get("/by-region", analyticsServiceHandler.GetClicksByRegion)
-	analyticsGroup.Get("/by-browser", analyticsServiceHandler.GetClicksByBrowser)
-	analyticsGroup.Get("/by-os", analyticsServiceHandler.GetClicksByOS)
-	analyticsGroup.Get("/by-device-type", analyticsServiceHandler.GetClicksByDeviceType)
-	analyticsGroup.Get("/by-hour", analyticsServiceHandler.GetClicksByHour)
-	analyticsGroup.Get("/by-date", analyticsServiceHandler.GetClicksByDate)
-	analyticsGroup.Get("/by-referrer", analyticsServiceHandler.GetClicksByReferrer)
-	//endregion analytics v1
-
-	//endregion v1
+	app.Use(loggingMiddleware)
+	app.Get("/image")
 	//endregion api
 	//endregion routing
 
