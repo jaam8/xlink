@@ -32,14 +32,29 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-country?short_link=shortL
 {
   "data": [
     {
-      "country": "US",
-      "clicks": 100,
-      "unique_clicks": 80
+      "stats": [
+        {
+          "country": "US",
+          "clicks": "1",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-20"
     },
     {
-      "country": "RU",
-      "clicks": 50,
-      "unique_clicks": 40
+      "stats": [
+        {
+          "country": "DE",
+          "clicks": "1",
+          "unique_clicks": "0"
+        },
+        {
+          "country": "US",
+          "clicks": "2",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-21"
     }
   ]
 }
@@ -83,14 +98,29 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-region?short_link=shortLi
 {
   "data": [
     {
-      "region": "California",
-      "clicks": 60,
-      "unique_clicks": 50
+      "stats": [
+        {
+          "region": "California",
+          "clicks": "1",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-20"
     },
     {
-      "region": "Moscow",
-      "clicks": 40,
-      "unique_clicks": 30
+      "stats": [
+        {
+          "region": "Moscow",
+          "clicks": "1",
+          "unique_clicks": "0"
+        },
+        {
+          "region": "California",
+          "clicks": "2",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-21"
     }
   ]
 }
@@ -134,14 +164,29 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-browser?short_link=shortL
 {
   "data": [
     {
-      "browser": "Chrome",
-      "clicks": 120,
-      "unique_clicks": 100
+      "stats": [
+        {
+          "browser": "Chrome",
+          "clicks": "1",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-20"
     },
     {
-      "browser": "Firefox",
-      "clicks": 30,
-      "unique_clicks": 25
+      "stats": [
+        {
+          "browser": "Opera",
+          "clicks": "1",
+          "unique_clicks": "0"
+        },
+        {
+          "browser": "Chrome",
+          "clicks": "2",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-21"
     }
   ]
 }
@@ -185,14 +230,29 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-os?short_link=shortLink&s
 {
   "data": [
     {
-      "os": "Windows",
-      "clicks": 80,
-      "unique_clicks": 70
+      "stats": [
+        {
+          "os": "Windows",
+          "clicks": "1",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-20"
     },
     {
-      "os": "MacOS",
-      "clicks": 50,
-      "unique_clicks": 40
+      "stats": [
+        {
+          "os": "Linux",
+          "clicks": "1",
+          "unique_clicks": "0"
+        },
+        {
+          "os": "Windows",
+          "clicks": "2",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-21"
     }
   ]
 }
@@ -236,14 +296,29 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-device-type?short_link=sh
 {
   "data": [
     {
-      "device_type": "Desktop",
-      "clicks": 100,
-      "unique_clicks": 90
+      "stats": [
+        {
+          "device_type": "Desktop",
+          "clicks": "1",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-20"
     },
     {
-      "device_type": "Mobile",
-      "clicks": 60,
-      "unique_clicks": 50
+      "stats": [
+        {
+          "device_type": "Desktop",
+          "clicks": "1",
+          "unique_clicks": "0"
+        },
+        {
+          "device_type": "Mobile",
+          "clicks": "2",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-21"
     }
   ]
 }
@@ -287,14 +362,29 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-hour?short_link=shortLink
 {
   "data": [
     {
-      "hour": "10:00",
-      "clicks": 30,
-      "unique_clicks": 25
+      "stats": [
+        {
+          "hour": "10:00",
+          "clicks": "1",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-20"
     },
     {
-      "hour": "11:00",
-      "clicks": 40,
-      "unique_clicks": 35
+      "stats": [
+        {
+          "hour": "10:00",
+          "clicks": "1",
+          "unique_clicks": "0"
+        },
+        {
+          "hour": "11:00",
+          "clicks": "2",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-21"
     }
   ]
 }
@@ -338,14 +428,24 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-date?short_link=shortLink
 {
   "data": [
     {
-      "date": "2023-01-01",
-      "clicks": 50,
-      "unique_clicks": 40
+      "stats": [
+        {
+          "date": "2025-04-20",
+          "clicks": "1",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-20"
     },
     {
-      "date": "2023-01-02",
-      "clicks": 70,
-      "unique_clicks": 60
+      "stats": [
+        {
+          "date": "2025-04-21",
+          "clicks": "2",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-21"
     }
   ]
 }
@@ -389,14 +489,29 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-referrer?short_link=short
 {
   "data": [
     {
-      "referrer": "https://example.com",
-      "clicks": 100,
-      "unique_clicks": 80
+      "stats": [
+        {
+          "referrer": "https://example.com",
+          "clicks": "1",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-20"
     },
     {
-      "referrer": "https://another.com",
-      "clicks": 50,
-      "unique_clicks": 40
+      "stats": [
+        {
+          "referrer": "https://example.com",
+          "clicks": "1",
+          "unique_clicks": "0"
+        },
+        {
+          "referrer": "https://example-2.com",
+          "clicks": "2",
+          "unique_clicks": "1"
+        }
+      ],
+      "date": "2025-04-21"
     }
   ]
 }
@@ -407,5 +522,3 @@ curl -X GET "http://localhost:8080/api/v1/analytics/by-referrer?short_link=short
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
 - `500 Internal Server Error` — Ошибка на сервере.
-
-`
