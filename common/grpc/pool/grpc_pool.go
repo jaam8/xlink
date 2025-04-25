@@ -28,7 +28,7 @@ func NewConnection(config Config) (*grpc.ClientConn, error) {
 func NewGrpcPool(ctx context.Context, config Config) (*GrpcPool, error) {
 	pool := &GrpcPool{
 		idle:   make([]*grpc.ClientConn, config.MaxConnections),
-		active: make([]*grpc.ClientConn, config.MaxConnections),
+		active: make([]*grpc.ClientConn, 0, config.MaxConnections),
 		mu:     sync.Mutex{},
 		config: config,
 	}
@@ -67,7 +67,6 @@ func (p *GrpcPool) GetConn() (*grpc.ClientConn, error) {
 
 	if len(p.idle) > 0 {
 		grpcConn, p.idle = p.idle[0], p.idle[1:]
-		p.active = append(p.active, grpcConn)
 	} else {
 		grpcConn, err = NewConnection(p.config)
 		if err != nil {
