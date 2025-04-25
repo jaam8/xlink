@@ -9,7 +9,7 @@ import (
 
 func LoggerMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		contextWithLogger, err := logger.New(c.Context())
+		contextWithLogger, err := logger.New(c.UserContext())
 		if err != nil {
 			ctx, _ := logger.New(context.Background())
 			logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't assign logger to context", zap.Error(err))
