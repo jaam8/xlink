@@ -12,7 +12,7 @@ xlink — сокращатель ссылок с аналитикой
 - **Shortener** — создание и редирект коротких ссылок.
 - **Analytics** — сбор статистики и аналитика.
 - **API Gateway** — маршрутизация запросов к микросервисам.
-[//]: # (- **Bot** — взаимодействие с Telegram.)
+- **Telegram Bot** — взаимодействие с пользователем через Telegram.
 
 ## Документация
 
@@ -49,3 +49,64 @@ xlink — сокращатель ссылок с аналитикой
 - **shortener:** `shortener/migrations`
 - **analytics:** `analytics/migrations`
 
+## Структура проекта
+
+```
+xlink
+├── analytics        # микросервис аналитики
+│   ├── api          # proto файл
+│   ├── cmd          # main.go
+│   ├── internal     
+│   │   ├── config   # загрузка конфигов
+│   │   ├── models   # доменные модели
+│   │   ├── ports    # контракты и адаптеры (Kafka, ClickHouse, Redis, shortener)
+│   │   ├── server   # HTTP/gRPC-сервер
+│   │   └── service  # бизнес-логика и хелперы
+│   ├── migrations   # SQL-скрипты миграций БД
+│   └── tests        # тесты
+├── build            # файлы для сборки и деплоя в Docker
+│   ├── docker       # Dockerfile'ы и docker-compose
+│   └── entry_nginx  # конфигурация Nginx для API Gateway
+├── common           # общие библиотеки и утилиты
+│   ├── callers      # retry/timeout обёртки
+│   ├── clickhouse   # клиент ClickHouse
+│   ├── gen          # сгенерированные gRPC-код
+│   ├── grpc         # интерсепторы и пул коннектов
+│   ├── kafka        # клиент Kafka
+│   ├── logger       # логгер
+│   ├── postgres     # клиент Postgres
+│   └── redis        # клиент Redis
+├── configs          # примеры и шаблоны конфигов
+├── docs             # документация по API и девопсу
+│   ├── configs.md   # описание конфигов
+│   ├── endpoints    # спецификации эндпойнтов (analytics, shortener, user_service)
+│   └── for_dev.md   # общие инструкции для девелоперов
+├── gateway          # API Gateway 
+│   ├── cmd          # main.go для gateway
+│   └── internal     # хэндлеры, middleware, порты и схемы
+├── scripts          # утилиты (yaml_to_env)
+├── shortener        # микросервис сокращателя ссылок
+│   ├── api          # proto файл
+│   ├── cmd          # main.go
+│   ├── internal     
+│   │   ├── config   # загрузка конфигов
+│   │   ├── models   # доменные модели
+│   │   ├── ports    # контракты и адаптеры (Kafka, ClickHouse, Redis, user_service)
+│   │   └── service  # бизнес-логика и хелперы
+│   ├── migrations   # SQL-миграции для links
+│   └── tests        # тесты
+├── tg_bot           # Telegram-бот для взаимодействия с микросервисами
+│   ├── cmd          # main.go
+│   └── internal     # handler, модели, адаптеры портов
+└── user_service     # микросервис авторизации
+    ├── api          # proto файл
+    ├── cmd          # main.go
+    ├── internal     
+    │   ├── config   # загрузка конфигов
+    │   ├── ports    # контракты и адаптеры (Kafka, Postgres, Redis, shortener)
+    │   ├── runner   # инициализация сервисов
+    │   ├── service  # бизнес-логика
+    │   └── utils    # хелперы
+    ├── migrations   # SQL-миграции для users
+    └── tests        # тесты
+```
