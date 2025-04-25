@@ -14,6 +14,7 @@ curl -X GET http://localhost:8080/l/shortLink
 **Response:**
 - **302 Found** — Редирект на целевой URL.
 - **404 Not Found** — Ссылка не найдена.
+- **400 Bad Request** — Пустая ссылка.
 
 ---
 
@@ -59,7 +60,50 @@ curl -X POST http://localhost:8080/api/v1/link/create \
 - `201 Created` — Ссылка успешно создана.
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
+
+---
+
+#### For Authenticated Users
+
+##### GET /api/v1/link/list/
+
+**Description:** Получения списка своих ссылок.
+
+**Headers:**
+
+| Header          | Required | Description               |
+|-----------------|----------|---------------------------|
+| `Authorization` | Yes      | Токен авторизации.        |
+
+**Response:**
+- **201 Created**
+```json
+[
+  {
+    "link_id": "uuid",
+    "user_id": "uuid",
+    "short_link": "customLink",
+    "target_url": "https://example.com",
+    "created_at": "2023-01-01T00:00:00Z",
+    "expire_at": "2023-12-31T23:59:59Z"
+  },
+  {
+    "link_id": "uuid",
+    "user_id": "uuid",
+    "short_link": "customLink",
+    "target_url": "https://example.com",
+    "created_at": "2023-01-01T00:00:00Z",
+    "expire_at": "2023-12-31T23:59:59Z"
+  }
+]
+```
+
+**Response Codes:**
+- `200 Ok` — Получен список ссылок.
+- `400 Bad Request` — Неверный формат данных или ошибка на сервере.
+- `401 Unauthorized` — Неверный токен.
 
 ---
 
@@ -85,12 +129,12 @@ curl -X PUT http://localhost:8080/api/v1/link/update/uuid \
 
 **Request Body:**
 
-| Field        | Type   | Required | Description               |
-|--------------|--------|----------|---------------------------|
-| `regenerate` | bool   | Yes      | Генерировать новую ссылку.|
-| `short_link` | string | No       | Новая короткая ссылка.    |
-| `target_url` | string | No       | Новый целевой URL.        |
-| `expire_at`  | string | Yes      | Дата истечения (ISO 8601).|
+| Field        | Type   | Required | Description                |
+|--------------|--------|----------|----------------------------|
+| `regenerate` | bool   | Yes      | Генерировать новую ссылку. |
+| `short_link` | string | No       | Новая короткая ссылка.     |
+| `target_url` | string | No       | Новый целевой URL.         |
+| `expire_at`  | string | Yes      | Дата истечения (ISO 8601). |
 
 **Response:**
 - **200 OK**
@@ -110,6 +154,7 @@ curl -X PUT http://localhost:8080/api/v1/link/update/uuid \
 - `400 Bad Request` — Неверный формат данных.
 - `401 Unauthorized` — Неверный токен.
 - `404 Not Found` — Ссылка не найдена.
+- `422 Unprocessable Entity` — Некорректное тело запроса.
 - `500 Internal Server Error` — Ошибка на сервере.
 
 ---
@@ -141,6 +186,45 @@ curl -X DELETE http://localhost:8080/api/v1/link/delete/shortLink \
 
 #### For Admins
 
+##### GET /api/v1/link/admin/list/:userId
+
+**Description:** Получения списка ссылок нужного пользователя администратором.
+
+**Headers:**
+
+| Header          | Required | Description               |
+|-----------------|----------|---------------------------|
+| `Authorization` | Yes      | Токен авторизации.        |
+
+**Response:**
+- **201 Created**
+```json
+[
+  {
+    "link_id": "uuid",
+    "user_id": "uuid",
+    "short_link": "customLink",
+    "target_url": "https://example.com",
+    "created_at": "2023-01-01T00:00:00Z",
+    "expire_at": "2023-12-31T23:59:59Z"
+  },
+  {
+    "link_id": "uuid",
+    "user_id": "uuid",
+    "short_link": "customLink",
+    "target_url": "https://example.com",
+    "created_at": "2023-01-01T00:00:00Z",
+    "expire_at": "2023-12-31T23:59:59Z"
+  }
+]
+```
+
+**Response Codes:**
+- `200 Ok` — Получен список ссылок.
+- `400 Bad Request` — Неверный формат данных или ошибка на сервере.
+- `401 Unauthorized` — Неверный токен.
+- `404 Not Found` — Пользователь не найден.
+
 ##### DELETE /api/v1/link/admin/delete/:id
 
 **Description:** Удаление короткой ссылки администратором.
@@ -159,9 +243,8 @@ curl -X DELETE http://localhost:8080/api/v1/link/admin/delete/uuid \
 
 **Response Codes:**
 - `204 No Content` — Ссылка успешно удалена.
-- `400 Bad Request` — Неверный формат данных.
+- `400 Bad Request` — Неверный формат данных или ошибка на сервере.
 - `401 Unauthorized` — Неверный токен.
 - `404 Not Found` — Ссылка не найдена.
-- `500 Internal Server Error` — Ошибка на сервере.
 
 ---

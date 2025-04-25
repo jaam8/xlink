@@ -58,18 +58,21 @@ upstream_names:
   user_service: user_service
   analytics: analytics
   renderer: renderer
+  tg_bot: tg_bot
 
 upstream_ports:
   user_service: 50051
   shortener: 50052
   analytics: 50053
   renderer: 50054
+  tg_bot: 50055
 
 timeouts:
   shortener: 1000
   user_service: 1000
   analytics: 1000
   renderer: 1000
+  tg_bot: 1000
 
 user_service:
   grpc_port: 50051
@@ -86,7 +89,7 @@ shortener:
   kafka_replication_factor: 1
   upstream_names: shortener
   upstream_ports: 50052
-  timeouts: 10000
+  timeouts: 1000
   expiration_seconds: 500
   default_link_expiration_minutes: 1440
   migrations_path: file:///shortener/migrations
@@ -102,16 +105,16 @@ analytics:
   timezone: Europe/Moscow
   batch_size: 1
   flush_timeout: 3
-  timeouts: 10000
+  timeouts: 1000
 
 bot:
   grpc_port: 50055
   redis_db: 3
   bot_token:
-  base_url: "gateway:3000/api/v1"
+  base_url: "http://nginx:80"
   upstream_names: tg_bot
   upstream_ports: 50055
-  timeouts: 10000
+  timeouts: 1000
 
 expiration_seconds: 0
 

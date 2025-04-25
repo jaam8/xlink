@@ -7,13 +7,15 @@ services:
       dockerfile: build/docker/Dockerfile.gateway
     env_file:
       - ../../configs/.env
-    ports:
-      - ${GATEWAY_PORT}:50050
+    expose:
+      - ${GATEWAY_PORT}
     depends_on:
       - postgres
       - kafka
       - clickhouse
       - zookeeper
+    networks:
+      - backend
 
   user_service:
     container_name: user_service
@@ -22,17 +24,20 @@ services:
       dockerfile: build/docker/Dockerfile.user_service
     env_file:
       - ../../configs/.env
-    ports:
-      - ${USER_SERVICE_GRPC_PORT}:50051
+    expose:
+      - ${USER_SERVICE_GRPC_PORT}
     depends_on:
       - gateway
       - clickhouse
       - postgres
       - redis
       - kafka
+    restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
+    networks:
+      - backend
 
   shortener:
     container_name: shortener
@@ -41,16 +46,19 @@ services:
       dockerfile: build/docker/Dockerfile.shortener
     env_file:
       - ../../configs/.env
-    ports:
-      - ${SHORTENER_GRPC_PORT}:50052
+    expose:
+      - ${SHORTENER_GRPC_PORT}
     depends_on:
       - postgres
       - user_service
       - kafka
       - zookeeper
+    restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
+    networks:
+      - backend
 
   analytics:
     container_name: analytics
@@ -59,40 +67,42 @@ services:
       dockerfile: build/docker/Dockerfile.analytics
     env_file:
       - ../../configs/.env
-    ports:
-      - ${ANALYTICS_GRPC_PORT}:50053
+    expose:
+      - ${ANALYTICS_GRPC_PORT}
     depends_on:
       - user_service
       - shortener
       - postgres
       - redis
       - kafka
+    restart: on-failure
     volumes:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
+    networks:
+      - backend
 
-#  tg_bot:
-#    container_name: tg_bot
-#    build:
-#      context: ../../
-#      dockerfile: build/docker/Dockerfile.tg_bot
-#    ports:
-#      - "50053:50053"
-#    env_file:
-#      - ../../configs/.env
-#    depends_on:
-#      - postgres
-#      - shortener
-#      - user_service
-#    volumes:
-#      - go-mod-cache:/go/pkg/mod
-#      - go-build-cache:/root/.cache/go-build
+  tg_bot:
+    container_name: tg_bot
+    build:
+      context: ../../
+      dockerfile: build/docker/Dockerfile.tg_bot
+    expose:
+      - ${BOT_GRPC_PORT}
+    env_file:
+      - ../../configs/.env
+    restart: on-failure
+    volumes:
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+    networks:
+      - backend
 
   postgres:
     image: postgres:latest
     container_name: postgres
-    ports:
-      - ${POSTGRES_PORT}:5432
+    expose:
+      - ${POSTGRES_PORT}
     env_file:
       - ../../configs/.env
     environment:
@@ -107,13 +117,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+    networks:
+      - backend
 
   redis:
     image: redis:latest
     container_name: redis
-    ports:
-      - ${REDIS_PORT}:6379
+    expose:
+      - ${REDIS_PORT}
     hostname: ${REDIS_HOST}
     volumes:
       - redis_data:/data
@@ -123,6 +134,8 @@ services:
       timeout: 1s
       retries: 3
     restart: unless-stopped
+    networks:
+      - backend
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -131,11 +144,13 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     hostname: ${ZOOKEEPER_HOST}
-    ports:
-      - ${ZOOKEEPER_PORT}:2181
+    expose:
+      - ${ZOOKEEPER_PORT}
     volumes:
       - zookeeper-data:/var/lib/zookeeper/data
       - zookeeper-log:/var/lib/zookeeper/log
+    networks:
+      - backend
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -143,8 +158,8 @@ services:
     depends_on:
       - zookeeper
     hostname: ${KAFKA_HOST}
-    ports:
-      - ${KAFKA_PORT}:9092
+    expose:
+      - ${KAFKA_PORT}
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: ${ZOOKEEPER_HOST}:2181
@@ -164,13 +179,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - backend
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     container_name: clickhouse
-    ports:
-      - "9000:9000"   # Native protocol port
-      - "8123:8123"   # HTTP protocol port
+    expose:
+      - ${CLICKHOUSE_PORT}
     environment:
       - CLICKHOUSE_USER=${CLICKHOUSE_USER}
       - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
@@ -179,6 +195,28 @@ services:
       - clickhouse-data:/var/lib/clickhouse
       - clickhouse-config:/etc/clickhouse-server/config.d
       - clickhouse-users:/etc/clickhouse-server/users.d
+    networks:
+      - backend
+
+
+  entry_nginx:
+    image: nginx:latest
+    environment:
+      - NGINX_ENTRY_PORT=${NGINX_ENTRY_PORT}
+    container_name: nginx
+    ports:
+      - ${NGINX_ENTRY_PORT}:80
+    command: ["nginx", "-g", "daemon off;"]
+    depends_on:
+      - gateway
+      - user_service
+      - shortener
+      - analytics
+      - tg_bot
+    volumes:
+      - ../entry_nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - backend
 
 
 volumes:
@@ -194,3 +232,5 @@ volumes:
   zookeeper-data:
   zookeeper-log:
 
+networks:
+  backend:

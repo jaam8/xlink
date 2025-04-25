@@ -76,12 +76,12 @@ test-shortener:
     - cd shortener
     - go test ./tests -coverpkg=./internal/service,./internal/service/utils,./internal/service/helper -coverprofile=cover.out
     - |
-      TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+      TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print $3}' | tr -d '%')
+      TOTAL_COVERAGE_INT=$(printf "%.0f" "$TOTAL_COVERAGE")
       echo "📊 shortener total coverage: ${TOTAL_COVERAGE}%"
-      MIN_COVERAGE=30.0
-      COMP_RESULT=$(echo "$TOTAL_COVERAGE < $MIN_COVERAGE" | bc -l)
-      if [[ "$COMP_RESULT" -eq 1 ]]; then
-        echo "❌ Coverage too low for shortener: ${TOTAL_COVERAGE}% (required ≥ ${MIN_COVERAGE}%)"
+      MIN_COVERAGE=30
+      if [ "$TOTAL_COVERAGE_INT" -lt "$MIN_COVERAGE" ]; then
+        echo "❌ Coverage too low for user_service: ${TOTAL_COVERAGE}% (required ≥ ${MIN_COVERAGE}%)"
         exit 1
       else
         echo "✅ Coverage OK: ${TOTAL_COVERAGE}%"
@@ -95,11 +95,11 @@ test-user-service:
     - cd user_service
     - go test ./tests -coverpkg=./internal/service,./internal/utils -coverprofile=cover.out
     - |
-      TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+      TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print $3}' | tr -d '%')
+      TOTAL_COVERAGE_INT=$(printf "%.0f" "$TOTAL_COVERAGE")
       echo "📊 user_service total coverage: ${TOTAL_COVERAGE}%"
-      MIN_COVERAGE=30.0
-      COMP_RESULT=$(echo "$TOTAL_COVERAGE < $MIN_COVERAGE" | bc -l)
-      if [[ "$COMP_RESULT" -eq 1 ]]; then
+      MIN_COVERAGE=30
+      if [ "$TOTAL_COVERAGE_INT" -lt "$MIN_COVERAGE" ]; then
         echo "❌ Coverage too low for user_service: ${TOTAL_COVERAGE}% (required ≥ ${MIN_COVERAGE}%)"
         exit 1
       else
@@ -114,12 +114,12 @@ test-analytics:
     - cd user_service
     - go test ./tests -coverpkg=./internal/service,./internal/service/helper -coverprofile=cover.out
     - |
-      TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+      TOTAL_COVERAGE=$(go tool cover -func=cover.out | grep total | awk '{print $3}' | tr -d '%')
+      TOTAL_COVERAGE_INT=$(printf "%.0f" "$TOTAL_COVERAGE")
       echo "📊 analytics total coverage: ${TOTAL_COVERAGE}%"
-      MIN_COVERAGE=30.0
-      COMP_RESULT=$(echo "$TOTAL_COVERAGE < $MIN_COVERAGE" | bc -l)
-      if [[ "$COMP_RESULT" -eq 1 ]]; then
-        echo "❌ Coverage too low for analytics: ${TOTAL_COVERAGE}% (required ≥ ${MIN_COVERAGE}%)"
+      MIN_COVERAGE=30
+      if [ "$TOTAL_COVERAGE_INT" -lt "$MIN_COVERAGE" ]; then
+        echo "❌ Coverage too low for user_service: ${TOTAL_COVERAGE}% (required ≥ ${MIN_COVERAGE}%)"
         exit 1
       else
         echo "✅ Coverage OK: ${TOTAL_COVERAGE}%"

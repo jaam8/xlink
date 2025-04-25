@@ -27,7 +27,7 @@ func ShortenerOwnerOnlyMiddleware(idParamName string, shortenerService Shortener
 
 		linkId, err = helpers.ParseUUIDField(c, idParamName)
 		if err != nil {
-			return helpers.BadRequest(c, fmt.Sprintf("invalid %s", idParamName))
+			return helpers.BadRequest(c, fmt.Errorf("invalid %s", idParamName))
 		}
 
 		var link *shortener.Link

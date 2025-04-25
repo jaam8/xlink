@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html/v2"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -127,8 +128,12 @@ func main() {
 	isStaffMiddleware := middlewares.RoleMiddleware(true, false, userService)
 	//endregion middlewares
 
+	//region html
+	htmlEngine := html.New("./web/html", ".html")
+	//endregion html
+
 	//region routing
-	app := fiber.New()
+	app := fiber.New(fiber.Config{Views: htmlEngine})
 
 	//region api
 	apiGroup := app.Group("/api")
@@ -141,11 +146,11 @@ func main() {
 	userGroup := v1Group.Group("/user")
 	userAdminGroup := userGroup.Group("/admin")
 	userStaffGroup := userGroup.Group("/staff")
-	userAuthedGroup := userGroup.Group("")
+	//userAuthedGroup := userGroup.Group("")
 
 	userAdminGroup.Use(isAdminMiddleware)
 	userStaffGroup.Use(isStaffMiddleware)
-	userAuthedGroup.Use(authMiddleware)
+	//userAuthedGroup.Use(authMiddleware)
 
 	userGroup.Post("/create", userServiceHandler.CreateUser)
 	userGroup.Patch("/update/:id", userServiceHandler.UpdateUser)
@@ -163,7 +168,7 @@ func main() {
 	userAdminGroup.Post("/get-by-token", userServiceHandler.GetUserIDByToken) // admin
 	userAdminGroup.Post("/token-check", userServiceHandler.CheckToken)        // admin
 
-	userAuthedGroup.Get("", userServiceHandler.Profile)
+	//userAuthedGroup.Get("", userServiceHandler.Profile)
 	//endregion user v1
 
 	//region shortener v1

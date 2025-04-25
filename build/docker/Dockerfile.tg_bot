@@ -9,10 +9,12 @@ COPY common/go.* ./common/
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    go work init ./shortener ./user_service ./common ./tg_bot && \
+    go work init ./common ./tg_bot && \
     go mod download
 
-COPY . .
+COPY tg_bot/ ./tg_bot/
+COPY common/ ./common/
+COPY configs/ ./configs/
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
@@ -22,5 +24,7 @@ FROM gcr.io/distroless/base-debian12 AS runner
 
 WORKDIR /app
 
+COPY --from=builder /build/configs/config.yaml ../configs/config.yaml
 COPY --from=builder /build/tg-bot-service .
+
 CMD ["./tg-bot-service"]
