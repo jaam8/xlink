@@ -108,6 +108,39 @@ func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {
 		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err))
 	}
 
+	userIdValue := ctx.Context().Value(handlers.UserIdKey)
+	if userIdValue == nil {
+		return ctx.Status(fiber.StatusUnauthorized).
+			JSON(fiber.Map{"error": "unauthorized (Use auth middleware before Owner only middleware!!!)"})
+	}
+	userId := userIdValue.(string)
+
+	request := &shortener.CreateLinkRequest{
+		UserId:    userId,
+		ShortLink: body.ShortLink,
+		TargetUrl: body.TargetUrl,
+	}
+
+	response, err := h.shortenerService.CreateNewLink(request)
+
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get shortener response", zap.Error(err))
+		return helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't get shortener response"))
+	}
+
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "created link (administrator)", zap.String("id", response.UserId))
+	return ctx.Status(fiber.StatusCreated).JSON(response)
+}
+
+func (h *ShortenerServiceHandler) CreateNewLinkAdmin(ctx *fiber.Ctx) error {
+	var body schemas.CreateLinkSchemaAdmin
+	if err := ctx.BodyParser(&body); err != nil {
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err))
+	}
+
 	if _, err := helpers.ParseUUID(body.UserId); err != nil {
 		return helpers.BadRequest(ctx, fmt.Errorf("invalid user id: %v", err))
 	}
@@ -133,7 +166,7 @@ func (h *ShortenerServiceHandler) CreateNewLink(ctx *fiber.Ctx) error {
 	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
-		Info(ctx.UserContext(), "created user", zap.String("id", response.UserId))
+		Info(ctx.UserContext(), "created link (administrator)", zap.String("id", response.UserId))
 	return ctx.Status(fiber.StatusCreated).JSON(response)
 }
 
