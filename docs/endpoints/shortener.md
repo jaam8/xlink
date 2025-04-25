@@ -18,13 +18,13 @@ curl -X GET http://localhost:8080/l/shortLink
 
 ---
 
-##### POST /api/v1/s/create
+##### POST /api/v1/link/create
 
 **Description:** Создание новой короткой ссылки.
 
 **Request:**
 ```bash
-curl -X POST http://localhost:8080/api/v1/s/create \
+curl -X POST http://localhost:8080/api/v1/link/create \
 -H "Authorization: Bearer token" \
 -H "Content-Type: application/json" \
 -d '{"short_link": "customLink", "target_url": "https://example.com"}'
@@ -67,13 +67,13 @@ curl -X POST http://localhost:8080/api/v1/s/create \
 
 #### For Link Owner
 
-##### PUT /api/v1/s/crud/owner/update/:id
+##### PUT /api/v1/link/update/:id
 
 **Description:** Обновление короткой ссылки.
 
 **Request:**
 ```bash
-curl -X PUT http://localhost:8080/api/v1/s/crud/owner/update/uuid \
+curl -X PUT http://localhost:8080/api/v1/link/update/uuid \
 -H "Authorization: Bearer token" \
 -H "Content-Type: application/json" \
 -d '{"regenerate": false, "short_link": "newLink", "target_url": "https://newexample.com", "expire_at": "2024-01-01T00:00:00Z"}'
@@ -117,13 +117,13 @@ curl -X PUT http://localhost:8080/api/v1/s/crud/owner/update/uuid \
 
 ---
 
-##### DELETE /api/v1/s/crud/owner/delete/:shortLink
+##### DELETE /api/v1/link/delete/:shortLink
 
 **Description:** Удаление короткой ссылки владельцем.
 
 **Request:**
 ```bash
-curl -X DELETE http://localhost:8080/api/v1/s/crud/owner/delete/shortLink \
+curl -X DELETE http://localhost:8080/api/v1/link/delete/shortLink \
 -H "Authorization: Bearer token"
 ```
 
@@ -144,13 +144,13 @@ curl -X DELETE http://localhost:8080/api/v1/s/crud/owner/delete/shortLink \
 
 #### For Admins
 
-##### DELETE /api/v1/s/crud/admin/delete/:id
+##### DELETE /api/v1/link/admin/delete/:id
 
 **Description:** Удаление короткой ссылки администратором.
 
 **Request:**
 ```bash
-curl -X DELETE http://localhost:8080/api/v1/s/crud/admin/delete/uuid \
+curl -X DELETE http://localhost:8080/api/v1/link/admin/delete/uuid \
 -H "Authorization: Bearer token"
 ```
 
