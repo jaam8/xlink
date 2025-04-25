@@ -80,10 +80,12 @@ curl -X POST http://localhost:8080/api/v1/link/create \
 **Response:**
 - **200 Ok**
 ```json
-[
-  "some-short-link-part1",
-  "some-short-link-part2"
-]
+{
+  "links":  [
+    "some-short-link-part1",
+    "some-short-link-part2"
+  ]
+}
 ```
 
 **Response Codes:**
@@ -185,10 +187,12 @@ curl -X DELETE http://localhost:8080/api/v1/link/delete/shortLink \
 **Response:**
 - **200 Ok**
 ```json
-[
-  "some-short-link-part1",
-  "some-short-link-part2"
-]
+{
+  "links":  [
+    "some-short-link-part1",
+    "some-short-link-part2"
+  ]
+}
 ```
 
 **Response Codes:**
