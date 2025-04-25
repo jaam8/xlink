@@ -76,7 +76,7 @@ func (h *UserServiceHandler) GetUser(ctx *fiber.Ctx) error {
 func (h *UserServiceHandler) GetUserIDByToken(ctx *fiber.Ctx) error {
 	var body schemas.UserIdByTokenSchema
 	if err := ctx.BodyParser(&body); err != nil {
-		return helpers.BadRequest(ctx, fmt.Errorf("invalid body"))
+		return helpers.BadRequest(ctx, fmt.Errorf("invalid body: %v", err))
 	}
 
 	request := &user_service.GetUserIDByTokenRequest{
