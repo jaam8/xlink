@@ -189,9 +189,10 @@ func main() {
 		shortenerAdminGroup := shortenerAuthenticatedGroup.Group("/admin")
 		shortenerAdminGroup.Use(isAdminMiddleware)
 		{
-			shortenerAdminGroup.Get("/links/:userId", shortenerServiceHandler.GetLinksByUserId)  // admin
-			shortenerAdminGroup.Put("/update/:shortLink", shortenerServiceHandler.UpdateLink)    // admin
-			shortenerAdminGroup.Delete("/delete/:shortLink", shortenerServiceHandler.DeleteLink) // admin
+			shortenerAdminGroup.Get("/links/:userId", shortenerServiceHandler.GetLinksByUserId)     // admin
+			shortenerAdminGroup.Post("/create/:userId", shortenerServiceHandler.CreateNewLinkAdmin) // admin
+			shortenerAdminGroup.Put("/update/:shortLink", shortenerServiceHandler.UpdateLink)       // admin
+			shortenerAdminGroup.Delete("/delete/:shortLink", shortenerServiceHandler.DeleteLink)    // admin
 		}
 
 		shortenerOwnerOnlyGroup := shortenerAuthenticatedGroup.Group("")
