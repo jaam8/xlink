@@ -28,6 +28,16 @@ func LinkSelectQuery(filter squirrel.Eq) (string, []interface{}, error) {
 	return sql, args, err
 }
 
+func ShortLinkSelectQuery(filter squirrel.Eq) (string, []interface{}, error) {
+	sql, args, err := squirrel.Select("short_link").
+		From("shortener.urls").
+		Where(filter).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	return sql, args, err
+}
+
 func LinkCountQuery(filter squirrel.Eq) (string, []interface{}, error) {
 	sql, args, err := squirrel.Select("count(*)").
 		From("shortener.urls").
@@ -44,7 +54,7 @@ func NewShortenerStorageRepositoryPostgres(pool *pgxpool.Pool) *ShortenerStorage
 	}
 }
 
-func (s *ShortenerStorageRepositoryPostgres) GetLinks(userId uuid.UUID) ([]*models.Link, error) {
+func (s *ShortenerStorageRepositoryPostgres) GetLinks(userId uuid.UUID) ([]string, error) {
 	//region getCount
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
@@ -69,40 +79,32 @@ func (s *ShortenerStorageRepositoryPostgres) GetLinks(userId uuid.UUID) ([]*mode
 	}()
 	//endregion getCount
 
-	sql, args, err := LinkSelectQuery(squirrel.Eq{"user_id": userId})
+	sql, args, err := ShortLinkSelectQuery(squirrel.Eq{"user_id": userId})
 	if err != nil {
-		return []*models.Link{}, fmt.Errorf("couldn't build an SQL query: %w", err)
+		return []string{}, fmt.Errorf("couldn't build an SQL query: %w", err)
 	}
 
 	rows, err := s.PostgresPool.Query(context.Background(), sql, args...)
 	if err != nil {
-		return []*models.Link{}, fmt.Errorf("couldn't execute select link list query: %w", err)
+		return []string{}, fmt.Errorf("couldn't execute select link list query: %w", err)
 	}
 
 	wg.Wait()
 	countRowsError := <-countErrorChannel
 	if countRowsError != nil {
-		return []*models.Link{}, countRowsError
+		return []string{}, countRowsError
 	}
 	totalRows := <-countChannel
 
 	defer rows.Close()
 
-	links := make([]*models.Link, 0, totalRows)
+	links := make([]string, 0, totalRows)
 
 	for rows.Next() {
-		var link *models.Link
-		err = rows.Scan(
-			&link.Id,
-			&link.UserId,
-			&link.Generated,
-			&link.ShortLink,
-			&link.TargetUrl,
-			&link.CreatedAt,
-			&link.ExpireAt,
-		)
+		var link string
+		err = rows.Scan(&link)
 		if err != nil {
-			return nil, err
+			return []string{}, fmt.Errorf("couldn't scan row: %w", err)
 		}
 		links = append(links, link)
 	}
