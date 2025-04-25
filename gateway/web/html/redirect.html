@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Переход...</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #121212;
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    img {
+      width: 200px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="countdown">Автоматический переход по ссылке через 5...</h1>
+  <img src="gopher.jpg" alt="Gopher" />
+
+  <script>
+    const redirectUrl = "{{.TargetLink}}"; // ← можешь поменять на любую ссылку
+    let seconds = 5;
+
+    const countdownEl = document.getElementById('countdown');
+    const interval = setInterval(() => {
+      seconds--;
+      countdownEl.textContent = `Автоматический переход по ссылке через ${seconds}...`;
+      if (seconds === 0) {
+        clearInterval(interval);
+        window.location.href = redirectUrl;
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
