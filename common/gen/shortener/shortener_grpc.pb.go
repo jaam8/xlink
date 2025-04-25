@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	ShortenerService_Redirect_FullMethodName                = "/api.ShortenerService/Redirect"
+	ShortenerService_GetLinks_FullMethodName                = "/api.ShortenerService/GetLinks"
 	ShortenerService_GetLink_FullMethodName                 = "/api.ShortenerService/GetLink"
 	ShortenerService_CreateNewLink_FullMethodName           = "/api.ShortenerService/CreateNewLink"
 	ShortenerService_UpdateLink_FullMethodName              = "/api.ShortenerService/UpdateLink"
@@ -34,6 +35,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ShortenerServiceClient interface {
 	Redirect(ctx context.Context, in *RedirectRequest, opts ...grpc.CallOption) (*RedirectResponse, error)
+	GetLinks(ctx context.Context, in *GetLinksRequest, opts ...grpc.CallOption) (*GetLinksResponse, error)
 	GetLink(ctx context.Context, in *GetLinkRequest, opts ...grpc.CallOption) (*Link, error)
 	CreateNewLink(ctx context.Context, in *CreateLinkRequest, opts ...grpc.CallOption) (*Link, error)
 	UpdateLink(ctx context.Context, in *UpdateLinkRequest, opts ...grpc.CallOption) (*Link, error)
@@ -55,6 +57,16 @@ func (c *shortenerServiceClient) Redirect(ctx context.Context, in *RedirectReque
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RedirectResponse)
 	err := c.cc.Invoke(ctx, ShortenerService_Redirect_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *shortenerServiceClient) GetLinks(ctx context.Context, in *GetLinksRequest, opts ...grpc.CallOption) (*GetLinksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetLinksResponse)
+	err := c.cc.Invoke(ctx, ShortenerService_GetLinks_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,6 +148,7 @@ func (c *shortenerServiceClient) GetLinkIdByShortLink(ctx context.Context, in *G
 // for forward compatibility.
 type ShortenerServiceServer interface {
 	Redirect(context.Context, *RedirectRequest) (*RedirectResponse, error)
+	GetLinks(context.Context, *GetLinksRequest) (*GetLinksResponse, error)
 	GetLink(context.Context, *GetLinkRequest) (*Link, error)
 	CreateNewLink(context.Context, *CreateLinkRequest) (*Link, error)
 	UpdateLink(context.Context, *UpdateLinkRequest) (*Link, error)
@@ -155,6 +168,9 @@ type UnimplementedShortenerServiceServer struct{}
 
 func (UnimplementedShortenerServiceServer) Redirect(context.Context, *RedirectRequest) (*RedirectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Redirect not implemented")
+}
+func (UnimplementedShortenerServiceServer) GetLinks(context.Context, *GetLinksRequest) (*GetLinksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLinks not implemented")
 }
 func (UnimplementedShortenerServiceServer) GetLink(context.Context, *GetLinkRequest) (*Link, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLink not implemented")
@@ -212,6 +228,24 @@ func _ShortenerService_Redirect_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ShortenerServiceServer).Redirect(ctx, req.(*RedirectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ShortenerService_GetLinks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLinksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShortenerServiceServer).GetLinks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShortenerService_GetLinks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShortenerServiceServer).GetLinks(ctx, req.(*GetLinksRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -352,6 +386,10 @@ var ShortenerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Redirect",
 			Handler:    _ShortenerService_Redirect_Handler,
+		},
+		{
+			MethodName: "GetLinks",
+			Handler:    _ShortenerService_GetLinks_Handler,
 		},
 		{
 			MethodName: "GetLink",
