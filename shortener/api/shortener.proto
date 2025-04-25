@@ -34,7 +34,7 @@ message GetLinksRequest {
 }
 
 message GetLinksResponse {
-  repeated Link links = 1;
+  repeated string shortLinks = 1;
 }
 
 // ======================== Get 1 ===========================
