@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"xlink/common/gen/analytics"
+	"xlink/common/logger"
 	"xlink/gateway/internal/handlers"
 	"xlink/gateway/internal/handlers/helpers"
 	"xlink/gateway/internal/services"
@@ -55,9 +57,15 @@ func (h *AnalyticsServiceHandler) GetClicksByCountry(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByCountry(request)
 	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get country stats",
+				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get country stats: %v", err))
 	}
 
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got country stats",
+			zap.String(handlers.UserIdKey, request.LinkOwner))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -69,9 +77,15 @@ func (h *AnalyticsServiceHandler) GetClicksByRegion(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByRegion(request)
 	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get region stats",
+				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get region stats: %v", err))
 	}
 
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got region stats",
+			zap.String(handlers.UserIdKey, request.LinkOwner))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -83,9 +97,15 @@ func (h *AnalyticsServiceHandler) GetClicksByBrowser(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByBrowser(request)
 	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get browser stats",
+				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get browser stats: %v", err))
 	}
 
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got browser stats",
+			zap.String(handlers.UserIdKey, request.LinkOwner))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -97,9 +117,15 @@ func (h *AnalyticsServiceHandler) GetClicksByOS(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByOS(request)
 	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get OS stats",
+				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get OS stats: %v", err))
 	}
 
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got OS stats",
+			zap.String(handlers.UserIdKey, request.LinkOwner))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -111,9 +137,15 @@ func (h *AnalyticsServiceHandler) GetClicksByDeviceType(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByDeviceType(request)
 	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get device type stats",
+				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get device type stats: %v", err))
 	}
 
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got device type stats",
+			zap.String(handlers.UserIdKey, request.LinkOwner))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -125,9 +157,15 @@ func (h *AnalyticsServiceHandler) GetClicksByHour(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByHour(request)
 	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get per-hour stats",
+				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get per-hour stats: %v", err))
 	}
 
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got per-hour stats",
+			zap.String(handlers.UserIdKey, request.LinkOwner))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -139,9 +177,15 @@ func (h *AnalyticsServiceHandler) GetClicksByDate(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByDate(request)
 	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get per-date stats",
+				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get per-date stats: %v", err))
 	}
 
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got per-date stats",
+			zap.String(handlers.UserIdKey, request.LinkOwner))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -153,8 +197,14 @@ func (h *AnalyticsServiceHandler) GetClicksByReferrer(ctx *fiber.Ctx) error {
 
 	response, err := h.analyticsService.ClicksByReferrer(request)
 	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't get referrer stats",
+				zap.Error(err), zap.String(handlers.UserIdKey, request.LinkOwner))
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get referrer stats: %v", err))
 	}
 
+	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+		Info(ctx.UserContext(), "got referrer stats",
+			zap.String(handlers.UserIdKey, request.LinkOwner))
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }

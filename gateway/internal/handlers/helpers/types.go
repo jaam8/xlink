@@ -7,12 +7,12 @@ import (
 )
 
 func InvalidDateBadRequest(c *fiber.Ctx, fieldName string) error {
-	return BadRequest(c, fmt.Sprintf("invalid %s: must follow %s pattern", fieldName, time.DateOnly))
+	return BadRequest(c, fmt.Errorf("invalid %s: must follow %s pattern", fieldName, time.DateOnly))
 }
 
-func BadRequest(c *fiber.Ctx, message string) error {
+func BadRequest(c *fiber.Ctx, err error) error {
 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-		"error": message,
+		"error": err.Error(),
 	})
 }
 
