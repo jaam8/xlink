@@ -46,7 +46,7 @@ func (s *Service) GetLinks(ctx context.Context, request *shortener.GetLinksReque
 		return &shortener.GetLinksResponse{}, fmt.Errorf("error while validating user_id: %w", err)
 	}
 
-	var links []*models.Link
+	var links []string
 	links, err = s.storageRepo.GetLinks(userId)
 	if err != nil {
 		logger.GetLoggerFromCtx(ctx).Error(ctx, "couldn't receive links list by user id from storage",
@@ -59,12 +59,7 @@ func (s *Service) GetLinks(ctx context.Context, request *shortener.GetLinksReque
 		zap.String(helper.UserIdKey, request.UserId),
 	)
 
-	linkResponseList := make([]*shortener.Link, len(links))
-	for i, link := range links {
-		linkResponseList[i] = helper.LinkResponseFromLinkModel(*link)
-	}
-
-	return &shortener.GetLinksResponse{Links: linkResponseList}, nil
+	return &shortener.GetLinksResponse{ShortLinks: links}, nil
 }
 
 func (s *Service) GetLink(ctx context.Context, request *shortener.GetLinkRequest) (*shortener.Link, error) {
