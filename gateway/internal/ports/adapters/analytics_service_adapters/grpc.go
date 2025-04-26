@@ -22,7 +22,8 @@ func (s AnalyticsServiceRepositoryGRPC) ClicksByCountry(request *analytics.GetCl
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := analytics.NewAnalyticsServiceClient(conn)
 
@@ -39,7 +40,8 @@ func (s AnalyticsServiceRepositoryGRPC) ClicksByRegion(request *analytics.GetCli
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := analytics.NewAnalyticsServiceClient(conn)
 
@@ -56,7 +58,8 @@ func (s AnalyticsServiceRepositoryGRPC) ClicksByBrowser(request *analytics.GetCl
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := analytics.NewAnalyticsServiceClient(conn)
 
@@ -73,7 +76,8 @@ func (s AnalyticsServiceRepositoryGRPC) ClicksByOS(request *analytics.GetClicksR
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := analytics.NewAnalyticsServiceClient(conn)
 
@@ -90,7 +94,8 @@ func (s AnalyticsServiceRepositoryGRPC) ClicksByDeviceType(request *analytics.Ge
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := analytics.NewAnalyticsServiceClient(conn)
 
@@ -107,7 +112,8 @@ func (s AnalyticsServiceRepositoryGRPC) ClicksByHour(request *analytics.GetClick
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := analytics.NewAnalyticsServiceClient(conn)
 
@@ -124,7 +130,8 @@ func (s AnalyticsServiceRepositoryGRPC) ClicksByDate(request *analytics.GetClick
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := analytics.NewAnalyticsServiceClient(conn)
 
@@ -141,7 +148,8 @@ func (s AnalyticsServiceRepositoryGRPC) ClicksByReferrer(request *analytics.GetC
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := analytics.NewAnalyticsServiceClient(conn)
 
