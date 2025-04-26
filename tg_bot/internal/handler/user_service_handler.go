@@ -91,6 +91,19 @@ func (h *Handler) SignInHandler(ctx *th.Context, update telego.Update) error {
 		return err
 	}
 	err = h.cache.SetUserToken(strconv.Itoa(int(update.CallbackQuery.From.ID)), token)
+	if err != nil {
+		inlineKeyboard := tu.InlineKeyboard(
+			tu.InlineKeyboardRow(
+				tu.InlineKeyboardButton("Авторизироваться").WithCallbackData("log-in"),
+			),
+		)
+		_, err = h.Bot.SendMessage(ctx, &telego.SendMessageParams{
+			ChatID:      tu.ID(update.CallbackQuery.From.ID),
+			Text:        "Кажется вы уже зарегестрированы",
+			ReplyMarkup: inlineKeyboard,
+		})
+		return nil
+	}
 	_, err = h.Bot.SendMessage(ctx,
 		tu.Messagef(tu.ID(update.CallbackQuery.From.ID),
 			"Ваш API ключ: `%s`\nСохраните его и никому не показывайте", token,
