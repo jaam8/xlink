@@ -50,5 +50,6 @@ func (h *RendererServiceHandler) Image(ctx *fiber.Ctx) error {
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get renderer response: %w", err))
 	}
 
+	ctx.Set("Content-Type", "image/png")
 	return ctx.Status(fiber.StatusOK).Send(response)
 }
