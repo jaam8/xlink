@@ -7,7 +7,7 @@ import (
 )
 
 func ParseNotEmptyStringField(ctx *fiber.Ctx, fieldName string) (string, error) {
-	val := ctx.Params(fieldName)
+	val := ctx.Query(fieldName)
 	if len(val) == 0 {
 		return "", fmt.Errorf("%s mustn't be empty", fieldName)
 	}
@@ -15,7 +15,7 @@ func ParseNotEmptyStringField(ctx *fiber.Ctx, fieldName string) (string, error) 
 }
 
 func ParseDateField(c *fiber.Ctx, fieldName string) (time.Time, error) {
-	return ParseDate(c.Params(fieldName))
+	return ParseDate(c.Query(fieldName))
 }
 
 func ParseDate(date string) (time.Time, error) {

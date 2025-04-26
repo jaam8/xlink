@@ -24,6 +24,8 @@ func NewRendererHandler(analyticsService *services.AnalyticsService, drawerGener
 }
 
 func (h *RendererHandler) Image(ctx *fiber.Ctx) error {
+	fmt.Println("SOSATEL ONLINE")
+
 	var err error
 
 	var shortLink string
