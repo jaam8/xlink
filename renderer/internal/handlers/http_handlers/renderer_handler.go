@@ -24,8 +24,6 @@ func NewRendererHandler(analyticsService *services.AnalyticsService, drawerGener
 }
 
 func (h *RendererHandler) Image(ctx *fiber.Ctx) error {
-	fmt.Println("SOSATEL ONLINE")
-
 	var err error
 
 	var shortLink string
@@ -239,6 +237,12 @@ func (h *RendererHandler) Image(ctx *fiber.Ctx) error {
 
 	var imageBytes []byte
 	imageBytes, err = h.drawerGenerator.Generate(statistics_data.StatisticsData{Stats: inputStats}, param)
+	if err != nil {
+		logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
+			Error(ctx.UserContext(), "couldn't render image", zap.Error(err))
+		return helpers.InternalServerError(ctx,
+			fmt.Errorf("couldn't render image"))
+	}
 
 	logger.GetOrCreateLoggerFromCtx(ctx.UserContext()).
 		Info(ctx.UserContext(), "generated image",
@@ -246,7 +250,8 @@ func (h *RendererHandler) Image(ctx *fiber.Ctx) error {
 			zap.String("linkOwner", linkOwner),
 			zap.String("param", param),
 			zap.Time("startDate", startDate),
-			zap.Time("endDate", endDate))
+			zap.Time("endDate", endDate),
+			zap.Int("bytesLen", len(imageBytes)))
 
 	ctx.Set("Content-Type", "image/png")
 	return ctx.Send(imageBytes)
