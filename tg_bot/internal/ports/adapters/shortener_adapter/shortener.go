@@ -3,6 +3,7 @@ package shortener_adapter
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -50,7 +51,7 @@ func (s *ShortenerAdapter) CreateLink(userToken, targetUrl string, shortLink *st
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", userToken)
-	client := &http.Client{Timeout: s.Timeout}
+	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", "", "", "", err
@@ -58,7 +59,9 @@ func (s *ShortenerAdapter) CreateLink(userToken, targetUrl string, shortLink *st
 	// nolint
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusCreated {
-		return "", "", "", "", err
+		log.Println(req)
+		log.Println(resp)
+		return "", "", "", "", fmt.Errorf("shortener create failed, status code: %d", resp.StatusCode)
 	}
 	if err = json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return "", "", "", "", err
@@ -149,7 +152,7 @@ func (s *ShortenerAdapter) GetUserLinks(userToken string) ([]string, error) {
 	}
 	req.Header.Set("Authorization", userToken)
 
-	client := &http.Client{Timeout: s.Timeout}
+	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
