@@ -76,9 +76,9 @@ func (h *Handler) HelpHandler(ctx *th.Context, update telego.Update) error {
 	_, err := h.Bot.SendMessage(ctx, &telego.SendMessageParams{
 		ChatID: tu.ID(update.Message.Chat.ID),
 		Text: `Вот, что я могу:
-- /start — запустить бота
-- /help — показать это сообщение
-- /menu — выбрать метрики для отображения`})
+/start - регистрация и авторизация
+/help - список команд
+/menu - управление ссылками`})
 	if err != nil {
 		return err
 	}
@@ -105,10 +105,7 @@ func (h *Handler) MenuHandler(ctx *th.Context, update telego.Update) error {
 	if err != nil || token == "" {
 		token, err = h.user.GetTokenByTgID(chatID.ID)
 		if err != nil {
-			return err
-		}
-		err = h.cache.SetUserToken(strconv.Itoa(int(chatID.ID)), token)
-		if err != nil {
+			h.SendMessage(ctx, chatID.ID, "для начала авторизуйтесь или зарегестрируйтесь")
 			return err
 		}
 	}
@@ -127,7 +124,7 @@ func (h *Handler) MenuHandler(ctx *th.Context, update telego.Update) error {
 
 	for _, link := range links {
 		keyboard = append(keyboard, []telego.InlineKeyboardButton{
-			tu.InlineKeyboardButton(fmt.Sprintf("%s/l/%s", h.basePath, link)).
+			tu.InlineKeyboardButton(fmt.Sprintf("%s/l/%s", "localhost", link)).
 				WithCallbackData("link-" + link)},
 		)
 	}
