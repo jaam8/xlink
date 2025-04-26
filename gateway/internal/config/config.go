@@ -23,7 +23,7 @@ type TimeoutsConfig struct {
 	Shortener     int `yaml:"shortener" env:"SHORTENER"`
 	UserService   int `yaml:"user_service" env:"USER_SERVICE"`
 	Analytics     int `yaml:"analytics" env:"ANALYTICS"`
-	FileGenerator int `yaml:"file_generator" env:"FILE_GENERATOR"`
+	FileGenerator int `yaml:"file_generator" env:"FILE_GENERATOR" env-default:"10000"`
 }
 
 type GrpcPoolConfig struct {
