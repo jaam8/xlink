@@ -6,10 +6,11 @@ import (
 )
 
 type ShortenerAdapter interface {
-	CreateLink(shortLink *string, targetUrl string) (string, string, time.Time, time.Time, error)
-	UpdateLink(shortLink, targetURL string, expireAt time.Time, regenerate bool,
-	) (string, string, time.Time, time.Time, error)
-	DeleteLink(shortLink string) error
+	CreateLink(userToken, targetUrl string, shortLink *string) (string, string, string, string, error)
+	UpdateLink(userToken, shortLink, targetURL string, expireAt time.Time, regenerate bool,
+	) (string, string, string, string, error)
+	GetUserLinks(userToken string) ([]string, error)
+	DeleteLink(userToken, shortLink string) error
 }
 
 type UserServiceAdapter interface {
@@ -21,13 +22,22 @@ type UserServiceAdapter interface {
 	SetTgID(userID string, tgID int64) error
 }
 
+type CacheAdapter interface {
+	GetUserToken(tgID string) (string, error)
+	SetUserToken(tgID, userToken string) error
+}
+
 type AnalyticsAdapter interface {
-	ClicksByCountry(linkOwner, shortLink, startDate, endDate string) (models.Stat[models.CountryDayStat], error)
-	ClicksByRegion(linkOwner, shortLink, startDate, endDate string) (models.Stat[models.RegionDayStat], error)
-	ClicksByBrowser(linkOwner, shortLink, startDate, endDate string) (models.Stat[models.BrowserDayStat], error)
-	ClicksByDevice(linkOwner, shortLink, startDate, endDate string) (models.Stat[models.DeviceDayStat], error)
-	ClicksByOS(linkOwner, shortLink, startDate, endDate string) (models.Stat[models.OSDayStat], error)
-	ClicksByReferrer(linkOwner, shortLink, startDate, endDate string) (models.Stat[models.ReferrerDayStat], error)
-	ClicksByHour(linkOwner, shortLink, startDate, endDate string) (models.Stat[models.HourDayStat], error)
-	ClicksByDate(linkOwner, shortLink, startDate, endDate string) (models.DateStat, error)
+	ClicksByCountry(userToken, shortLink, startDate, endDate string) ([]models.Stat[models.CountryDayStat], error)
+	ClicksByRegion(userToken, shortLink, startDate, endDate string) ([]models.Stat[models.RegionDayStat], error)
+	ClicksByBrowser(userToken, shortLink, startDate, endDate string) ([]models.Stat[models.BrowserDayStat], error)
+	ClicksByDevice(userToken, shortLink, startDate, endDate string) ([]models.Stat[models.DeviceDayStat], error)
+	ClicksByOS(userToken, shortLink, startDate, endDate string) ([]models.Stat[models.OSDayStat], error)
+	ClicksByReferrer(userToken, shortLink, startDate, endDate string) ([]models.Stat[models.ReferrerDayStat], error)
+	ClicksByHour(userToken, shortLink, startDate, endDate string) ([]models.Stat[models.HourDayStat], error)
+	ClicksByDate(userToken, shortLink, startDate, endDate string) ([]models.DateStat, error)
+}
+
+type RendererAdapter interface {
+	RenderChart(chartType string) (string, error)
 }
