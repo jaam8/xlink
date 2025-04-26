@@ -10,19 +10,19 @@ import (
 )
 
 func (h *Handler) ChooseMetricsToRenderHandler(ctx *th.Context, update telego.Update) error {
-	userID := update.Message.From.ID
+	userID := update.CallbackQuery.From.ID
 
 	shortLink := strings.TrimPrefix(update.CallbackQuery.Data, "show-metrics-")
 
+	h.mu.Lock()
 	// Инициализируем выборы для юзера, если их ещё нет
 	if _, ok := h.userMetricSelections[userID]; !ok {
 		h.userMetricSelections[userID] = make(map[string]bool)
 	}
 
-	// Инициализируем выбор самой ссылки для юзера
-	if _, ok := h.userShortLinkSelections[userID]; ok {
-		h.userShortLinkSelections[userID] = shortLink
-	}
+	// Меняем выбор самой ссылки для юзера
+	h.userShortLinkSelections[userID] = shortLink
+	h.mu.Unlock()
 
 	// Шлем стартовое сообщение с клавиатурой
 	_, err := h.Bot.SendMessage(ctx, &telego.SendMessageParams{
@@ -118,7 +118,7 @@ func (h *Handler) HandleMetricSelection(ctx *th.Context, update telego.Update) e
 }
 
 func (h *Handler) ChooseDateToRenderHandler(ctx *th.Context, update telego.Update) error {
-	userID := update.CallbackQuery.From.ID
+	userID := update.Message.From.ID
 	dataSplit := strings.Split(update.Message.Text, " ")
 
 	var err error
@@ -157,14 +157,17 @@ func (h *Handler) ChooseDateToRenderHandler(ctx *th.Context, update telego.Updat
 			Text:   "не выбраны метрики!",
 		})
 	}
+	fmt.Println("!!!", h.userShortLinkSelections, userID)
 	shortLink, ok = h.userShortLinkSelections[userID]
 	if !ok {
 		h.mu.Unlock()
+		fmt.Println("не выбрана ссылка!")
 		_, _ = h.Bot.SendMessage(ctx, &telego.SendMessageParams{
 			ChatID: tu.ID(userID),
 			Text:   "не выбрана ссылка!",
 		})
 	}
+	fmt.Println(shortLink)
 
 	h.mu.Unlock()
 	//endregion
@@ -180,6 +183,7 @@ func (h *Handler) ChooseDateToRenderHandler(ctx *th.Context, update telego.Updat
 	//endregion
 
 	for clickByParamShortLinkString, value := range selected {
+		fmt.Println(clickByParamShortLinkString, value)
 		if !value {
 			continue
 		}

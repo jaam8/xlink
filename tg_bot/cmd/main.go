@@ -46,7 +46,7 @@ func main() {
 	redisClient, err := redis.NewRedisClient(ctx, redisCfg, botCfg.RedisDB)
 
 	redisAdapter := cache.NewRedisAdapter(redisClient, time.Duration(botCfg.ExpirationSeconds)*time.Second)
-
+	fmt.Println(fmt.Sprintf("%s:%d", userServiceCfg.UpstreamNames, userServiceCfg.UpstreamPorts))
 	userAdapter := user_service_adapter.NewUserServiceAdapter(
 		fmt.Sprintf("%s:%d", userServiceCfg.UpstreamNames, userServiceCfg.UpstreamPorts),
 		fmt.Sprintf("%s/%s", botCfg.BaseAPIURL, "api/v1/user/"),

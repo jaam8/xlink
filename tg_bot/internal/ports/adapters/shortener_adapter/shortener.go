@@ -140,9 +140,9 @@ func (s *ShortenerAdapter) UpdateLink(userToken, shortLink, targetURL string,
 
 func (s *ShortenerAdapter) GetUserLinks(userToken string) ([]string, error) {
 	var respData struct {
-		Links []string `json:"links"`
+		Links []string `json:"shortLinks"`
 	}
-	path := s.BaseURL + "my_links"
+	path := s.BaseURL + "my-links"
 	req, err := http.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
@@ -161,7 +161,6 @@ func (s *ShortenerAdapter) GetUserLinks(userToken string) ([]string, error) {
 	if err = json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-
 	return respData.Links, nil
 }
 

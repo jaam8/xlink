@@ -40,6 +40,7 @@ func NewHandler(
 	handler.shortener = shortener
 	handler.analytics = analytics
 	handler.userMetricSelections = make(map[int64]map[string]bool)
+	handler.userShortLinkSelections = make(map[int64]string)
 	handler.cache = cache
 	handler.renderer = renderer
 	handler.basePath = basePath
@@ -101,7 +102,7 @@ func (h *Handler) SendImage(ctx *th.Context, chatID int64, url string) {
 func (h *Handler) MenuHandler(ctx *th.Context, update telego.Update) error {
 	chatID := tu.ID(update.Message.From.ID)
 	token, err := h.cache.GetUserToken(strconv.Itoa(int(chatID.ID)))
-	if err != nil {
+	if err != nil || token == "" {
 		token, err = h.user.GetTokenByTgID(chatID.ID)
 		if err != nil {
 			return err

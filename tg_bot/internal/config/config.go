@@ -18,7 +18,7 @@ type BotConfig struct {
 
 type UserServiceConfig struct {
 	UpstreamNames string `yaml:"upstream_names" env:"UPSTREAM_NAMES"`
-	UpstreamPorts string `yaml:"upstream_ports" env:"UPSTREAM_PORTS"`
+	UpstreamPorts int    `yaml:"upstream_ports" env:"UPSTREAM_PORTS"`
 	Timeouts      int    `yaml:"timeouts" env:"TIMEOUTS"`
 }
 
