@@ -52,6 +52,7 @@ gateway:
   port: 3000
 
 http_port: 8080
+http_port_renderer: 8085
 
 upstream_names:
   shortener: shortener
