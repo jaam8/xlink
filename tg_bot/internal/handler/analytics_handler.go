@@ -14,13 +14,11 @@ func (h *Handler) ChooseMetricsToRenderHandler(ctx *th.Context, update telego.Up
 
 	shortLink := strings.TrimPrefix(update.CallbackQuery.Data, "show-metrics-")
 
-	fmt.Println("SOSAL")
 	//h.mu.Lock()
 	// Инициализируем выборы для юзера, если их ещё нет
 	if _, ok := h.userMetricSelections[userID]; !ok {
 		h.userMetricSelections[userID] = make(map[string]bool)
 	}
-	fmt.Println("SOSAL")
 
 	// Меняем выбор самой ссылки для юзера
 	h.userShortLinkSelections[userID] = shortLink
