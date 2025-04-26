@@ -93,7 +93,10 @@ func main() {
 	bh.Handle(h.CreateLinkHandler, th.CallbackDataEqual("create-link"))
 	bh.Handle(h.DoCustomLink, th.CallbackDataEqual("do-custom-link"))
 	bh.Handle(h.DoGenerateLink, th.CallbackDataEqual("do-generate-link"))
-	bh.Handle(h.ChooseLinkType)
+	// receive messages start with "http"
+	bh.Handle(h.ChooseLinkType, th.TextPrefix("http"))
+	// receive messages start with "l <link>"
+	bh.Handle(h.DoCustomLinkFinal, th.TextPrefix("l "))
 	err = bh.Start()
 	if err != nil {
 		log.Fatal(err)
