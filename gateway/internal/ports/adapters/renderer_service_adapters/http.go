@@ -26,7 +26,7 @@ func (r *RendererServiceRepositoryHTTP) Generate(shortLink string, param string,
 
 	var request *http.Request
 	request, err = http.NewRequest("GET",
-		fmt.Sprintf("%s?shortLink=%s&param=%s&start_date=%s&end_date=%s", r.address, shortLink, param, startDate, endDate),
+		fmt.Sprintf("%s/image?shortLink=%s&param=%s&start_date=%s&end_date=%s", r.address, shortLink, param, startDate.Format(time.DateOnly), endDate.Format(time.DateOnly)),
 		nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating HTTP renderer request: %s", err)

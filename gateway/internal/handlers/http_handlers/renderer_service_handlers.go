@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 	"time"
+	"xlink/common/logger"
 	"xlink/gateway/internal/handlers/helpers"
 	"xlink/gateway/internal/services"
 )
@@ -27,7 +29,7 @@ func (h *RendererServiceHandler) Image(ctx *fiber.Ctx) error {
 	}
 
 	var param string
-	param, err = helpers.ParseNonEmptyStringField(ctx, "param")
+	param, err = helpers.ParseNonEmptyStringFieldParam(ctx, "param")
 	if err != nil {
 		return helpers.BadRequest(ctx, errors.New("'param' is required"))
 	}
@@ -49,6 +51,9 @@ func (h *RendererServiceHandler) Image(ctx *fiber.Ctx) error {
 	if err != nil {
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get renderer response: %w", err))
 	}
+
+	logger.GetLoggerFromCtx(ctx.UserContext()).Info(ctx.UserContext(), "created an image",
+		zap.String("short_link", shortLink))
 
 	ctx.Set("Content-Type", "image/png")
 	return ctx.Status(fiber.StatusOK).Send(response)
