@@ -137,7 +137,7 @@ func main() {
 	//region middlewares
 	loggingMiddleware := middlewares.LoggerMiddleware()
 	authMiddleware := middlewares.AuthMiddleware(userService)
-	// authMiddlewareTokenParam := middlewares.AuthMiddlewareTokenParam(userService, "token")
+	authMiddlewareTokenParam := middlewares.AuthMiddlewareTokenParam(userService, "token")
 	isAdminMiddleware := middlewares.RoleMiddleware(false, true, userService)
 	isStaffMiddleware := middlewares.RoleMiddleware(true, false, userService)
 	shortLinkOwnerOnlyMiddleware := middlewares.ShortenerOwnerOnlyMiddleware("shortLink", shortenerService)
@@ -236,9 +236,10 @@ func main() {
 	//endregion analytics v1
 
 	//region renderer v1
-	rendererGroup := v1Group.Group("/img")
+	rendererGroup := v1Group.Group("/img/:shortLink")
+	rendererGroup.Use(authMiddlewareTokenParam, shortLinkOwnerOnlyMiddleware)
 	{
-		rendererGroup.Get("/:shortLink/", rendererHandler.Image)
+		rendererGroup.Get("/", rendererHandler.Image)
 	}
 	for _, b := range app.GetRoutes() {
 		fmt.Println(b)

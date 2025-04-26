@@ -33,7 +33,7 @@ func AuthMiddleware(service IdCheckerService) fiber.Handler {
 
 func AuthMiddlewareTokenParam(service IdCheckerService, paramName string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		token := c.Params(paramName)
+		token := c.Query(paramName)
 		if token == "" {
 			return c.Status(fiber.StatusUnauthorized).
 				JSON(fiber.Map{"error": fmt.Errorf("missing '%s' parameter", paramName)})

@@ -21,12 +21,13 @@ func NewRendererServiceRepositoryHTTP(protocol string, hostName string, port str
 	}
 }
 
-func (r *RendererServiceRepositoryHTTP) Generate(shortLink string, param string, startDate time.Time, endDate time.Time) ([]byte, error) {
+func (r *RendererServiceRepositoryHTTP) Generate(shortLink string, param string, startDate time.Time, endDate time.Time, linkOwner string) ([]byte, error) {
 	var err error
 
 	var request *http.Request
 	request, err = http.NewRequest("GET",
-		fmt.Sprintf("%s/image?short_link=%s&param=%s&start_date=%s&end_date=%s", r.address, shortLink, param, startDate.Format(time.DateOnly), endDate.Format(time.DateOnly)),
+		fmt.Sprintf("%s/image?short_link=%s&param=%s&start_date=%s&end_date=%s&link_owner=%s",
+			r.address, shortLink, param, startDate.Format(time.DateOnly), endDate.Format(time.DateOnly), linkOwner),
 		nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating HTTP renderer request: %s", err)

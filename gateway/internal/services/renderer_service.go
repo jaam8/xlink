@@ -21,11 +21,11 @@ func NewRendererService(rendererServiceRepo ports.RendererServiceRepository, max
 	}
 }
 
-func (s *RendererService) Generate(shortLink string, param string, startDate time.Time, endDate time.Time) ([]byte, error) {
+func (s *RendererService) Generate(shortLink string, param string, startDate time.Time, endDate time.Time, linkOwner string) ([]byte, error) {
 	resultChan := make(chan []byte, 1)
 
 	err := callers.Retry(func() error {
-		response, err := s.rendererServiceRepo.Generate(shortLink, param, startDate, endDate)
+		response, err := s.rendererServiceRepo.Generate(shortLink, param, startDate, endDate, linkOwner)
 		if err != nil {
 			return fmt.Errorf("error in retry Renderer caller: %v", err)
 		}
