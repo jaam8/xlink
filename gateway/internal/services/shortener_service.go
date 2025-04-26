@@ -28,7 +28,7 @@ func (s *ShortenerService) Redirect(request *shortener.RedirectRequest) (*shorte
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).Redirect(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout Redirect caller: %v", err)
+			return fmt.Errorf("error in retry Redirect caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -50,7 +50,7 @@ func (s *ShortenerService) GetLinks(request *shortener.GetLinksRequest) (*shorte
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).GetLinks(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout GetLinks caller: %v", err)
+			return fmt.Errorf("error in retry GetLinks caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -72,7 +72,7 @@ func (s *ShortenerService) GetLink(request *shortener.GetLinkRequest) (*shortene
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).GetLink(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout GetLink caller: %v", err)
+			return fmt.Errorf("error in retry GetLink caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -94,7 +94,7 @@ func (s *ShortenerService) CreateNewLink(request *shortener.CreateLinkRequest) (
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).CreateNewLink(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout CreateNewLink caller: %v", err)
+			return fmt.Errorf("error in retry CreateNewLink caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -116,7 +116,7 @@ func (s *ShortenerService) UpdateLink(request *shortener.UpdateLinkRequest) (*sh
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).UpdateLink(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout UpdateLink caller: %v", err)
+			return fmt.Errorf("error in retry UpdateLink caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -138,7 +138,7 @@ func (s *ShortenerService) DeleteLink(request *shortener.DeleteLinkRequest) (*sh
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).DeleteLink(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout DeleteLink caller: %v", err)
+			return fmt.Errorf("error in retry DeleteLink caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -160,7 +160,7 @@ func (s *ShortenerService) GetLinksCountByUserId(request *shortener.GetLinksCoun
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).GetLinksCountByUserId(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout GetLinksCountByUserId caller: %v", err)
+			return fmt.Errorf("error in retry GetLinksCountByUserId caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -182,7 +182,7 @@ func (s *ShortenerService) GetLinkIdByShortLink(request *shortener.GetLinkIdBySh
 	err := callers.Retry(func() error {
 		response, err := (*s.ShortenerServiceRepo).GetLinkIdByShortLink(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout GetLinkIdByShortLinkResponse caller: %v", err)
+			return fmt.Errorf("error in retry GetLinkIdByShortLinkResponse caller: %v", err)
 		}
 		resultChan <- response
 		return nil

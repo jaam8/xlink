@@ -42,3 +42,11 @@ func ParseDate(date string) (time.Time, error) {
 	}
 	return dateField, nil
 }
+
+func ParseNonEmptyStringField(c *fiber.Ctx, fieldName string) (string, error) {
+	value := c.Params(fieldName)
+	if len(value) == 0 {
+		return "", fmt.Errorf("field %s is empty", fieldName)
+	}
+	return value, nil
+}

@@ -17,6 +17,7 @@ import (
 	"xlink/gateway/internal/handlers/http_handlers"
 	"xlink/gateway/internal/handlers/middlewares"
 	"xlink/gateway/internal/ports/adapters/analytics_service_adapters"
+	"xlink/gateway/internal/ports/adapters/renderer_service_adapters"
 	"xlink/gateway/internal/ports/adapters/shortener_service_adapters"
 	"xlink/gateway/internal/ports/adapters/user_service_adapters"
 	"xlink/gateway/internal/services"
@@ -97,6 +98,12 @@ func main() {
 	userServiceRepo := user_service_adapters.NewUserServiceRepositoryGRPC(usersGrpcPool)
 	shortenerServiceRepo := shortener_service_adapters.NewShortenerServiceRepositoryGRPC(shortenerGrpcPool)
 	analyticsServiceRepo := analytics_service_adapters.NewAnalyticsServiceRepositoryGRPC(analyticsGrpcPool)
+	rendererServiceRepo := renderer_service_adapters.NewRendererServiceRepositoryHTTP(
+		"http",
+		mainConfig.UpstreamNames.FileGenerator,
+		mainConfig.UpstreamPorts.FileGenerator,
+		time.Duration(mainConfig.Timeouts.FileGenerator)*time.Millisecond,
+	)
 
 	userService := services.NewUserService(
 		userServiceRepo,
@@ -113,19 +120,27 @@ func main() {
 		mainConfig.GrpcPool.MaxRetries,
 		time.Millisecond*time.Duration(mainConfig.GrpcPool.BaseRetryDelayMilliseconds),
 	)
+	rendererService := services.NewRendererService(
+		rendererServiceRepo,
+		mainConfig.GrpcPool.MaxRetries,
+		time.Millisecond*time.Duration(mainConfig.GrpcPool.BaseRetryDelayMilliseconds),
+	)
 	//endregion repos
 
 	//region handlers
 	userServiceHandler := http_handlers.NewUserServiceHandler(userService)
 	shortenerServiceHandler := http_handlers.NewShortenerServiceHandler(shortenerService, userService)
 	analyticsServiceHandler := http_handlers.NewAnalyticsServiceHandler(analyticsService)
+	rendererHandler := http_handlers.NewRendererServiceHandler(rendererService)
 	//endregion handlers
 
 	//region middlewares
 	loggingMiddleware := middlewares.LoggerMiddleware()
 	authMiddleware := middlewares.AuthMiddleware(userService)
+	authMiddlewareTokenParam := middlewares.AuthMiddlewareTokenParam(userService, "token")
 	isAdminMiddleware := middlewares.RoleMiddleware(false, true, userService)
 	isStaffMiddleware := middlewares.RoleMiddleware(true, false, userService)
+	shortLinkOwnerOnlyMiddleware := middlewares.ShortenerOwnerOnlyMiddleware("shortLink", shortenerService)
 	//endregion middlewares
 
 	//region html
@@ -196,7 +211,7 @@ func main() {
 		}
 
 		shortenerOwnerOnlyGroup := shortenerAuthenticatedGroup.Group("")
-		shortenerOwnerOnlyGroup.Use(middlewares.ShortenerOwnerOnlyMiddleware("shortLink", shortenerService))
+		shortenerOwnerOnlyGroup.Use(shortLinkOwnerOnlyMiddleware)
 		{
 			shortenerOwnerOnlyGroup.Put("/update/:shortLink", shortenerServiceHandler.UpdateLink)    // owner
 			shortenerOwnerOnlyGroup.Delete("/delete/:shortLink", shortenerServiceHandler.DeleteLink) // owner
@@ -220,6 +235,14 @@ func main() {
 	}
 	//endregion analytics v1
 
+	//region renderer v1
+	rendererGroup := v1Group.Group("/img")
+	rendererGroup.Use(authMiddlewareTokenParam, shortLinkOwnerOnlyMiddleware)
+	{
+		rendererGroup.Get("/:shortLink/", rendererHandler.Image)
+	}
+	//endregion renderer v1
+	
 	//region static
 	app.Static("/static/", "./web/static")
 	//endregion static
