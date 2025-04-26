@@ -3,14 +3,17 @@ package config
 import (
 	"fmt"
 	"github.com/ilyakaznacheev/cleanenv"
+	"xlink/common/redis"
 )
 
 type BotConfig struct {
-	BotToken   string `yaml:"bot_token" env:"BOT_TOKEN"`
-	Host       string `yaml:"host" env:"HOST" env-default:"tg_bot"`
-	Port       string `yaml:"port" env:"PORT" env-default:"50055"`
-	BaseAPIURL string `yaml:"base_api_url" env:"BASE_URL" env-default:"http://nginx:80"`
-	Timeouts   int    `yaml:"timeouts" env:"TIMEOUTS" env-default:"1000"`
+	BotToken          string `yaml:"bot_token" env:"BOT_TOKEN"`
+	Host              string `yaml:"host" env:"HOST" env-default:"tg_bot"`
+	Port              string `yaml:"port" env:"PORT" env-default:"50055"`
+	BaseAPIURL        string `yaml:"base_api_url" env:"BASE_URL" env-default:"http://nginx:80"`
+	RedisDB           int    `yaml:"redis_db" env:"REDIS_DB" env-default:"3"`
+	ExpirationSeconds int    `yaml:"expiration_seconds" env:"EXPIRATION_SECONDS" env-default:"500"`
+	Timeouts          int    `yaml:"timeouts" env:"TIMEOUTS" env-default:"1000"`
 }
 
 type UserServiceConfig struct {
@@ -22,6 +25,7 @@ type UserServiceConfig struct {
 type Config struct {
 	BotConfig   BotConfig         `yaml:"bot" env-prefix:"BOT_"`
 	UserService UserServiceConfig `yaml:"user_service" env-prefix:"USER_SERVICE_"`
+	RedisConfig redis.Config      `yaml:"redis" env-prefix:"REDIS_"`
 }
 
 func New() (Config, error) {
