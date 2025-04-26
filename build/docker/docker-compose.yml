@@ -1,7 +1,6 @@
 
 services:
   gateway:
-    container_name: gateway
     build:
       context: ../../
       dockerfile: build/docker/Dockerfile.gateway
@@ -14,11 +13,11 @@ services:
       - kafka
       - clickhouse
       - zookeeper
+    scale: 3
     networks:
       - backend
 
   user_service:
-    container_name: user_service
     build:
       context: ../../
       dockerfile: build/docker/Dockerfile.user_service
@@ -36,11 +35,29 @@ services:
     volumes:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
+    scale: 3
+    networks:
+      - backend
+
+  renderer:
+    build:
+      context: ../../
+      dockerfile: build/docker/Dockerfile.renderer
+    env_file:
+      - ../../configs/.env
+    expose:
+      - ${HTTP_PORT_RENDERER}
+    depends_on:
+      - analytics
+    restart: on-failure
+    volumes:
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+    scale: 3
     networks:
       - backend
 
   shortener:
-    container_name: shortener
     build:
       context: ../../
       dockerfile: build/docker/Dockerfile.shortener
@@ -57,11 +74,11 @@ services:
     volumes:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
+    scale: 3
     networks:
       - backend
 
   analytics:
-    container_name: analytics
     build:
       context: ../../
       dockerfile: build/docker/Dockerfile.analytics
@@ -79,6 +96,7 @@ services:
     volumes:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
+    scale: 3
     networks:
       - backend
 
@@ -212,7 +230,7 @@ services:
       - user_service
       - shortener
       - analytics
-      - tg_bot
+      # - tg_bot
     volumes:
       - ../entry_nginx/conf.d:/etc/nginx/conf.d
     networks:
