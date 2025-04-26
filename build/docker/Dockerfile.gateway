@@ -25,6 +25,6 @@ WORKDIR /app
 
 COPY --from=builder /build/configs/config.yaml ../configs/config.yaml
 COPY --from=builder /build/gateway-service .
-COPY --from=builder /build/gateway/web/html ./web/html
+COPY --from=builder /build/gateway/web ./web
 
 CMD ["./gateway-service"]
