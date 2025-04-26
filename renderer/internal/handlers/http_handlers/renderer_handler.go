@@ -246,5 +246,6 @@ func (h *RendererHandler) Image(ctx *fiber.Ctx) error {
 			zap.Time("startDate", startDate),
 			zap.Time("endDate", endDate))
 
+	ctx.Set("Content-Type", "image/png")
 	return ctx.Send(imageBytes)
 }
