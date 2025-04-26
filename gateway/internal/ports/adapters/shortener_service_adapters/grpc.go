@@ -22,7 +22,8 @@ func (s ShortenerServiceRepositoryGRPC) Redirect(request *shortener.RedirectRequ
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := shortener.NewShortenerServiceClient(conn)
 
@@ -39,7 +40,8 @@ func (s ShortenerServiceRepositoryGRPC) GetLinks(request *shortener.GetLinksRequ
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := shortener.NewShortenerServiceClient(conn)
 
@@ -56,7 +58,8 @@ func (s ShortenerServiceRepositoryGRPC) GetLink(request *shortener.GetLinkReques
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := shortener.NewShortenerServiceClient(conn)
 
@@ -73,7 +76,8 @@ func (s ShortenerServiceRepositoryGRPC) CreateNewLink(request *shortener.CreateL
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := shortener.NewShortenerServiceClient(conn)
 
@@ -90,7 +94,8 @@ func (s ShortenerServiceRepositoryGRPC) UpdateLink(request *shortener.UpdateLink
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := shortener.NewShortenerServiceClient(conn)
 
@@ -107,7 +112,8 @@ func (s ShortenerServiceRepositoryGRPC) DeleteLink(request *shortener.DeleteLink
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := shortener.NewShortenerServiceClient(conn)
 
@@ -124,7 +130,8 @@ func (s ShortenerServiceRepositoryGRPC) GetLinksCountByUserId(request *shortener
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := shortener.NewShortenerServiceClient(conn)
 
@@ -141,7 +148,8 @@ func (s ShortenerServiceRepositoryGRPC) GetLinkIdByShortLink(request *shortener.
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get conn from pool: %v", err)
 	}
-	defer conn.Close() //nolint:all
+	defer conn.Close()             //nolint:all
+	defer s.grpcPool.Restore(conn) //nolint:all
 
 	client := shortener.NewShortenerServiceClient(conn)
 

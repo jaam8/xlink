@@ -242,6 +242,10 @@ func main() {
 		rendererGroup.Get("/:shortLink/", rendererHandler.Image)
 	}
 	//endregion renderer v1
+	
+	//region static
+	app.Static("/static/", "./web/static")
+	//endregion static
 
 	//endregion v1
 	//endregion api
