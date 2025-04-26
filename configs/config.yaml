@@ -50,6 +50,7 @@ nginx:
 
 gateway:
   port: 3000
+  unknown_referer_value: "unknown"
 
 http_port: 8080
 http_port_renderer: 8090

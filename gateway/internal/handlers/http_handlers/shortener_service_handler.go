@@ -18,15 +18,21 @@ import (
 )
 
 type ShortenerServiceHandler struct {
-	shortenerService *services.ShortenerService
-	userService      *services.UserService
+	shortenerService    *services.ShortenerService
+	userService         *services.UserService
+	unknownRefererValue string
 }
 
 func NewShortenerServiceHandler(
 	shortenerService *services.ShortenerService,
 	userService *services.UserService,
+	unknownRefererValue string,
 ) *ShortenerServiceHandler {
-	return &ShortenerServiceHandler{shortenerService: shortenerService, userService: userService}
+	return &ShortenerServiceHandler{
+		shortenerService:    shortenerService,
+		userService:         userService,
+		unknownRefererValue: unknownRefererValue,
+	}
 }
 
 func (h *ShortenerServiceHandler) getLinkIdByShortLinkParameter(ctx *fiber.Ctx) (string, error) {
@@ -51,7 +57,11 @@ func (h *ShortenerServiceHandler) getLinkIdByShortLinkParameter(ctx *fiber.Ctx) 
 func (h *ShortenerServiceHandler) Redirect(ctx *fiber.Ctx) error {
 	shortLink := ctx.Params("shortLink")
 	clickedAt := timestamppb.New(time.Now())
+
 	referrer := ctx.Get("HTTP_REFERER")
+	if referrer == "" {
+		referrer = h.unknownRefererValue
+	}
 
 	ipAddress := ctx.Get("X-Forwarded-For")
 	if len(ipAddress) == 0 {

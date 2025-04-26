@@ -33,12 +33,17 @@ type GrpcPoolConfig struct {
 	BaseRetryDelayMilliseconds uint `yaml:"base_retry_delay_milliseconds" env:"BASE_RETRY_DELAY_MILLISECONDS" env-default:"200"`
 }
 
+type Gateway struct {
+	UnknownRefererValue string `yaml:"unknown_referer_value" env:"UNKNOWN_REFERER_VALUE" env-default:"unknown"`
+}
+
 type Config struct {
 	UpstreamNames UpstreamNamesConfig `yaml:"upstream_names" env-prefix:"UPSTREAM_NAMES_"`
 	UpstreamPorts UpstreamPortsConfig `yaml:"upstream_ports" env-prefix:"UPSTREAM_PORTS_"`
 	GrpcPool      GrpcPoolConfig      `yaml:"grpc_pool" env-prefix:"GRPC_POOL_"`
 	Timeouts      TimeoutsConfig      `yaml:"timeouts" env-prefix:"TIMEOUT_"`
 	HTTPPort      int                 `yaml:"http_port" env:"HTTP_PORT" env-default:"8080"`
+	Gateway       Gateway             `yaml:"gateway" env-prefix:"GATEWAY_"`
 }
 
 func New() (Config, error) {

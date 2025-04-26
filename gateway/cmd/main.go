@@ -129,7 +129,7 @@ func main() {
 
 	//region handlers
 	userServiceHandler := http_handlers.NewUserServiceHandler(userService)
-	shortenerServiceHandler := http_handlers.NewShortenerServiceHandler(shortenerService, userService)
+	shortenerServiceHandler := http_handlers.NewShortenerServiceHandler(shortenerService, userService, mainConfig.Gateway.UnknownRefererValue)
 	analyticsServiceHandler := http_handlers.NewAnalyticsServiceHandler(analyticsService)
 	rendererHandler := http_handlers.NewRendererServiceHandler(rendererService)
 	//endregion handlers
@@ -242,7 +242,7 @@ func main() {
 		rendererGroup.Get("/:shortLink/", rendererHandler.Image)
 	}
 	//endregion renderer v1
-	
+
 	//region static
 	app.Static("/static/", "./web/static")
 	//endregion static
