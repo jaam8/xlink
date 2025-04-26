@@ -83,6 +83,9 @@ user_service:
   token_len: 32
   cache_expiration_seconds: 3600
   migrations_path: file:///user_service/migrations
+  upstream_names: user_service
+  upstream_ports: 50051
+  timeouts: 500
 
 shortener:
   grpc_port: 50052
