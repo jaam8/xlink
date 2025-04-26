@@ -220,6 +220,10 @@ func main() {
 	}
 	//endregion analytics v1
 
+	//region static
+	app.Static("/static/", "./web/static")
+	//endregion static
+
 	//endregion v1
 	//endregion api
 	//endregion routing
