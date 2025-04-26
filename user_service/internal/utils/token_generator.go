@@ -3,7 +3,7 @@ package utils
 import "math/rand"
 
 var (
-	letters    = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890#$%&")
+	letters    = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 	lettersLen = len(letters)
 )
 

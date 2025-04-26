@@ -26,6 +26,7 @@ func AuthMiddleware(service IdCheckerService) fiber.Handler {
 		}
 
 		c.Context().SetUserValue(handlers.UserIdKey, userIdData.UserId)
+		fmt.Println(c.Context().UserValue(handlers.UserIdKey))
 
 		return c.Next()
 	}

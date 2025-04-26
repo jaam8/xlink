@@ -32,7 +32,7 @@ func ParseDateTime(dateTime string) (time.Time, error) {
 }
 
 func ParseDateField(c *fiber.Ctx, fieldName string) (time.Time, error) {
-	return ParseDate(c.Params(fieldName))
+	return ParseDate(c.Query(fieldName))
 }
 
 func ParseDate(date string) (time.Time, error) {
