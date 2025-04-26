@@ -12,6 +12,9 @@ func (h *Handler) LoginHandler(ctx *th.Context, firstUpdate telego.Update) error
 		ChatID: tu.ID(firstUpdate.CallbackQuery.From.ID),
 		Text:   "Введите ваш API ключ",
 	})
+	_ = h.Bot.AnswerCallbackQuery(ctx, &telego.AnswerCallbackQueryParams{
+		CallbackQueryID: firstUpdate.CallbackQuery.ID,
+	})
 	if err != nil {
 		return err
 	}
