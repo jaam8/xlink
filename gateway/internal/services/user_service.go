@@ -28,7 +28,7 @@ func (s *UserService) CreateUser(request *user_service.CreateUserRequest) (*user
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).CreateUser(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout CreateUser caller: %v", err)
+			return fmt.Errorf("error in retry CreateUser caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -50,7 +50,7 @@ func (s *UserService) GetUser(request *user_service.GetUserRequest) (*user_servi
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).GetUser(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout GetUser caller: %v", err)
+			return fmt.Errorf("error in retry GetUser caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -71,7 +71,7 @@ func (s *UserService) GetUserIDByToken(request *user_service.GetUserIDByTokenReq
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).GetUserIDByToken(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout GetUserIDByToken caller: %v", err)
+			return fmt.Errorf("error in retry GetUserIDByToken caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -92,7 +92,7 @@ func (s *UserService) GetUserIDByTgID(request *user_service.GetUserIDByTgIDReque
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).GetUserIDByTgID(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout GetUserIDByTgID caller: %v", err)
+			return fmt.Errorf("error in retry GetUserIDByTgID caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -113,7 +113,7 @@ func (s *UserService) UpdateUser(request *user_service.UpdateUserRequest) (*user
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).UpdateUser(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout UpdateUser caller: %v", err)
+			return fmt.Errorf("error in retry UpdateUser caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -134,7 +134,7 @@ func (s *UserService) CheckToken(request *user_service.TokenCheckRequest) (*user
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).CheckToken(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout CheckToken caller: %v", err)
+			return fmt.Errorf("error in retry CheckToken caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -155,7 +155,7 @@ func (s *UserService) RefreshToken(request *user_service.RefreshTokenRequest) (*
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).RefreshToken(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout RefreshToken caller: %v", err)
+			return fmt.Errorf("error in retry RefreshToken caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -176,7 +176,7 @@ func (s *UserService) DeleteUser(request *user_service.DeleteUserRequest) (*user
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).DeleteUser(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout DeleteUser caller: %v", err)
+			return fmt.Errorf("error in retry DeleteUser caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -197,7 +197,7 @@ func (s *UserService) GetRole(request *user_service.GetRoleRequest) (*user_servi
 	err := callers.Retry(func() error {
 		response, err := (*s.UserServiceRepo).GetRole(request)
 		if err != nil {
-			return fmt.Errorf("error in timeout GetRole caller: %v", err)
+			return fmt.Errorf("error in retry GetRole caller: %v", err)
 		}
 		resultChan <- response
 		return nil
