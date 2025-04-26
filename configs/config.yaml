@@ -85,7 +85,7 @@ user_service:
   migrations_path: file:///user_service/migrations
   upstream_names: user_service
   upstream_ports: 50051
-  timeouts: 500
+  timeouts: 5000
 
 shortener:
   grpc_port: 50052
@@ -95,7 +95,7 @@ shortener:
   kafka_replication_factor: 1
   upstream_names: shortener
   upstream_ports: 50052
-  timeouts: 1000
+  timeouts: 5000
   expiration_seconds: 500
   default_link_expiration_minutes: 1440
   migrations_path: file:///shortener/migrations
@@ -121,7 +121,7 @@ bot:
   expiration_seconds: 600
   upstream_names: tg_bot
   upstream_ports: 50055
-  timeouts: 1000
+  timeouts: 5000
 
 expiration_seconds: 0
 
