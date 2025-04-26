@@ -276,8 +276,7 @@ func (h *ShortenerServiceHandler) DeleteLink(ctx *fiber.Ctx) error {
 func (h *ShortenerServiceHandler) MyLinks(ctx *fiber.Ctx) error {
 	userIdValue := ctx.Context().Value(handlers.UserIdKey)
 	if userIdValue == nil {
-		return ctx.Status(fiber.StatusUnauthorized).
-			JSON(fiber.Map{"error": "unauthorized (Use auth middleware before Owner only middleware!!!)"})
+		return helpers.NotAuthenticatedError(ctx, errors.New("unauthorized (Use auth middleware before Owner only middleware!!!)"))
 	}
 	userId := userIdValue.(string)
 
