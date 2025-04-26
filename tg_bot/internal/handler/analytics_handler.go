@@ -14,7 +14,7 @@ func (h *Handler) ChooseMetricsToRenderHandler(ctx *th.Context, update telego.Up
 
 	shortLink := strings.TrimPrefix(update.CallbackQuery.Data, "show-metrics-")
 
-	h.mu.Lock()
+	//h.mu.Lock()
 	// Инициализируем выборы для юзера, если их ещё нет
 	if _, ok := h.userMetricSelections[userID]; !ok {
 		h.userMetricSelections[userID] = make(map[string]bool)
@@ -22,7 +22,7 @@ func (h *Handler) ChooseMetricsToRenderHandler(ctx *th.Context, update telego.Up
 
 	// Меняем выбор самой ссылки для юзера
 	h.userShortLinkSelections[userID] = shortLink
-	h.mu.Unlock()
+	//h.mu.Unlock()
 
 	// Шлем стартовое сообщение с клавиатурой
 	_, err := h.Bot.SendMessage(ctx, &telego.SendMessageParams{
@@ -74,7 +74,7 @@ func (h *Handler) HandleMetricSelection(ctx *th.Context, update telego.Update) e
 
 		selectedStrings := make([]string, 0, len(selected))
 		for metricName := range selected {
-			selectedStrings = append(selectedStrings, metricName)
+			selectedStrings = append(selectedStrings, strings.TrimPrefix(metricName, "clicks-by-"))
 		}
 
 		_, err := h.Bot.SendMessage(ctx, &telego.SendMessageParams{
@@ -157,7 +157,6 @@ func (h *Handler) ChooseDateToRenderHandler(ctx *th.Context, update telego.Updat
 			Text:   "не выбраны метрики!",
 		})
 	}
-	fmt.Println("!!!", h.userShortLinkSelections, userID)
 	shortLink, ok = h.userShortLinkSelections[userID]
 	if !ok {
 		h.mu.Unlock()
@@ -167,7 +166,6 @@ func (h *Handler) ChooseDateToRenderHandler(ctx *th.Context, update telego.Updat
 			Text:   "не выбрана ссылка!",
 		})
 	}
-	fmt.Println(shortLink)
 
 	h.mu.Unlock()
 	//endregion
@@ -177,7 +175,7 @@ func (h *Handler) ChooseDateToRenderHandler(ctx *th.Context, update telego.Updat
 	if err != nil {
 		_, _ = h.Bot.SendMessage(ctx, &telego.SendMessageParams{
 			ChatID: tu.ID(userID),
-			Text:   "Нет доступа",
+			Text:   fmt.Errorf("нет доступа: %w", err).Error(),
 		})
 	}
 	//endregion
@@ -188,9 +186,10 @@ func (h *Handler) ChooseDateToRenderHandler(ctx *th.Context, update telego.Updat
 			continue
 		}
 
-		param := strings.Split(clickByParamShortLinkString, "-")[2]
+		param := strings.TrimPrefix(clickByParamShortLinkString, "clicks-by-")
 
 		imageUrl := h.renderer.GetImageUrl(shortLink, token, param, startDate, endDate)
+		fmt.Println(imageUrl)
 		h.SendImage(ctx, userID, imageUrl)
 	}
 

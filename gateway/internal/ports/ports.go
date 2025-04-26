@@ -42,5 +42,5 @@ type AnalyticsServiceRepository interface {
 }
 
 type RendererServiceRepository interface {
-	Generate(shortLink string, param string, startDate time.Time, endDate time.Time) ([]byte, error)
+	Generate(shortLink string, param string, startDate time.Time, endDate time.Time, linkOwner string) ([]byte, error)
 }

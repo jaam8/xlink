@@ -99,12 +99,12 @@ func (d DrawerRepositoryEcharts) Generate(input statistics_data.StatisticsData, 
 
 	output := fileBuf.Bytes()
 
-	var screenshot []byte
-	screenshot, err = takeScreenshot(output)
+	// var screenshot []byte
+	// screenshot, err = takeScreenshot(output)
+	//
+	// if err != nil {
+	// 	return nil, fmt.Errorf("couldn't take screenshot: %w", err)
+	// }
 
-	if err != nil {
-		return nil, fmt.Errorf("couldn't take screenshot: %w", err)
-	}
-
-	return screenshot, nil
+	return output, nil
 }

@@ -18,11 +18,13 @@ func (s *RendererAdapterGateway) RenderChart(chartType string) (string, error) {
 }
 
 func (s *RendererAdapterGateway) GetImageUrl(shortLink, token, param string, startDate time.Time, endDate time.Time) string {
-	return fmt.Sprintf("%s/%s/?token=%s&param=%s&start_date=%s&end_date=%s",
+	url := fmt.Sprintf("%s%s/?param=%s&start_date=%s&end_date=%s&token=%s",
 		s.BaseUrl,
 		shortLink,
-		token, param,
+		param,
 		startDate.Format(time.DateOnly),
 		endDate.Format(time.DateOnly),
+		token,
 	)
+	return url
 }

@@ -60,6 +60,7 @@ upstream_names:
   user_service: user_service
   analytics: analytics
   renderer: renderer
+  file_generator: renderer
   tg_bot: tg_bot
 
 upstream_ports:

@@ -236,10 +236,13 @@ func main() {
 	//endregion analytics v1
 
 	//region renderer v1
-	rendererGroup := v1Group.Group("/img")
+	rendererGroup := v1Group.Group("/img/:shortLink")
 	rendererGroup.Use(authMiddlewareTokenParam, shortLinkOwnerOnlyMiddleware)
 	{
-		rendererGroup.Get("/:shortLink/", rendererHandler.Image)
+		rendererGroup.Get("/", rendererHandler.Image)
+	}
+	for _, b := range app.GetRoutes() {
+		fmt.Println(b)
 	}
 	//endregion renderer v1
 

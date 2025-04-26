@@ -4,7 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 	"time"
+	"xlink/common/logger"
+	"xlink/gateway/internal/handlers"
 	"xlink/gateway/internal/handlers/helpers"
 	"xlink/gateway/internal/services"
 )
@@ -20,6 +23,12 @@ func NewRendererServiceHandler(rendererService *services.RendererService) *Rende
 func (h *RendererServiceHandler) Image(ctx *fiber.Ctx) error {
 	var err error
 
+	var linkOwner = ctx.Context().UserValue(handlers.UserIdKey)
+	if linkOwner == nil {
+		return helpers.NotAuthenticatedError(ctx, errors.New("must have used auth middleware first"))
+	}
+	linkOwnerString := linkOwner.(string)
+
 	var shortLink string
 	shortLink, err = helpers.ParseNonEmptyStringField(ctx, "shortLink")
 	if err != nil {
@@ -27,7 +36,7 @@ func (h *RendererServiceHandler) Image(ctx *fiber.Ctx) error {
 	}
 
 	var param string
-	param, err = helpers.ParseNonEmptyStringField(ctx, "param")
+	param, err = helpers.ParseNonEmptyStringFieldParam(ctx, "param")
 	if err != nil {
 		return helpers.BadRequest(ctx, errors.New("'param' is required"))
 	}
@@ -45,11 +54,14 @@ func (h *RendererServiceHandler) Image(ctx *fiber.Ctx) error {
 	}
 
 	var response []byte
-	response, err = h.rendererService.Generate(shortLink, param, startDate, endDate)
+	response, err = h.rendererService.Generate(shortLink, param, startDate, endDate, linkOwnerString)
 	if err != nil {
 		return helpers.InternalServerError(ctx, fmt.Errorf("couldn't get renderer response: %w", err))
 	}
 
-	ctx.Set("Content-Type", "image/png")
+	logger.GetLoggerFromCtx(ctx.UserContext()).Info(ctx.UserContext(), "created an image",
+		zap.String("short_link", shortLink))
+
+	ctx.Set("Content-Type", "text/html")
 	return ctx.Status(fiber.StatusOK).Send(response)
 }
