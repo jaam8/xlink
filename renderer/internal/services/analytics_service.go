@@ -5,7 +5,7 @@ import (
 	"time"
 	"xlink/common/callers"
 	"xlink/common/gen/analytics"
-	"xlink/gateway/internal/ports"
+	"xlink/renderer/internal/ports"
 )
 
 type AnalyticsService struct {
@@ -28,7 +28,7 @@ func (s *AnalyticsService) ClicksByCountry(request *analytics.GetClicksRequest) 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByCountry(request)
 		if err != nil {
-			return fmt.Errorf("error in retry ClicksByCountry caller: %v", err)
+			return fmt.Errorf("error in timeout ClicksByCountry caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -50,7 +50,7 @@ func (s *AnalyticsService) ClicksByRegion(request *analytics.GetClicksRequest) (
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByRegion(request)
 		if err != nil {
-			return fmt.Errorf("error in retry ClicksByRegion caller: %v", err)
+			return fmt.Errorf("error in timeout ClicksByRegion caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -72,7 +72,7 @@ func (s *AnalyticsService) ClicksByBrowser(request *analytics.GetClicksRequest) 
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByBrowser(request)
 		if err != nil {
-			return fmt.Errorf("error in retry ClicksByBrowser caller: %v", err)
+			return fmt.Errorf("error in timeout ClicksByBrowser caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -94,7 +94,7 @@ func (s *AnalyticsService) ClicksByOS(request *analytics.GetClicksRequest) (*ana
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByOS(request)
 		if err != nil {
-			return fmt.Errorf("error in retry ClicksByOS caller: %v", err)
+			return fmt.Errorf("error in timeout ClicksByOS caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -116,7 +116,7 @@ func (s *AnalyticsService) ClicksByDeviceType(request *analytics.GetClicksReques
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByDeviceType(request)
 		if err != nil {
-			return fmt.Errorf("error in retry ClicksByDeviceType caller: %v", err)
+			return fmt.Errorf("error in timeout ClicksByDeviceType caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -138,7 +138,7 @@ func (s *AnalyticsService) ClicksByHour(request *analytics.GetClicksRequest) (*a
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByHour(request)
 		if err != nil {
-			return fmt.Errorf("error in retry ClicksByHour caller: %v", err)
+			return fmt.Errorf("error in timeout ClicksByHour caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -160,7 +160,7 @@ func (s *AnalyticsService) ClicksByDate(request *analytics.GetClicksRequest) (*a
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByDate(request)
 		if err != nil {
-			return fmt.Errorf("error in retry ClicksByDate caller: %v", err)
+			return fmt.Errorf("error in timeout ClicksByDate caller: %v", err)
 		}
 		resultChan <- response
 		return nil
@@ -182,7 +182,7 @@ func (s *AnalyticsService) ClicksByReferrer(request *analytics.GetClicksRequest)
 	err := callers.Retry(func() error {
 		response, err := (*s.AnalyticsServiceRepo).ClicksByReferrer(request)
 		if err != nil {
-			return fmt.Errorf("error in retry ClicksByReferrer caller: %v", err)
+			return fmt.Errorf("error in timeout ClicksByReferrer caller: %v", err)
 		}
 		resultChan <- response
 		return nil

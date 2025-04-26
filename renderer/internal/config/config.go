@@ -6,24 +6,15 @@ import (
 )
 
 type UpstreamNamesConfig struct {
-	Shortener     string `yaml:"shortener" env:"SHORTENER"`
-	UserService   string `yaml:"user_service" env:"USER_SERVICE"`
-	Analytics     string `yaml:"analytics" env:"ANALYTICS"`
-	FileGenerator string `yaml:"file_generator" env:"FILE_GENERATOR"`
+	Analytics string `yaml:"analytics" env:"ANALYTICS"`
 }
 
 type UpstreamPortsConfig struct {
-	Shortener     string `yaml:"shortener" env:"SHORTENER"`
-	UserService   string `yaml:"user_service" env:"USER_SERVICE"`
-	Analytics     string `yaml:"analytics" env:"ANALYTICS"`
-	FileGenerator string `yaml:"file_generator" env:"FILE_GENERATOR"`
+	Analytics string `yaml:"analytics" env:"ANALYTICS"`
 }
 
 type TimeoutsConfig struct {
-	Shortener     int `yaml:"shortener" env:"SHORTENER"`
-	UserService   int `yaml:"user_service" env:"USER_SERVICE"`
-	Analytics     int `yaml:"analytics" env:"ANALYTICS"`
-	FileGenerator int `yaml:"file_generator" env:"FILE_GENERATOR" env-default:"10000"`
+	Analytics int `yaml:"analytics" env:"ANALYTICS"`
 }
 
 type GrpcPoolConfig struct {
@@ -38,7 +29,7 @@ type Config struct {
 	UpstreamPorts UpstreamPortsConfig `yaml:"upstream_ports" env-prefix:"UPSTREAM_PORTS_"`
 	GrpcPool      GrpcPoolConfig      `yaml:"grpc_pool" env-prefix:"GRPC_POOL_"`
 	Timeouts      TimeoutsConfig      `yaml:"timeouts" env-prefix:"TIMEOUT_"`
-	HTTPPort      int                 `yaml:"http_port" env:"HTTP_PORT" env-default:"8080"`
+	HTTPPort      int                 `yaml:"http_port_renderer" env:"HTTP_PORT_RENDERER" env-default:"8085"`
 }
 
 func New() (Config, error) {

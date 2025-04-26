@@ -1,6 +1,7 @@
 package ports
 
 import (
+	"time"
 	"xlink/common/gen/analytics"
 	"xlink/common/gen/shortener"
 	"xlink/common/gen/user_service"
@@ -38,4 +39,8 @@ type AnalyticsServiceRepository interface {
 	ClicksByHour(request *analytics.GetClicksRequest) (*analytics.ClicksByHourResponse, error)
 	ClicksByDate(request *analytics.GetClicksRequest) (*analytics.ClicksByDateResponse, error)
 	ClicksByReferrer(request *analytics.GetClicksRequest) (*analytics.ClicksByReferrerResponse, error)
+}
+
+type RendererServiceRepository interface {
+	Generate(shortLink string, param string, startDate time.Time, endDate time.Time) ([]byte, error)
 }
