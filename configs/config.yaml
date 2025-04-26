@@ -111,7 +111,8 @@ bot:
   grpc_port: 50055
   redis_db: 3
   bot_token:
-  base_url: "http://nginx:80"
+  base_api_url: "http://nginx:80"
+  expiration_seconds: 600
   upstream_names: tg_bot
   upstream_ports: 50055
   timeouts: 1000
@@ -119,7 +120,7 @@ bot:
 expiration_seconds: 0
 
 grpc_pool:
-  max_connections: 10
+  max_connections: 100
   min_connections: 1
   max_retries: 3
   base_retry_delay_milliseconds: 300
