@@ -17,7 +17,7 @@ type ShortenerStorageRepositoryPostgres struct {
 
 func LinkSelectQuery(filter squirrel.Eq) (string, []interface{}, error) {
 	sql, args, err := squirrel.Select(
-		"id", "user_id", "group_id", "generated",
+		"id", "user_id", "generated",
 		"short_link", "url", "created_at", "expire_at",
 	).
 		From("shortener.urls").

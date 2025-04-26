@@ -189,7 +189,7 @@ func (s *Service) Redirect(ctx context.Context, request *shortener.RedirectReque
 	var targetUrl string
 
 	targetUrl, err = s.cachingRepo.GetUrl(shortLink)
-	if err != nil {
+	if err != nil || targetUrl == "" {
 		// if it's not in cache, then we get in from relational DB
 		var link models.Link
 		link, err = s.storageRepo.GetLinkByShortUrl(shortLink)
