@@ -22,25 +22,26 @@ func NewAnalyticsServiceHandler(analyticsService *services.AnalyticsService) *An
 }
 
 func getClicksRequestFromRequest(ctx *fiber.Ctx) (*analytics.GetClicksRequest, error) {
-	linkOwner := ctx.Get(handlers.UserIdKey)
-	if linkOwner == "" {
-		return nil, helpers.NotAuthenticatedError(ctx, errors.New("not authenticated (must use auth middleware)"))
+	linkOwner := ctx.Context().UserValue(handlers.UserIdKey)
+	if linkOwner == nil {
+		return nil, errors.New("not authenticated (must use auth middleware)")
 	}
+	linkOwnerString := linkOwner.(string)
 
-	shortLink := ctx.Params("shortLink")
+	shortLink := ctx.Query("short_link")
 
 	startDate, err := helpers.ParseDateField(ctx, "start_date")
 	if err != nil {
-		return nil, helpers.InvalidDateBadRequest(ctx, "end_date")
+		return nil, errors.New("invalid start_date" + ctx.Query("start_date") + err.Error())
 	}
 
 	endDate, err := helpers.ParseDateField(ctx, "end_date")
 	if err != nil {
-		return nil, helpers.InvalidDateBadRequest(ctx, "end_date")
+		return nil, errors.New("invalid end_date")
 	}
 
 	request := &analytics.GetClicksRequest{
-		LinkOwner: linkOwner,
+		LinkOwner: linkOwnerString,
 		ShortLink: shortLink,
 		StartDate: timestamppb.New(startDate),
 		EndDate:   timestamppb.New(endDate),
@@ -52,7 +53,7 @@ func getClicksRequestFromRequest(ctx *fiber.Ctx) (*analytics.GetClicksRequest, e
 func (h *AnalyticsServiceHandler) GetClicksByCountry(ctx *fiber.Ctx) error {
 	request, err := getClicksRequestFromRequest(ctx)
 	if err != nil {
-		return err //nolint:all
+		return helpers.BadRequest(ctx, err) //nolint:all
 	}
 
 	response, err := h.analyticsService.ClicksByCountry(request)
