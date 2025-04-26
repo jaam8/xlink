@@ -60,7 +60,7 @@ func (us *UserServiceAdapter) CreateUser(tgID *int64) (string, string, error) {
 	}
 	//nolint
 	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusCreated {
 		fmt.Println(resp.Status)
 		fmt.Println(resp.Body)
 		fmt.Println(resp)
@@ -123,7 +123,7 @@ func (us *UserServiceAdapter) LoginUser(token string) (string, *int64, error) {
 	}
 	var respData struct {
 		UserID     string `json:"user_id"`
-		TelegramId *int64 `json:"telegram_id"`
+		TelegramId *int64 `json:"telegram_id,omitempty"`
 	}
 
 	reqData.ApiToken = token
