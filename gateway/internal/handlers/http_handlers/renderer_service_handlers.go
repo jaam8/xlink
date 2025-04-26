@@ -62,6 +62,6 @@ func (h *RendererServiceHandler) Image(ctx *fiber.Ctx) error {
 	logger.GetLoggerFromCtx(ctx.UserContext()).Info(ctx.UserContext(), "created an image",
 		zap.String("short_link", shortLink))
 
-	ctx.Set("Content-Type", "image/png")
+	ctx.Set("Content-Type", "text/html")
 	return ctx.Status(fiber.StatusOK).Send(response)
 }
