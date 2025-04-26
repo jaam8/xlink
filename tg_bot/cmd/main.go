@@ -18,6 +18,7 @@ import (
 	"xlink/tg_bot/internal/handler"
 	"xlink/tg_bot/internal/ports/adapters/analytics_adapter"
 	"xlink/tg_bot/internal/ports/adapters/cache"
+	"xlink/tg_bot/internal/ports/adapters/renderer_adapter"
 	"xlink/tg_bot/internal/ports/adapters/shortener_adapter"
 	"xlink/tg_bot/internal/ports/adapters/user_service_adapter"
 )
@@ -63,8 +64,12 @@ func main() {
 		time.Millisecond*time.Duration(botCfg.Timeouts),
 	)
 
+	rendererAdapter := renderer_adapter.NewRendererAdapterGateway(
+		fmt.Sprintf("%s/%s", botCfg.BaseAPIURL, "api/v1/img/"),
+	)
+
 	h := handler.NewHandler(userAdapter, shortenerAdapter, analyticsAdapter,
-		redisAdapter, cfg.BotConfig.BaseAPIURL, bot)
+		redisAdapter, rendererAdapter, cfg.BotConfig.BaseAPIURL, bot)
 
 	updates, _ := h.Bot.UpdatesViaLongPolling(ctx, &telego.GetUpdatesParams{
 		Timeout: 3,
@@ -82,7 +87,8 @@ func main() {
 	bh.Handle(h.SignInHandler, th.CallbackDataEqual("sign-in"))
 	bh.Handle(h.SetTgIDHandler, th.CallbackDataEqual("set-tg-id"))
 	bh.Handle(h.HandleMetricSelection, th.CallbackDataPrefix("clicks-"))
-	bh.Handle(h.ChooseMetricsToRenderHandler, th.CallbackDataEqual("show-metrics"))
+	bh.Handle(h.ChooseMetricsToRenderHandler, th.CallbackDataPrefix("show-metrics-"))
+	bh.Handle(h.ChooseDateToRenderHandler, th.TextPrefix("d "))
 	bh.Handle(h.DeleteLinkHandler, th.CallbackDataPrefix("delete-link"))
 	bh.Handle(h.CreateLinkHandler, th.CallbackDataEqual("create-link"))
 	bh.Handle(h.DoCustomLink, th.CallbackDataEqual("do-custom-link"))

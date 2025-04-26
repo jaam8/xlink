@@ -7,6 +7,7 @@ import (
 	tu "github.com/mymmrac/telego/telegoutil"
 	"strconv"
 	"strings"
+	"sync"
 	"xlink/tg_bot/internal/ports"
 )
 
@@ -15,22 +16,32 @@ type Handler struct {
 	shortener ports.ShortenerAdapter
 	analytics ports.AnalyticsAdapter
 	cache     ports.CacheAdapter
+	renderer  ports.RendererAdapter
 	// key = tgID, value = map[metrics]bool
 	// сделать потокобезопасным
-	userMetricSelections map[int64]map[string]bool
-	basePath             string
-	Bot                  *telego.Bot
+	mu                      sync.Mutex
+	userMetricSelections    map[int64]map[string]bool
+	userShortLinkSelections map[int64]string
+	basePath                string
+	Bot                     *telego.Bot
 }
 
-func NewHandler(user ports.UserServiceAdapter, shortener ports.ShortenerAdapter,
-	analytics ports.AnalyticsAdapter, cache ports.CacheAdapter,
-	basePath string, bot *telego.Bot) *Handler {
+func NewHandler(
+	user ports.UserServiceAdapter,
+	shortener ports.ShortenerAdapter,
+	analytics ports.AnalyticsAdapter,
+	cache ports.CacheAdapter,
+	renderer ports.RendererAdapter,
+	basePath string,
+	bot *telego.Bot,
+) *Handler {
 	var handler Handler
 	handler.user = user
 	handler.shortener = shortener
 	handler.analytics = analytics
 	handler.userMetricSelections = make(map[int64]map[string]bool)
 	handler.cache = cache
+	handler.renderer = renderer
 	handler.basePath = basePath
 	handler.Bot = bot
 	return &handler
@@ -77,6 +88,13 @@ func (h *Handler) SendMessage(ctx *th.Context, chatID int64, text string) {
 	_, _ = h.Bot.SendMessage(ctx, &telego.SendMessageParams{
 		ChatID: tu.ID(chatID),
 		Text:   text,
+	})
+}
+
+func (h *Handler) SendImage(ctx *th.Context, chatID int64, url string) {
+	_, _ = h.Bot.SendPhoto(ctx, &telego.SendPhotoParams{
+		ChatID: tu.ID(chatID),
+		Photo:  telego.InputFile{URL: url},
 	})
 }
 

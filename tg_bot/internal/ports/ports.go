@@ -40,4 +40,5 @@ type AnalyticsAdapter interface {
 
 type RendererAdapter interface {
 	RenderChart(chartType string) (string, error)
+	GetImageUrl(shortLink, token, param string, startDate time.Time, endDate time.Time) string
 }
