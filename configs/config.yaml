@@ -72,11 +72,11 @@ upstream_ports:
   tg_bot: 50055
 
 timeouts:
-  shortener: 1000
-  user_service: 1000
-  analytics: 1000
-  renderer: 1000
-  tg_bot: 1000
+  shortener: 10000
+  user_service: 10000
+  analytics: 10000
+  renderer: 10000
+  tg_bot: 10000
 
 user_service:
   grpc_port: 50051
@@ -86,7 +86,7 @@ user_service:
   migrations_path: file:///user_service/migrations
   upstream_names: user_service
   upstream_ports: 50051
-  timeouts: 5000
+  timeouts: 10000
 
 shortener:
   grpc_port: 50052
@@ -96,7 +96,7 @@ shortener:
   kafka_replication_factor: 1
   upstream_names: shortener
   upstream_ports: 50052
-  timeouts: 5000
+  timeouts: 10000
   expiration_seconds: 500
   default_link_expiration_minutes: 1440
   migrations_path: file:///shortener/migrations
@@ -112,17 +112,22 @@ analytics:
   timezone: Europe/Moscow
   batch_size: 1
   flush_timeout: 3
-  timeouts: 1000
+  max_retries: 5
+  base_retry_delay_second: 1
+  timeouts: 10000
 
 bot:
   grpc_port: 50055
   redis_db: 3
+  local_server_url: https://5674-212-192-215-93.ngrok-free.app
   bot_token:
+  max_retries: 5
+  base_retry_delay_second: 1
   base_api_url: "http://nginx:80"
-  expiration_seconds: 600
+  expiration_seconds: 6000
   upstream_names: tg_bot
   upstream_ports: 50055
-  timeouts: 5000
+  timeouts: 100000
 
 expiration_seconds: 0
 
