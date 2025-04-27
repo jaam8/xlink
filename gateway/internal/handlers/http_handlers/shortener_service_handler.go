@@ -7,6 +7,7 @@ import (
 	"github.com/mileusna/useragent"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"strings"
 	"time"
 	"xlink/common/gen/shortener"
 	"xlink/common/gen/user_service"
@@ -70,14 +71,22 @@ func (h *ShortenerServiceHandler) Redirect(ctx *fiber.Ctx) error {
 			ipAddress = ctx.IP()
 		}
 	}
-
+	ipAddress = strings.Split(ipAddress, ",")[0]
 	visitorToken := ctx.Cookies("xlinkVisitor")
-
 	userAgentText := ctx.Get("User-Agent")
 	userAgent := useragent.Parse(userAgentText)
 	browser := userAgent.Name
+	if browser == "" {
+		browser = "unknown"
+	}
 	deviceType := userAgent.Device
+	if deviceType == "" {
+		deviceType = "unknown"
+	}
 	userOs := userAgent.OS
+	if userOs == "" {
+		userOs = "unknown"
+	}
 
 	request := &shortener.RedirectRequest{
 		ShortLink:    shortLink,
