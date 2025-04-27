@@ -42,26 +42,25 @@ func main() {
 	botCfg := cfg.BotConfig
 	userServiceCfg := cfg.UserService
 	redisCfg := cfg.RedisConfig
-
 	redisClient, err := redis.NewRedisClient(ctx, redisCfg, botCfg.RedisDB)
 
 	redisAdapter := cache.NewRedisAdapter(redisClient, time.Duration(botCfg.ExpirationSeconds)*time.Second)
-	fmt.Println(fmt.Sprintf("%s:%d", userServiceCfg.UpstreamNames, userServiceCfg.UpstreamPorts))
+
 	userAdapter := user_service_adapter.NewUserServiceAdapter(
 		fmt.Sprintf("%s:%d", userServiceCfg.UpstreamNames, userServiceCfg.UpstreamPorts),
 		fmt.Sprintf("%s/%s", botCfg.BaseAPIURL, "api/v1/user/"),
 		[]grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())},
-		time.Millisecond*time.Duration(userServiceCfg.Timeouts),
+		time.Second*time.Duration(userServiceCfg.Timeouts),
 	)
 
 	shortenerAdapter := shortener_adapter.NewShortenerAdapter(
 		fmt.Sprintf("%s/%s", botCfg.BaseAPIURL, "api/v1/link/"),
-		time.Millisecond*time.Duration(botCfg.Timeouts),
+		time.Second*time.Duration(botCfg.Timeouts),
 	)
 
 	analyticsAdapter := analytics_adapter.NewAnalyticsAdapter(
 		fmt.Sprintf("%s/%s", botCfg.BaseAPIURL, "api/v1/analytics/"),
-		time.Millisecond*time.Duration(botCfg.Timeouts),
+		time.Second*time.Duration(botCfg.Timeouts),
 	)
 
 	rendererAdapter := renderer_adapter.NewRendererAdapterGateway(
@@ -69,7 +68,8 @@ func main() {
 	)
 
 	h := handler.NewHandler(userAdapter, shortenerAdapter, analyticsAdapter,
-		redisAdapter, rendererAdapter, cfg.BotConfig.BaseAPIURL, bot)
+		redisAdapter, rendererAdapter, botCfg.BaseAPIURL, botCfg.GatewayServerUrl,
+		time.Second*time.Duration(botCfg.BaseRetryDelay), botCfg.MaxRetries, bot)
 
 	updates, _ := h.Bot.UpdatesViaLongPolling(ctx, &telego.GetUpdatesParams{
 		Timeout: 3,
@@ -93,7 +93,10 @@ func main() {
 	bh.Handle(h.CreateLinkHandler, th.CallbackDataEqual("create-link"))
 	bh.Handle(h.DoCustomLink, th.CallbackDataEqual("do-custom-link"))
 	bh.Handle(h.DoGenerateLink, th.CallbackDataEqual("do-generate-link"))
-	bh.Handle(h.ChooseLinkType)
+	// receive messages start with "http"
+	bh.Handle(h.ChooseLinkType, th.TextPrefix("http"))
+	// receive messages start with "l <link>"
+	bh.Handle(h.DoCustomLinkFinal, th.TextPrefix("l "))
 	err = bh.Start()
 	if err != nil {
 		log.Fatal(err)

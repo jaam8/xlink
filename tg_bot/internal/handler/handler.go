@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
+	"xlink/common/callers"
 	"xlink/tg_bot/internal/ports"
 )
 
@@ -17,12 +19,14 @@ type Handler struct {
 	analytics ports.AnalyticsAdapter
 	cache     ports.CacheAdapter
 	renderer  ports.RendererAdapter
+	mu        sync.Mutex
 	// key = tgID, value = map[metrics]bool
-	// сделать потокобезопасным
-	mu                      sync.Mutex
 	userMetricSelections    map[int64]map[string]bool
 	userShortLinkSelections map[int64]string
 	basePath                string
+	gatewayServerUrl        string
+	baseRetryDelay          time.Duration
+	maxRetries              uint
 	Bot                     *telego.Bot
 }
 
@@ -33,6 +37,9 @@ func NewHandler(
 	cache ports.CacheAdapter,
 	renderer ports.RendererAdapter,
 	basePath string,
+	gatewayServerUrl string,
+	baseRetryDelay time.Duration,
+	maxRetries uint,
 	bot *telego.Bot,
 ) *Handler {
 	var handler Handler
@@ -44,6 +51,9 @@ func NewHandler(
 	handler.cache = cache
 	handler.renderer = renderer
 	handler.basePath = basePath
+	handler.gatewayServerUrl = gatewayServerUrl
+	handler.baseRetryDelay = baseRetryDelay
+	handler.maxRetries = maxRetries
 	handler.Bot = bot
 	return &handler
 }
@@ -76,9 +86,9 @@ func (h *Handler) HelpHandler(ctx *th.Context, update telego.Update) error {
 	_, err := h.Bot.SendMessage(ctx, &telego.SendMessageParams{
 		ChatID: tu.ID(update.Message.Chat.ID),
 		Text: `Вот, что я могу:
-- /start — запустить бота
-- /help — показать это сообщение
-- /menu — выбрать метрики для отображения`})
+/start - регистрация и авторизация
+/help - список команд
+/menu - управление ссылками`})
 	if err != nil {
 		return err
 	}
@@ -105,18 +115,24 @@ func (h *Handler) MenuHandler(ctx *th.Context, update telego.Update) error {
 	if err != nil || token == "" {
 		token, err = h.user.GetTokenByTgID(chatID.ID)
 		if err != nil {
-			return err
-		}
-		err = h.cache.SetUserToken(strconv.Itoa(int(chatID.ID)), token)
-		if err != nil {
+			h.SendMessage(ctx, chatID.ID, "для начала авторизуйтесь или зарегестрируйтесь")
 			return err
 		}
 	}
 
 	links, err := h.shortener.GetUserLinks(token)
 	if err != nil {
-		h.SendMessage(ctx, chatID.ID, "Что то пошло не так"+err.Error())
-		return err
+		err = callers.Retry(func() error {
+			links, err = h.shortener.GetUserLinks(token)
+			if err != nil {
+				return err
+			}
+			return nil
+		}, h.maxRetries, h.baseRetryDelay)
+		if err != nil {
+			h.SendMessage(ctx, chatID.ID, "Что то пошло не так, попробуйте еще раз\n (Докер на локалке в 90% случаев не тянет, ловит истекшие таймауты)")
+			return err
+		}
 	}
 
 	keyboard := [][]telego.InlineKeyboardButton{
@@ -127,7 +143,7 @@ func (h *Handler) MenuHandler(ctx *th.Context, update telego.Update) error {
 
 	for _, link := range links {
 		keyboard = append(keyboard, []telego.InlineKeyboardButton{
-			tu.InlineKeyboardButton(fmt.Sprintf("%s/l/%s", h.basePath, link)).
+			tu.InlineKeyboardButton(fmt.Sprintf("%s/l/%s", "localhost", link)).
 				WithCallbackData("link-" + link)},
 		)
 	}

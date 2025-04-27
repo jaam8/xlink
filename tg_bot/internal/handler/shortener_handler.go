@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
 	"strconv"
 	"strings"
+	"xlink/common/callers"
 )
 
 type CreateLinkData struct {
@@ -14,123 +16,6 @@ type CreateLinkData struct {
 }
 
 var createLinkData = &CreateLinkData{}
-
-//func (h *Handler) CreateLinkHandler(ctx *th.Context, firstUpdate telego.Update) error {
-//	chatID := tu.ID(firstUpdate.CallbackQuery.From.ID)
-//
-//	var targetUrl string
-//	var shortLink *string
-//	var err error
-//	var stop = false
-//
-//	_, err = h.Bot.SendMessage(ctx, &telego.SendMessageParams{
-//		ChatID: chatID,
-//		Text:   "Напишите ссылку для сокращения",
-//	})
-//	if err != nil {
-//		return err
-//	}
-//	updateID := firstUpdate.UpdateID
-//	for {
-//		updates, err := h.Bot.GetUpdates(ctx, &telego.GetUpdatesParams{
-//			Offset:  updateID + 1,
-//			Timeout: 3,
-//		})
-//		if err != nil {
-//			return err
-//		}
-//		log.Println(updateID)
-//		log.Println(updates)
-//		if stop {
-//			log.Println("40 stop")
-//			break
-//		}
-//		var update telego.Update
-//		if len(updates) > 0 {
-//			update = updates[0]
-//		}
-//		switch {
-//		case update.Message != nil && strings.HasPrefix(update.Message.Text, "http"):
-//			targetUrl = update.Message.Text
-//			inlineKeyboard := tu.InlineKeyboard(
-//				tu.InlineKeyboardRow(
-//					tu.InlineKeyboardButton("Сделать кастомной").WithCallbackData("do-custom-link"),
-//				),
-//				tu.InlineKeyboardRow(
-//					tu.InlineKeyboardButton("Сгенерировать").WithCallbackData("do-generate-link"),
-//				),
-//			)
-//			_, err = h.Bot.SendMessage(ctx, &telego.SendMessageParams{
-//				ChatID:      chatID,
-//				Text:        `Сгенерировать ссылку или сделать кастомной?\n Кастмоная ссылка должна быть на английском длинной до 10 символов`,
-//				ReplyMarkup: inlineKeyboard,
-//			})
-//			if err != nil {
-//				return err
-//			}
-//			continue
-//		case update.CallbackQuery != nil && update.CallbackQuery.Data == "do-custom-link":
-//			_, err = h.Bot.SendMessage(ctx, &telego.SendMessageParams{
-//				ChatID: chatID,
-//				Text:   "Напишите кастомную ссылку",
-//			})
-//			if err != nil {
-//				return err
-//			}
-//			_ = h.Bot.AnswerCallbackQuery(ctx, &telego.AnswerCallbackQueryParams{
-//				CallbackQueryID: update.CallbackQuery.ID,
-//			})
-//			continue
-//		case update.CallbackQuery != nil && update.CallbackQuery.Data == "do-generate-link":
-//			shortLink = nil
-//			_ = h.Bot.AnswerCallbackQuery(ctx, &telego.AnswerCallbackQueryParams{
-//				CallbackQueryID: update.CallbackQuery.ID,
-//			})
-//			stop = true
-//			break
-//		case update.Message != nil:
-//			if len(update.Message.Text) <= 10 && helper.IsValidShortLink(update.Message.Text) {
-//				shortLink = &update.Message.Text
-//				stop = true
-//				break
-//			} else {
-//				_, err = h.Bot.SendMessage(ctx, &telego.SendMessageParams{
-//					ChatID: chatID,
-//					Text:   "Кастомная ссылка должна быть на английском и длинной до 10 символов",
-//				})
-//				if err != nil {
-//					return err
-//				}
-//				continue
-//			}
-//		}
-//	}
-//
-//	var token string
-//	token, err = h.cache.GetUserToken(strconv.Itoa(int(chatID.ID)))
-//	if err != nil {
-//		token, err = h.user.GetTokenByTgID(chatID.ID)
-//		if err != nil {
-//			return err
-//		}
-//		err = h.cache.SetUserToken(strconv.Itoa(int(chatID.ID)), token)
-//		if err != nil {
-//			return err
-//		}
-//	}
-//	ShortLink, TargetURL, CreatedAt, ExpireAt, err := h.shortener.CreateLink(token, targetUrl, shortLink)
-//	if err != nil {
-//		return err
-//	}
-//	_, err = h.Bot.SendMessage(ctx,
-//		tu.Messagef(tu.ID(chatID.ID),
-//			"Короткая ссылка: %s/l/%s\nЦелевой ресурс: %s\nСоздана: %s\nИстекает: %s",
-//			h.basePath, ShortLink, TargetURL, CreatedAt, ExpireAt))
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}
 
 func (h *Handler) CreateLinkHandler(ctx *th.Context, firstUpdate telego.Update) error {
 	chatID := tu.ID(firstUpdate.CallbackQuery.From.ID)
@@ -158,7 +43,7 @@ func (h *Handler) ChooseLinkType(ctx *th.Context, update telego.Update) error {
 	)
 	_, err := h.Bot.SendMessage(ctx, &telego.SendMessageParams{
 		ChatID:      tu.ID(chatID),
-		Text:        `Сгенерировать ссылку или сделать кастомной?\n Кастмоная ссылка должна быть на английском длинной до 10 символов`,
+		Text:        "Сгенерировать ссылку или сделать кастомной?\n Кастмоная ссылка должна быть на английском длинной до 10 символов",
 		ReplyMarkup: inlineKeyboard,
 	})
 	if err != nil {
@@ -169,10 +54,10 @@ func (h *Handler) ChooseLinkType(ctx *th.Context, update telego.Update) error {
 
 func (h *Handler) DoCustomLinkFinal(ctx *th.Context, update telego.Update) error {
 	chatID := update.Message.From.ID
-	createLinkData.ShortLink = nil
-	var token string
+	text := update.Message.Text[2:]
+	createLinkData.ShortLink = &text
 	token, err := h.cache.GetUserToken(strconv.Itoa(int(chatID)))
-	if err != nil {
+	if err != nil || token == "" {
 		token, err = h.user.GetTokenByTgID(chatID)
 		if err != nil {
 			return err
@@ -185,12 +70,36 @@ func (h *Handler) DoCustomLinkFinal(ctx *th.Context, update telego.Update) error
 	ShortLink, TargetURL, CreatedAt, ExpireAt, err := h.shortener.CreateLink(
 		token, createLinkData.TargetUrl, createLinkData.ShortLink)
 	if err != nil {
+		err = callers.Retry(func() error {
+			ShortLink, TargetURL, CreatedAt, ExpireAt, err = h.shortener.CreateLink(
+				token, createLinkData.TargetUrl, createLinkData.ShortLink)
+			if err != nil {
+				return err
+			}
+			return nil
+		}, h.maxRetries, h.baseRetryDelay)
+		h.SendMessage(ctx, chatID, "Что то пошло не так, попробуйте еще раз\n (Докер на локалке в 90% случаев не тянет, ловит истекшие таймауты)")
 		return err
 	}
+	_ = h.Bot.AnswerCallbackQuery(ctx, &telego.AnswerCallbackQueryParams{
+		CallbackQueryID: update.CallbackQuery.ID,
+	})
+	createLinkData.ShortLink = nil
+	createLinkData.TargetUrl = ""
+	resultLink := fmt.Sprintf("%s/l/%s", h.gatewayServerUrl, ShortLink)
+	msg := fmt.Sprintf(
+		`Короткая ссылка: <a href="%[1]s">%[1]s</a>
+Целевой ресурс: %s
+Создана: %s
+Истекает: %s`,
+		resultLink, TargetURL, CreatedAt, ExpireAt,
+	)
+
 	_, err = h.Bot.SendMessage(ctx,
-		tu.Messagef(tu.ID(chatID),
-			"Короткая ссылка: %s/l/%s\nЦелевой ресурс: %s\nСоздана: %s\nИстекает: %s",
-			h.basePath, ShortLink, TargetURL, CreatedAt, ExpireAt))
+		tu.Message(tu.ID(chatID), msg).
+			WithParseMode(telego.ModeHTML),
+	)
+
 	if err != nil {
 		return err
 	}
@@ -199,7 +108,7 @@ func (h *Handler) DoCustomLinkFinal(ctx *th.Context, update telego.Update) error
 
 // callback = "do-custom-link"
 func (h *Handler) DoCustomLink(ctx *th.Context, update telego.Update) error {
-	h.SendMessage(ctx, update.CallbackQuery.From.ID, "Напишите кастомную ссылку")
+	h.SendMessage(ctx, update.CallbackQuery.From.ID, "Напишите кастомную ссылку в формате `l <link>`")
 	_ = h.Bot.AnswerCallbackQuery(ctx, &telego.AnswerCallbackQueryParams{
 		CallbackQueryID: update.CallbackQuery.ID,
 	})
@@ -215,7 +124,7 @@ func (h *Handler) DoGenerateLink(ctx *th.Context, update telego.Update) error {
 
 	var token string
 	token, err := h.cache.GetUserToken(strconv.Itoa(int(chatID)))
-	if err != nil {
+	if err != nil || token == "" {
 		token, err = h.user.GetTokenByTgID(chatID)
 		if err != nil {
 			return err
@@ -230,10 +139,21 @@ func (h *Handler) DoGenerateLink(ctx *th.Context, update telego.Update) error {
 	if err != nil {
 		return err
 	}
+	createLinkData.ShortLink = nil
+	createLinkData.TargetUrl = ""
+	resultLink := fmt.Sprintf("%s/l/%s", h.gatewayServerUrl, ShortLink)
+	msg := fmt.Sprintf(
+		`Короткая ссылка: <a href="%[1]s">%[1]s</a>
+Целевой ресурс: %s
+Создана: %s
+Истекает: %s`,
+		resultLink, TargetURL, CreatedAt, ExpireAt,
+	)
+
 	_, err = h.Bot.SendMessage(ctx,
-		tu.Messagef(tu.ID(chatID),
-			"Короткая ссылка: %s/l/%s\nЦелевой ресурс: %s\nСоздана: %s\nИстекает: %s",
-			h.basePath, ShortLink, TargetURL, CreatedAt, ExpireAt))
+		tu.Message(tu.ID(chatID), msg).
+			WithParseMode(telego.ModeHTML),
+	)
 	if err != nil {
 		return err
 	}
@@ -254,12 +174,13 @@ func (h *Handler) DeleteLinkHandler(ctx *th.Context, update telego.Update) error
 			return err
 		}
 	}
-
+	fmt.Println(shortLink)
+	fmt.Println(token)
 	err = h.shortener.DeleteLink(token, shortLink)
 	if err != nil {
 		return err
 	}
-
+	h.SendMessage(ctx, chatID.ID, "Ссылка удалена")
 	_ = h.Bot.AnswerCallbackQuery(ctx, &telego.AnswerCallbackQueryParams{
 		CallbackQueryID: update.CallbackQuery.ID,
 	})

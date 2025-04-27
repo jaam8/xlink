@@ -4,13 +4,17 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
 func main() {
-	data, err := os.ReadFile("../configs/config.yaml")
+	inputPath := filepath.Join("..", "configs", "config.yaml")
+	outputPath := filepath.Join("..", "configs", ".env")
+
+	data, err := os.ReadFile(inputPath)
 	if err != nil {
 		log.Fatalf("failed to read YAML: %v", err)
 	}
@@ -32,17 +36,30 @@ func main() {
 	for i := 0; i < len(content.Content); i += 2 {
 		keyNode := content.Content[i]
 		valNode := content.Content[i+1]
-		prefix := strings.ToUpper(keyNode.Value) + "_"
 
-		flattenYAML(valNode, prefix, &env)
+		key := strings.ToUpper(keyNode.Value)
 
-		// добавляем пустую строку между секциями, кроме последней
+		switch valNode.Kind {
+		case yaml.MappingNode:
+			flattenYAML(valNode, key+"_", &env)
+		case yaml.SequenceNode:
+			items := make([]string, 0, len(valNode.Content))
+			for _, item := range valNode.Content {
+				items = append(items, item.Value)
+			}
+			env = append(env, fmt.Sprintf("%s=%s", key, strings.Join(items, ",")))
+		case yaml.ScalarNode:
+			env = append(env, fmt.Sprintf("%s=%s", key, valNode.Value))
+		default:
+			log.Printf("unsupported YAML kind: %v", valNode.Kind)
+		}
+
 		if i+2 < len(content.Content) {
 			env = append(env, "")
 		}
 	}
 
-	err = os.WriteFile("../configs/.env", []byte(strings.Join(env, "\n")), 0644)
+	err = os.WriteFile(outputPath, []byte(strings.Join(env, "\n")), 0644)
 	if err != nil {
 		log.Fatalf("failed to write .env file: %v", err)
 	}

@@ -3,6 +3,7 @@ package shortener_adapter
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -58,7 +59,9 @@ func (s *ShortenerAdapter) CreateLink(userToken, targetUrl string, shortLink *st
 	// nolint
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusCreated {
-		return "", "", "", "", err
+		log.Println(req)
+		log.Println(resp)
+		return "", "", "", "", fmt.Errorf("shortener create failed, status code: %d", resp.StatusCode)
 	}
 	if err = json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return "", "", "", "", err
