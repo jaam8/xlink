@@ -51,7 +51,7 @@ func (s *ShortenerAdapter) CreateLink(userToken, targetUrl string, shortLink *st
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", userToken)
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: s.Timeout}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", "", "", "", err
@@ -152,7 +152,7 @@ func (s *ShortenerAdapter) GetUserLinks(userToken string) ([]string, error) {
 	}
 	req.Header.Set("Authorization", userToken)
 
-	client := &http.Client{Timeout: 5 * time.Second}
+	client := &http.Client{Timeout: s.Timeout}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
