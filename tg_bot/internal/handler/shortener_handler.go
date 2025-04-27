@@ -7,6 +7,7 @@ import (
 	tu "github.com/mymmrac/telego/telegoutil"
 	"strconv"
 	"strings"
+	"xlink/common/callers"
 )
 
 type CreateLinkData struct {
@@ -56,7 +57,7 @@ func (h *Handler) DoCustomLinkFinal(ctx *th.Context, update telego.Update) error
 	text := update.Message.Text[2:]
 	createLinkData.ShortLink = &text
 	token, err := h.cache.GetUserToken(strconv.Itoa(int(chatID)))
-	if err != nil {
+	if err != nil || token == "" {
 		token, err = h.user.GetTokenByTgID(chatID)
 		if err != nil {
 			return err
@@ -66,29 +67,38 @@ func (h *Handler) DoCustomLinkFinal(ctx *th.Context, update telego.Update) error
 			return err
 		}
 	}
-	if token == "" {
-		h.SendMessage(ctx, chatID, "для начала авторизуйтесь или зарегестрируйтесь")
-	}
 	ShortLink, TargetURL, CreatedAt, ExpireAt, err := h.shortener.CreateLink(
 		token, createLinkData.TargetUrl, createLinkData.ShortLink)
 	if err != nil {
+		err = callers.Retry(func() error {
+			ShortLink, TargetURL, CreatedAt, ExpireAt, err = h.shortener.CreateLink(
+				token, createLinkData.TargetUrl, createLinkData.ShortLink)
+			if err != nil {
+				return err
+			}
+			return nil
+		}, h.maxRetries, h.baseRetryDelay)
+		h.SendMessage(ctx, chatID, "Что то пошло не так, попробуйте еще раз\n (Докер на локалке в 90% случаев не тянет, ловит истекшие таймауты)")
 		return err
 	}
-	resultLink := fmt.Sprintf("%s/l/%s", "http://localhost", ShortLink)
-	linkEsc := strings.ReplaceAll(resultLink, ".", `\.`)
-	linkEsc = strings.ReplaceAll(linkEsc, "-", `\-`)
-	TargetURLEsc := strings.ReplaceAll(TargetURL, ".", `\.`)
-	TargetURLEsc = strings.ReplaceAll(TargetURLEsc, "-", `\-`)
-	CreatedAtEsc := strings.ReplaceAll(CreatedAt, ".", `\.`)
-	CreatedAtEsc = strings.ReplaceAll(CreatedAtEsc, "-", `\-`)
-	ExpireAtEsc := strings.ReplaceAll(ExpireAt, ".", `\.`)
-	ExpireAtEsc = strings.ReplaceAll(ExpireAtEsc, "-", `\-`)
-	message := fmt.Sprintf(
-		"Короткая ссылка: [%s](%s)\nЦелевой ресурс: %s\nСоздана: %s\nИстекает: %s",
-		linkEsc, linkEsc, TargetURLEsc, CreatedAtEsc, ExpireAtEsc,
+	_ = h.Bot.AnswerCallbackQuery(ctx, &telego.AnswerCallbackQueryParams{
+		CallbackQueryID: update.CallbackQuery.ID,
+	})
+	createLinkData.ShortLink = nil
+	createLinkData.TargetUrl = ""
+	resultLink := fmt.Sprintf("%s/l/%s", h.gatewayServerUrl, ShortLink)
+	msg := fmt.Sprintf(
+		`Короткая ссылка: <a href="%[1]s">%[1]s</a>
+Целевой ресурс: %s
+Создана: %s
+Истекает: %s`,
+		resultLink, TargetURL, CreatedAt, ExpireAt,
 	)
-	_, err = h.Bot.SendMessage(ctx, tu.Message(tu.ID(chatID), message).
-		WithParseMode(telego.ModeMarkdownV2))
+
+	_, err = h.Bot.SendMessage(ctx,
+		tu.Message(tu.ID(chatID), msg).
+			WithParseMode(telego.ModeHTML),
+	)
 
 	if err != nil {
 		return err
@@ -114,7 +124,7 @@ func (h *Handler) DoGenerateLink(ctx *th.Context, update telego.Update) error {
 
 	var token string
 	token, err := h.cache.GetUserToken(strconv.Itoa(int(chatID)))
-	if err != nil {
+	if err != nil || token == "" {
 		token, err = h.user.GetTokenByTgID(chatID)
 		if err != nil {
 			return err
@@ -129,21 +139,21 @@ func (h *Handler) DoGenerateLink(ctx *th.Context, update telego.Update) error {
 	if err != nil {
 		return err
 	}
-	resultLink := fmt.Sprintf("%s/l/%s", "http://localhost", ShortLink)
-	linkEsc := strings.ReplaceAll(resultLink, ".", `\.`)
-	linkEsc = strings.ReplaceAll(linkEsc, "-", `\-`)
-	TargetURLEsc := strings.ReplaceAll(TargetURL, ".", `\.`)
-	TargetURLEsc = strings.ReplaceAll(TargetURLEsc, "-", `\-`)
-	CreatedAtEsc := strings.ReplaceAll(CreatedAt, ".", `\.`)
-	CreatedAtEsc = strings.ReplaceAll(CreatedAtEsc, "-", `\-`)
-	ExpireAtEsc := strings.ReplaceAll(ExpireAt, ".", `\.`)
-	ExpireAtEsc = strings.ReplaceAll(ExpireAtEsc, "-", `\-`)
-	message := fmt.Sprintf(
-		"Короткая ссылка: [%s](%s)\nЦелевой ресурс: %s\nСоздана: %s\nИстекает: %s",
-		linkEsc, linkEsc, TargetURLEsc, CreatedAtEsc, ExpireAtEsc,
+	createLinkData.ShortLink = nil
+	createLinkData.TargetUrl = ""
+	resultLink := fmt.Sprintf("%s/l/%s", h.gatewayServerUrl, ShortLink)
+	msg := fmt.Sprintf(
+		`Короткая ссылка: <a href="%[1]s">%[1]s</a>
+Целевой ресурс: %s
+Создана: %s
+Истекает: %s`,
+		resultLink, TargetURL, CreatedAt, ExpireAt,
 	)
-	_, err = h.Bot.SendMessage(ctx, tu.Message(tu.ID(chatID), message).
-		WithParseMode(telego.ModeMarkdownV2))
+
+	_, err = h.Bot.SendMessage(ctx,
+		tu.Message(tu.ID(chatID), msg).
+			WithParseMode(telego.ModeHTML),
+	)
 	if err != nil {
 		return err
 	}
@@ -164,12 +174,13 @@ func (h *Handler) DeleteLinkHandler(ctx *th.Context, update telego.Update) error
 			return err
 		}
 	}
-
+	fmt.Println(shortLink)
+	fmt.Println(token)
 	err = h.shortener.DeleteLink(token, shortLink)
 	if err != nil {
 		return err
 	}
-
+	h.SendMessage(ctx, chatID.ID, "Ссылка удалена")
 	_ = h.Bot.AnswerCallbackQuery(ctx, &telego.AnswerCallbackQueryParams{
 		CallbackQueryID: update.CallbackQuery.ID,
 	})
