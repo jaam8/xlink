@@ -21,7 +21,7 @@ curl -X GET "http://localhost:8080/api/v1/img/dsalakviqm/?param=browser&start_da
 | `end_date`   | string | Yes      | Конечная дата (YYYY-MM-DD).           |
 
 **Response:**
-- **200 OK** - байты с картинкой
+- **200 OK** - `html` страница с графиками
 
 **Response Codes:**
 - `200 OK` — Статистика успешно получена.
