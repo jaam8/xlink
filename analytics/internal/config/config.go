@@ -16,6 +16,8 @@ type AnalyticsConfig struct {
 	Timezone       string `yaml:"timezone" env:"TIMEZONE"`
 	BatchSize      int    `yaml:"batch_size" env:"BATCH_SIZE"`
 	FlushTimeout   int    `yaml:"flush_timeout" env:"FLUSH_TIMEOUT"`
+	MaxRetries     uint   `yaml:"max_retries" env:"MAX_RETRIES"`
+	BaseRetryDelay int    `yaml:"base_retry_delay" env:"BASE_RETRY_DELAY"`
 	MigrationsPath string `yaml:"migrations_path" env:"MIGRATIONS_PATH"`
 }
 
