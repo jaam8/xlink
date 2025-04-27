@@ -12,20 +12,26 @@ import (
 )
 
 type ShortenerAdapter struct {
-	Address     string
-	DialOptions []grpc.DialOption
-	Timeout     time.Duration
+	Address        string
+	DialOptions    []grpc.DialOption
+	Timeout        time.Duration
+	MaxRetries     uint
+	BaseRetryDelay time.Duration
 }
 
 func NewShortenerAdapter(
 	address string,
 	options []grpc.DialOption,
 	timeout time.Duration,
+	maxRetries uint,
+	baseRetryDelay time.Duration,
 ) *ShortenerAdapter {
 	return &ShortenerAdapter{
-		Address:     address,
-		Timeout:     timeout,
-		DialOptions: options,
+		Address:        address,
+		Timeout:        timeout,
+		DialOptions:    options,
+		MaxRetries:     maxRetries,
+		BaseRetryDelay: baseRetryDelay,
 	}
 }
 
@@ -50,7 +56,7 @@ func (s *ShortenerAdapter) GetLinkOwner(shortLink string) (uuid.UUID, error) {
 
 	resultChan := make(chan string, 1)
 
-	err = callers.Timeout(func() error {
+	err = callers.Retry(func() error {
 		request := &shortener.GetLinkOwnerByShortLinkRequest{ShortLink: shortLink}
 		response, grpcErr := (*clientPointer).GetLinkOwnerByShortLink(context.Background(), request)
 		if grpcErr != nil {
@@ -58,7 +64,7 @@ func (s *ShortenerAdapter) GetLinkOwner(shortLink string) (uuid.UUID, error) {
 		}
 		resultChan <- response.GetLinkOwner()
 		return nil
-	}, s.Timeout)
+	}, s.MaxRetries, s.BaseRetryDelay)
 
 	if err != nil {
 		log.Printf("error in timeout gRPC caller: %v", err)
