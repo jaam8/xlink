@@ -71,6 +71,8 @@ func main() {
 		fmt.Sprintf("%s:%s", shortenerCfg.UpstreamNames, shortenerCfg.UpstreamPorts),
 		[]grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())},
 		time.Millisecond*time.Duration(shortenerCfg.Timeouts),
+		analyticsCfg.MaxRetries,
+		time.Second*time.Duration(analyticsCfg.BaseRetryDelay),
 	)
 
 	Server := server.NewService(redisAdapter, clickhouseAdapter, kafkaAdapter, shortenerAdapter)
