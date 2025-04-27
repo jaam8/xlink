@@ -5,6 +5,7 @@ import (
 	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
 	"strconv"
+	"xlink/common/callers"
 )
 
 func (h *Handler) LoginHandler(ctx *th.Context, firstUpdate telego.Update) error {
@@ -18,7 +19,7 @@ func (h *Handler) LoginHandler(ctx *th.Context, firstUpdate telego.Update) error
 	if err != nil {
 		return err
 	}
-
+	var tgID *int64
 	// wait for user input
 	for {
 		updates, err := h.Bot.GetUpdates(ctx, &telego.GetUpdatesParams{
@@ -32,7 +33,19 @@ func (h *Handler) LoginHandler(ctx *th.Context, firstUpdate telego.Update) error
 			if update.Message != nil {
 				apiKey := update.Message.Text
 
-				_, tgID, err := h.user.LoginUser(apiKey)
+				_, tgID, err = h.user.LoginUser(apiKey)
+				if err != nil {
+					err = callers.Retry(func() error {
+						_, tgID, err = h.user.LoginUser(apiKey)
+						if err != nil {
+							return err
+						}
+						return nil
+					}, h.maxRetries, h.baseRetryDelay)
+					if err != nil {
+						h.SendMessage(ctx, update.Message.From.ID, "Что-то пошло не так, попробуйте позже\n(Докер на локалке в 90% случаев не тянет, ловит истекшие таймауты)")
+					}
+				}
 				if err != nil {
 					return err
 				}
