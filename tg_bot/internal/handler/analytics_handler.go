@@ -70,21 +70,10 @@ func (h *Handler) HandleMetricSelection(ctx *th.Context, update telego.Update) e
 	}
 
 	if metric == "clicks-done" {
-		selected := h.userMetricSelections[userID]
-
-		selectedStrings := make([]string, 0, len(selected))
-		for metricName := range selected {
-			selectedStrings = append(selectedStrings, strings.TrimPrefix(metricName, "clicks-by-"))
-		}
-
-		_, err := h.Bot.SendMessage(ctx, &telego.SendMessageParams{
-			ChatID: tu.ID(userID),
-			Text: fmt.Sprintf(
-				"Ты выбрал: %v. Ввети букву d, дату начала и окончания выборки через пробел (как `d 2025-01-01 %s`)",
-				selectedStrings,
-				time.Now().Format(time.DateOnly),
-			),
-		})
+		_, err := h.Bot.SendMessage(ctx,
+			tu.Messagef(tu.ID(userID), "Введи букву d, дату начала и окончания выборки через пробел \\(как `d 2025-04-01 %s`\\)",
+				time.Now().Add(24*time.Hour).Format(time.DateOnly)).WithParseMode(telego.ModeMarkdownV2),
+		)
 		if err != nil {
 			return err
 		}
@@ -189,8 +178,12 @@ func (h *Handler) ChooseDateToRenderHandler(ctx *th.Context, update telego.Updat
 		param := strings.TrimPrefix(clickByParamShortLinkString, "clicks-by-")
 
 		imageUrl := h.renderer.GetImageUrl(shortLink, token, param, startDate, endDate)
-		fmt.Println(imageUrl)
-		h.SendImage(ctx, userID, imageUrl)
+		imageUrl = strings.TrimPrefix(imageUrl, "http://nginx:80")
+		h.Bot.SendMessage(ctx, &telego.SendMessageParams{
+			ChatID: tu.ID(userID),
+			Text:   fmt.Sprintf("Ссылка на график %s", h.gatewayServerUrl+imageUrl),
+		})
+		//h.SendImage(ctx, userID, imageUrl)
 	}
 
 	return nil
