@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 FROM golang:1.24-alpine AS builder
-LABEL authors="chempik1234"
+LABEL authors="chempik1234, jaam8"
 
 WORKDIR /build
 
@@ -18,14 +18,13 @@ COPY configs/ ./configs/
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -o user-service renderer/cmd/main.go
+    go build -o renderer-service renderer/cmd/main.go
 
 FROM gcr.io/distroless/base-debian12 AS runner
 
 WORKDIR /app
 
 COPY --from=builder /build/configs/config.yaml ../configs/config.yaml
-COPY --from=builder /build/user-service .
+COPY --from=builder /build/renderer-service .
 
-CMD ["./user-service"]
+CMD ["./renderer-service"]
