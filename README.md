@@ -52,6 +52,7 @@ xlink — сокращатель ссылок с аналитикой
 
 3. Запустите проект с Docker Compose:
    ```bash
+   cd build/docker
    docker compose up
    ```
    
