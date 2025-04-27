@@ -7,6 +7,9 @@ import (
 )
 
 type BotConfig struct {
+	MaxRetries        uint   `yaml:"max_retries" env:"MAX_RETRIES" env-default:"3"`
+	BaseRetryDelay    int    `yaml:"base_retry_delay_second" env:"BASE_RETRY_DELAY_SECOND" env-default:"1"`
+	GatewayServerUrl  string `yaml:"local_server_url" env:"LOCAL_SERVER_URL"`
 	BotToken          string `yaml:"bot_token" env:"BOT_TOKEN"`
 	Host              string `yaml:"host" env:"HOST" env-default:"tg_bot"`
 	Port              string `yaml:"port" env:"PORT" env-default:"50055"`
