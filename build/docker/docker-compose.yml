@@ -119,10 +119,8 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres
-#    expose:
-#      - ${POSTGRES_PORT}
-    ports:
-      - "${POSTGRES_PORT}:5432"
+    expose:
+      - ${POSTGRES_PORT}
     env_file:
       - ../../configs/.env
     environment:
