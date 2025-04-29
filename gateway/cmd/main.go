@@ -4,13 +4,18 @@ import (
 	"context"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	_ "github.com/gofiber/fiber/v2/utils"
 	"github.com/gofiber/template/html/v2"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"os"
 	"os/signal"
 	"time"
+	"xlink/common/prometheus"
+
 	"xlink/common/grpc/pool"
 	"xlink/common/logger"
 	"xlink/gateway/internal/config"
@@ -147,9 +152,12 @@ func main() {
 	htmlEngine := html.New("./web/html", ".html")
 	//endregion html
 
+	prometheus.InitMetrics()
+
 	//region routing
 	app := fiber.New(fiber.Config{Views: htmlEngine})
 	app.Use(loggingMiddleware)
+	app.Use(middlewares.MetricsMiddlewareFiber())
 
 	//region api
 	apiGroup := app.Group("/api")
@@ -252,6 +260,8 @@ func main() {
 
 	//endregion v1
 	//endregion api
+
+	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 	//endregion routing
 
 	go func() {
