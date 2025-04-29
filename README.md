@@ -24,6 +24,7 @@ xlink — сокращатель ссылок с аналитикой
 - [Endpoints: User Service](./docs/endpoints/user_service.md) - Документация по API эндпоинтам сервиса `user_service`
 - [Endpoints: Renderer](./docs/endpoints/renderer.md) - Документация по API эндпоинтам сервиса `renderer`
 - [Architecture](./docs/architecture.md) - Архитектура проекта
+- [Monitoring](./docs/monitoring.md) - Настройка мониторинга с помощью `Prometheus` и `Grafana`
 
 ## Требования
 - [Go 1.24](https://go.dev/)
@@ -82,7 +83,9 @@ xlink
 │   └── tests        
 ├── build            # файлы для сборки и деплоя в Docker
 │   ├── docker       
-│   └── entry_nginx  
+│   ├── entry_nginx       
+│   ├── grafana       
+│   └── prometheus  
 ├── common           # общие библиотеки и утилиты
 │   ├── callers      
 │   ├── clickhouse   
@@ -90,14 +93,16 @@ xlink
 │   ├── grpc         
 │   ├── kafka        
 │   ├── logger       
-│   ├── postgres     
+│   ├── postgres 
+│   ├── prometheus
 │   └── redis        
 ├── configs          # примеры и шаблоны конфигов
 ├── docs             # документация по API и девопсу
 │   ├── endpoints    
 │   ├── architecture.md    
 │   ├── configs.md   
-│   └── for_dev.md   
+│   ├── for_dev.md   
+│   └── monitoring.md   
 ├── gateway          # API Gateway 
 │   ├── cmd          
 │   ├── internal     
