@@ -1,0 +1,48 @@
+{
+  "id": null,
+  "title": "Go HTTP Metrics",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "HTTP Requests Total",
+      "targets": [
+        {
+          "expr": "sum by (method, path) (http_requests_total)",
+          "legendFormat": "{{method}} {{path}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+    },
+  {
+    "type": "timeseries",
+    "title": "HTTP Requests per Second",
+    "targets": [
+      {
+        "expr": "sum by (method, route) (rate(http_duration_seconds_count[1m]))",
+        "legendFormat": "{{method}} {{route}}",
+        "refId": "A"
+      }
+    ],
+    "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+  },
+  {
+    "type": "timeseries",
+    "title": "HTTP Duration (p95)",
+    "targets": [
+      {
+        "expr": "histogram_quantile(0.95, sum by (le, method, route) (rate(http_duration_seconds_bucket[1m])))",
+        "legendFormat": "{{method}} {{route}}",
+        "refId": "B"
+      }
+    ],
+    "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+  }
+  ],
+
+
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "10s"
+}
